@@ -34,7 +34,7 @@ export default function TintCard({ product, tint, label, compact = false, eager 
     <article data-record={`products:${product.id}`} data-tilt=""
       className={`relative flex flex-col overflow-hidden rounded ${TINTS[tint % TINTS.length]} ${compact ? "" : "min-h-full"}`}>
       <Link to={`/shop/${product.id}`} data-testid={`tint-${product.id}`} className="flex flex-1 flex-col">
-        <span className={`flex flex-1 flex-col items-start gap-3 ${compact ? "p-5" : "p-5 pb-8 lg:p-7 lg:pb-10"}`}>
+        <span className={`flex flex-1 flex-col items-start gap-3 ${compact ? "p-5" : "p-5 pb-6 lg:p-7 lg:pb-7"}`}>
           {label && <span className="rounded-full bg-ground px-3 py-1 text-xs text-ink">{label}</span>}
           <span className={`leading-[1.08] tracking-tight text-ink ${compact ? "text-xl" : "text-[1.75rem] lg:text-[2rem]"}`}>
             <span className="font-light">{product.brand} </span>
