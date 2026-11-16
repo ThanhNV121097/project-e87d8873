@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { T } from "../editable";
+import { T, useContent } from "../editable";
+import { Picture } from "../picture";
 import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
 import { useCart } from "../lib/cart";
@@ -29,11 +30,22 @@ export default function Checkout() {
   const lines = demo && cart.lines.length === 0 ? EXAMPLE_LINES : cart.lines;
   const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const fee = delivery === "courier" ? shop?.delivery_fee ?? 0 : 0;
+  const image = useContent("pages.checkout.image");
+  const imageAlt = useContent("pages.checkout.image_alt");
   return (
     <div className="pb-8">
-      <Bleed className="bg-surface pb-10 pt-10">
-        <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.checkout.heading" /></h1>
-        <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
+      {/* The head on a band to both screen edges, the workshop's close-up
+          off its right edge: every bike is built before it leaves. */}
+      <Bleed className="bg-surface lg:grid lg:grid-cols-12 lg:gap-12">
+        {image && (
+          <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:mx-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+            <Picture src={image} alt={imageAlt} width={1280} height={853} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="pb-10 pt-10 lg:col-span-8 lg:col-start-1 lg:row-start-1">
+          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.checkout.heading" /></h1>
+          <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
+        </div>
       </Bleed>
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
         <OrderForm className="min-w-0 flex-1" lines={lines} subtotal={subtotal} fee={fee}
