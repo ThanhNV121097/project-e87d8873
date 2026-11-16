@@ -10,6 +10,7 @@ import type { Department, Faq, Product, Service, Shot } from "../lib/shop";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
+import { TINTS } from "../components/TintCard";
 import Weights from "../components/Weights";
 
 const KINDS = ["bikes", "types", "services", "faqs", "gallery"] as const;
@@ -39,6 +40,7 @@ export default function Search() {
   const placeholder = useContent("pages.search.placeholder");
   const filterLabel = useContent("pages.search.filter");
   const suggestions = useList<string>("pages.search.suggestions");
+  const image = useContent("pages.search.image");
 
   const bikes = useCollection<Product>("products", {
     where: { status: "live" }, q, pageSize: BIKES_SHOWN,
@@ -77,14 +79,14 @@ export default function Search() {
         )}
       </section>
 
-      <form role="search" onSubmit={submit}
-        className="mt-8 flex items-center gap-3 rounded-full border border-ink py-1.5 pl-5 pr-1.5 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink">
-        <Icon name="search" size={20} className="text-ink-soft" />
+      {/* The field is the pill: its own edge, the dark button set inside its line. */}
+      <form role="search" onSubmit={submit} className="relative mt-8">
+        <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ink-soft"><Icon name="search" size={20} /></span>
         <input id="site-search" data-testid="search-page-input" value={text} onChange={(e) => setText(e.target.value)}
           aria-label={label} placeholder={placeholder}
-          className="min-w-0 flex-1 appearance-none bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-soft lg:text-lg" />
+          className="w-full appearance-none text-ellipsis rounded-full border border-ink bg-ground py-4 pl-12 pr-36 text-base text-ink placeholder:text-ink-soft focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink lg:text-lg" />
         <button type="submit" data-testid="search-go"
-          className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-90">
+          className="absolute right-1.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink hover:opacity-90">
           <T k="pages.search.go" /><Icon name="arrow" size={16} />
         </button>
       </form>
@@ -102,17 +104,46 @@ export default function Search() {
         </nav>
       )}
 
+      {/* Nothing typed yet: what people search for, a riding photograph off
+          the right edge, and the four riding types to start from instead. */}
       {!on && (
-        <div className="mt-12 flex flex-col items-start gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:px-10">
-          <T k="pages.search.prompt" as="p" className="text-xl text-ink" />
-          <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
-          <div className="flex flex-wrap gap-2 text-sm">
-            {suggestions.map((s, i) => (
-              <Link key={s} to={`/search?q=${encodeURIComponent(s)}`} data-testid={`search-suggest-${i}`}
-                className="rounded-full bg-ground px-4 py-2 text-ink hover:bg-accent hover:text-accent-ink">{s}</Link>
-            ))}
+        <>
+          <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
+            <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:col-span-7 lg:px-10">
+              <T k="pages.search.prompt" as="p" className="text-[length:var(--size-h2)] font-light leading-tight text-ink" />
+              <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
+              <div className="flex flex-wrap gap-2 text-sm">
+                {suggestions.map((s, i) => (
+                  <Link key={s} to={`/search?q=${encodeURIComponent(s)}`} data-testid={`search-suggest-${i}`}
+                    className="rounded-full bg-ground px-4 py-2 text-ink hover:bg-accent hover:text-accent-ink">{s}</Link>
+                ))}
+              </div>
+            </div>
+            {image && (
+              <div className="overflow-hidden rounded lg:col-span-5 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
+                <Picture src={image} alt="" width={1280} height={853} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
+              </div>
+            )}
           </div>
-        </div>
+          {types.items.length > 0 && (
+            <section className="pt-16">
+              <h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.search.start" /></h2>
+              <Grid max={4} phone={1}>
+                {types.items.map((d, i) => (
+                  <Link key={d.id} to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`search-type-${d.id}`}
+                    className={`group flex h-full flex-col gap-3 rounded p-6 ${TINTS[i % TINTS.length]}`}>
+                    <span className="text-[1.75rem] font-bold leading-none tracking-tight text-ink">{d.name}</span>
+                    <span className="flex-1 text-sm leading-relaxed text-ink">{d.line}</span>
+                    <span className="flex items-center justify-between gap-4 border-t border-line pt-3 text-xs text-ink-soft">
+                      {d.terrain}
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-ink"><Icon name="arrow" size={15} /></span>
+                    </span>
+                  </Link>
+                ))}
+              </Grid>
+            </section>
+          )}
+        </>
       )}
 
       {on && !loading && sum === 0 && (
