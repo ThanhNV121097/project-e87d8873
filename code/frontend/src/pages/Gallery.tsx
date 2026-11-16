@@ -23,14 +23,23 @@ export default function Gallery() {
   return (
     <div className="pb-8 pt-10">
       <section className="flex flex-col gap-10 lg:flex-row lg:items-start">
-        <div className="lg:w-4/12 lg:pt-6">
-          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.gallery.heading" /></h1>
-          <T k="pages.gallery.lead" as="p" className="mt-5 max-w-[40ch] text-sm leading-relaxed text-ink-soft" />
-          <p className="mt-6 text-sm text-ink-soft"><span className="text-2xl font-bold tabular-nums text-ink">{total}</span> <T k="pages.gallery.count" /></p>
+        <div className="flex flex-col justify-between gap-10 lg:w-4/12 lg:self-stretch lg:pb-24 lg:pt-6">
+          <div>
+            <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.gallery.heading" /></h1>
+            <T k="pages.gallery.lead" as="p" className="mt-5 max-w-[40ch] text-sm leading-relaxed text-ink-soft" />
+          </div>
+          <div>
+            <p className="text-sm text-ink-soft"><span className="text-2xl font-bold tabular-nums text-ink">{total}</span> <T k="pages.gallery.count" /></p>
+            <nav aria-label="Riding types" className="mt-5 flex flex-wrap gap-2 text-sm">
+              {types.map((d) => (
+                <Link key={d.id} to={`/shop?category=${d.id}`} className="rounded-full border border-ink px-4 py-1.5 text-ink hover:bg-accent hover:text-accent-ink">{d.name}</Link>
+              ))}
+            </nav>
+          </div>
         </div>
         {first && (
           <figure data-record={`gallery:${first.id}`} className="lg:w-8/12">
-            <div className="overflow-hidden rounded">
+            <div className="overflow-hidden rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
               <Picture src={first.image} alt={first.title} width={1280} height={853} loading="eager" motion="parallax" className="aspect-[3/2] w-full object-cover" />
             </div>
             <Caption shot={first} type={typeOf(first.type)} />
