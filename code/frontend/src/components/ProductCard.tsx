@@ -26,11 +26,11 @@ export default function ProductCard({ product }: { product: Product }) {
         <ProductImage src={product.image} hover={product.image_back} alt={`${product.brand} ${product.name}`} aspect="4/3"
           className="rounded border border-line" />
         <span className="mt-4 block text-xs uppercase tracking-[0.14em] text-ink-soft">{product.brand}{type ? ` · ${type}` : ""}</span>
-        <span className="mt-1.5 flex items-baseline justify-between gap-4">
+        <span className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
           <span className="text-base font-semibold text-ink underline-offset-4 group-hover:underline">{product.name}</span>
           <span className="shrink-0 text-base font-bold tabular-nums text-ink">{formatPrice(product.price)}</span>
         </span>
-        <span className="mt-1 flex items-baseline justify-between gap-4 text-sm text-ink-soft">
+        <span className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 text-sm text-ink-soft">
           <span>{product.fact}</span>
           {product.was !== undefined && product.was > product.price && (
             <span className="shrink-0 tabular-nums line-through">{formatPrice(product.was)}</span>
