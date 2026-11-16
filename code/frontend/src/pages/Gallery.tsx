@@ -3,6 +3,7 @@ import { T } from "../editable";
 import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
 import { Picture } from "../picture";
+import { useHashScroll } from "../lib/hash";
 import type { Department, Shot } from "../lib/shop";
 import Icon from "../components/Icon";
 import Weights from "../components/Weights";
@@ -20,6 +21,7 @@ export default function Gallery() {
   const types = useCollection<Department>("categories", { pageSize: 12 }).items;
   const [first, ...rest] = items;
   const typeOf = (id?: string) => types.find((d) => d.id === id);
+  useHashScroll(items.length > 0);
   return (
     <div className="pb-8 pt-10">
       <section className="flex flex-col gap-10 lg:flex-row lg:items-start">
@@ -38,7 +40,7 @@ export default function Gallery() {
           </div>
         </div>
         {first && (
-          <figure data-record={`gallery:${first.id}`} className="lg:w-8/12">
+          <figure id={`shot-${first.id}`} data-record={`gallery:${first.id}`} className="scroll-mt-24 lg:w-8/12">
             <div className="overflow-hidden rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
               <Picture src={first.image} alt={first.title} width={1280} height={853} loading="eager" motion="parallax" className="aspect-[3/2] w-full object-cover" />
             </div>
@@ -51,7 +53,7 @@ export default function Gallery() {
         {rest.map((s, i) => {
           const wide = rest.length % 2 === 1 && i === rest.length - 1;
           return (
-            <figure key={s.id} data-record={`gallery:${s.id}`} className={wide ? "md:col-span-2" : ""}>
+            <figure key={s.id} id={`shot-${s.id}`} data-record={`gallery:${s.id}`} className={`scroll-mt-24 ${wide ? "md:col-span-2" : ""}`}>
               <div className="overflow-hidden rounded">
                 <Picture src={s.image} alt={s.title} width={1280} height={853} className={`w-full object-cover ${wide ? "aspect-[3/2] md:aspect-[21/9]" : "aspect-[3/2]"}`} />
               </div>
