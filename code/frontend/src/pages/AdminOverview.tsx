@@ -30,7 +30,8 @@ export default function AdminOverview() {
       stats={[
         { label: useContent("pages.admin.overview.products"), value: products.length, icon: "tag", to: "/admin/products",
           note: `${drafts} ${useContent("pages.admin.overview.drafts")}` },
-        { label: useContent("pages.admin.overview.kinds"), value: kinds.total, icon: "grid", to: "/admin/kinds" },
+        { label: useContent("pages.admin.overview.kinds"), value: kinds.total, icon: "grid", to: "/admin/kinds",
+          note: useContent("pages.admin.overview.kinds_note") },
         { label: useContent("pages.admin.overview.low"), value: low.length, icon: "alert", to: "/admin/products",
           note: useContent("pages.admin.overview.low_note") },
         { label: useContent("pages.admin.overview.worth"), value: formatPrice(worth), icon: "cash",
