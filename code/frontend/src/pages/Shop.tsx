@@ -49,7 +49,9 @@ export default function Shop() {
   const sortLabels = [useContent("pages.shop.sort_default"), useContent("pages.shop.sort_low"), useContent("pages.shop.sort_high")];
   const wheel29 = useContent("pages.shop.wheel_29");
   const wheelMixed = useContent("pages.shop.wheel_mixed");
-  const bandLabels = PRICE_BANDS.map((b) => useContent(`pages.shop.band.${b.id}`));
+  const bandWords = useContent<Record<string, string>>("pages.shop.band");
+  const bandLabels = PRICE_BANDS.map((b) => bandWords?.[b.id] ?? b.id);
+  const sortLabel = useContent("pages.shop.sort");
   const pick = (id: string) => { t.set("category", chosen.length === 1 && chosen[0] === id ? [] : [id]); setShown(PAGE); };
   return (
     <div className="pb-8 pt-10">
@@ -71,7 +73,7 @@ export default function Shop() {
           <p data-testid="shop-count" className="text-sm text-ink-soft">
             <span className="text-2xl font-bold tabular-nums text-ink">{found.length}</span>{" "}<T k="pages.shop.count" />
           </p>
-          <Select aria-label={useContent("pages.shop.sort")} value={t.sort} onChange={(v) => t.toggleSort(v) }
+          <Select aria-label={sortLabel} value={t.sort} onChange={(v) => t.set("sort", v)}
             options={[{ value: "", label: sortLabels[0] }, { value: "price", label: sortLabels[1] }, { value: "-price", label: sortLabels[2] }]}
             className="w-52" />
         </div>
