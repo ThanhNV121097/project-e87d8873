@@ -38,11 +38,12 @@ export default function ProductCard({ product }: { product: Product }) {
         </span>
       </Link>
       <StockLine stock={product.stock ?? 0} className="mt-3" />
-      <Link to={`/shop/${product.id}#sizes`}
-        className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink py-2.5 text-sm font-medium text-ink hover:bg-accent hover:text-accent-ink">
-        <span className="pt-4" />
-        <T k={out ? "card.ask" : "card.choose"} /><Icon name="next" size={15} />
-      </Link>
+      <div className="mt-4 flex flex-1 items-end">
+        <Link to={`/shop/${product.id}#sizes`}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink py-2.5 text-sm font-medium text-ink hover:bg-accent hover:text-accent-ink">
+          <T k={out ? "card.ask" : "card.choose"} /><Icon name="next" size={15} />
+        </Link>
+      </div>
       <SaveButton id={product.id} name={product.name} className="absolute right-3 top-3" />
     </article>
   );
