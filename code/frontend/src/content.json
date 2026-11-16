@@ -488,6 +488,7 @@
         "light": "Search",
         "tail": ""
       },
+      "image": "/images/gallery-ridge-view.jpg",
       "kinds": {
         "bikes": "Bikes",
         "faqs": "Questions",
@@ -508,6 +509,11 @@
       "placeholder": "A model, a job or a question — Stance, brake bleed, size",
       "prompt": "What are you looking for?",
       "prompt_line": "A bike, a part of one, a workshop job or a question about buying — try one of these.",
+      "start": {
+        "bold": "a riding type",
+        "light": "Or start from",
+        "tail": ""
+      },
       "suggestions": [
         "Stance",
         "E-MTB",
