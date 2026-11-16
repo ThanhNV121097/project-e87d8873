@@ -14,8 +14,8 @@ const STEPS: IconName[] = ["done", "phone", "settings", "shipping"];
 
 /**
  * AFTER THE ORDER: the answer first and largest — the order is in — with its
- * number; then the four steps on one line with where it is now (on a butter
- * card); then what was ordered with its picture, where it goes and how it is
+ * number; then the four steps on one line on the shop's navy, run to the
+ * screen's edge, where it is now lit in butter; then what was ordered with its picture, where it goes and how it is
  * paid, and who to ask.
  */
 export default function CheckoutDone() {
@@ -50,13 +50,13 @@ export default function CheckoutDone() {
         </dl>
       </div>
 
-      <ol className="-mx-[var(--gutter)] mt-12 grid gap-6 bg-[var(--tint-2)] p-6 sm:mx-0 sm:grid-cols-4 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none lg:p-10 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+2.5rem)]">
+      <ol className="-mx-[var(--gutter)] mt-12 grid gap-6 bg-accent p-6 sm:mx-0 sm:grid-cols-4 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none lg:p-10 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+2.5rem)]">
         {STEPS.map((icon, i) => (
           <li key={icon} className="flex items-start gap-3 sm:flex-col">
-            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 0 ? "bg-accent text-accent-ink" : "bg-ground text-ink"}`}><Icon name={icon} size={19} /></span>
+            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 0 ? "bg-[var(--tint-2)] text-ink" : "border border-accent-ink/40 text-accent-ink"}`}><Icon name={icon} size={19} /></span>
             <span>
-              <T k={`pages.done.steps.${i}.title`} as="span" className="block text-sm font-semibold text-ink" />
-              <T k={`pages.done.steps.${i}.line`} as="span" className="mt-1 block text-xs leading-relaxed text-ink-soft" />
+              <T k={`pages.done.steps.${i}.title`} as="span" className="block text-sm font-semibold text-accent-ink" />
+              <T k={`pages.done.steps.${i}.line`} as="span" className="mt-1 block text-xs leading-relaxed text-accent-ink/80" />
             </span>
           </li>
         ))}
