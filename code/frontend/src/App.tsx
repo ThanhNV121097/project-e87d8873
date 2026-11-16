@@ -11,8 +11,11 @@ import AdminProduct from "./pages/AdminProduct";
 import AdminProducts from "./pages/AdminProducts";
 import AdminSignIn from "./pages/AdminSignIn";
 import Bag from "./pages/Bag";
+import About from "./pages/About";
 import Checkout from "./pages/Checkout";
+import CheckoutDone from "./pages/CheckoutDone";
 import Contact from "./pages/Contact";
+import Gallery from "./pages/Gallery";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Shop from "./pages/Shop";
@@ -59,6 +62,9 @@ export default function App() {
         <Route path="/shop/:id" element={<Product />} />
         <Route path="/bag" element={<Bag />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/done" element={<CheckoutDone />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Route>
       <Route path="/admin/sign-in" element={<AdminSignIn />} />
