@@ -91,9 +91,9 @@
   "header": {
     "account": "Shop sign-in",
     "bag": "Bag",
-    "search": "Search bikes",
+    "search": "Search the shop",
     "search_go": "Search",
-    "search_hint": "Model, brand or riding type — Stance, Liv, e-MTB"
+    "search_hint": "Bikes, workshop jobs, questions — Stance, brake bleed, size"
   },
   "hero": {
     "cta": {
@@ -132,7 +132,7 @@
     },
     "promises": [
       {
-        "bold": "Delivered built",
+        "bold": "Delivered across Vietnam",
         "light": ""
       },
       {
@@ -411,7 +411,7 @@
         "light": "Where",
         "tail": "go"
       },
-      "lead": "Climbs to the pass, rock on the way down, dirt roads at dusk — the riding our customers buy their bikes for.",
+      "lead": "Climbs to the pass, rock on the way down, roots under the trees — the riding our customers buy their bikes for.",
       "title": "Gallery"
     },
     "home": {
@@ -474,6 +474,49 @@
       "title": "A bike from Đèo Bikes",
       "to_bag": "See your bag",
       "warranty": "years of frame warranty from the shop"
+    },
+    "search": {
+      "all": "Everything",
+      "ask": "Ask the shop",
+      "browse": "See all bikes",
+      "count": "results",
+      "description": "Search the bikes, riding types, workshop jobs and prices, buying questions and gallery of Đèo Bikes.",
+      "filter": "Show results from",
+      "go": "Search",
+      "heading": {
+        "bold": "the shop",
+        "light": "Search",
+        "tail": ""
+      },
+      "kinds": {
+        "bikes": "Bikes",
+        "faqs": "Questions",
+        "gallery": "Gallery",
+        "services": "Workshop",
+        "types": "Riding types"
+      },
+      "lead": "Bikes and their specifications, workshop jobs and prices, the questions riders ask before buying, and the gallery.",
+      "more": {
+        "bikes": "Narrow by size, wheel and price",
+        "faqs": "All questions",
+        "gallery": "The whole gallery",
+        "services": "All workshop prices",
+        "types": "All bikes by type"
+      },
+      "none": "Nothing in the shop matches",
+      "none_line": "Try a shorter word or another spelling — or send us the question and a rider answers.",
+      "placeholder": "A model, a job or a question — Stance, brake bleed, size",
+      "prompt": "What are you looking for?",
+      "prompt_line": "A bike, a part of one, a workshop job or a question about buying — try one of these.",
+      "suggestions": [
+        "Stance",
+        "E-MTB",
+        "Brake bleed",
+        "Size",
+        "Delivery",
+        "Carbon"
+      ],
+      "title": "Search"
     },
     "shop": {
       "all": "All types",
