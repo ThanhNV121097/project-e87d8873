@@ -10,7 +10,6 @@ import type { Department, Faq, Product, Service, Shot } from "../lib/shop";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
 import ProductCard, { cardViews } from "../components/ProductCard";
-import { TINTS } from "../components/TintCard";
 import Weights from "../components/Weights";
 
 const KINDS = ["bikes", "types", "services", "faqs", "gallery"] as const;
@@ -209,14 +208,15 @@ export default function Search() {
 }
 
 /**
- * Nothing typed yet: what people search for on a tinted panel, and the four
- * riding types to start from.
+ * Nothing typed yet: what people search for on a tinted panel at the left,
+ * and beside it the four riding types to start from instead, each a row with
+ * the ground it is for and an arrow.
  */
 function StartHere({ types }: { types: Department[] }) {
   const suggestions = useList<string>("pages.search.suggestions");
   return (
-    <>
-        <div className="mt-12 flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:px-10">
+    <div className="mt-12 flex flex-col gap-8 lg:flex-row lg:items-stretch">
+        <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:w-7/12 lg:px-10">
           <T k="pages.search.prompt" as="p" className="text-[length:var(--size-h2)] font-light leading-tight text-ink" />
           <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
           <div className="flex flex-wrap gap-2 text-sm">
@@ -227,24 +227,25 @@ function StartHere({ types }: { types: Department[] }) {
           </div>
         </div>
       {types.length > 0 && (
-        <section className="pt-16">
-          <h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.search.start" /></h2>
-          <Grid max={4} phone={1}>
-            {types.map((d, i) => (
-              <Link key={d.id} to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`search-type-${d.id}`}
-                className={`group flex h-full flex-col gap-3 rounded p-6 ${TINTS[i % TINTS.length]}`}>
-                <span className="text-[1.75rem] font-bold leading-none tracking-tight text-ink">{d.name}</span>
-                <span className="flex-1 text-sm leading-relaxed text-ink">{d.line}</span>
-                <span className="flex items-center justify-between gap-4 border-t border-line pt-3 text-xs text-ink-soft">
-                  {d.terrain}
+        <section className="flex flex-col rounded bg-surface px-6 py-8 lg:flex-1 lg:px-8">
+          <h2 className="text-xl leading-tight text-ink"><Weights k="pages.search.start" /></h2>
+          <ul className="mt-4">
+            {types.map((d) => (
+              <li key={d.id} className="border-b border-line last:border-b-0">
+                <Link to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`search-type-${d.id}`}
+                  className="group flex items-center justify-between gap-4 py-3">
+                  <span>
+                    <span className="block font-semibold text-ink underline-offset-4 group-hover:underline">{d.name}</span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">{d.terrain}</span>
+                  </span>
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-ink"><Icon name="arrow" size={15} /></span>
-                </span>
-              </Link>
+                </Link>
+              </li>
             ))}
-          </Grid>
+          </ul>
         </section>
       )}
-    </>
+    </div>
   );
 }
 
