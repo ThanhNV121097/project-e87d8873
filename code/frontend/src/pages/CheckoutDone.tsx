@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { T } from "../editable";
+import { T, useContent } from "../editable";
+import { Picture } from "../picture";
 import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
 import { useDemo } from "../lib/demo";
@@ -24,35 +25,48 @@ export default function CheckoutDone() {
   const demo = useDemo();
   const order = lastOrder() ?? (demo ? EXAMPLE_ORDER : null);
   const shop = useCollection<ShopInfo>("shop", { pageSize: 1 }).items[0];
+  const image = useContent("pages.done.image");
+  const imageAlt = useContent("pages.done.image_alt");
+  // The page's own photograph, off the right edge beside the words (on a
+  // phone, a strip above them, edge to edge) — the same in both states.
+  const photo = image ? (
+    <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:mx-0 lg:w-5/12 lg:shrink-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+      <Picture src={image} alt={imageAlt} width={1280} height={960} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+    </div>
+  ) : null;
   if (!order) {
     return (
       <div className="pb-8">
         {/* Nothing ordered on this browser yet: said once, on the shop's navy
             run to both screen edges, with the one way on. */}
-        <Bleed className="flex flex-col items-start gap-6 bg-accent py-20 text-accent-ink">
-          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-accent-ink"><Weights k="pages.done.none" /></h1>
-          <T k="pages.done.none_line" as="p" className="max-w-[52ch] text-sm text-accent-ink/80" />
-          <Link to="/shop" className="rounded-full bg-ground px-7 py-3 text-sm font-medium text-ink hover:opacity-90"><T k="pages.bag.browse" /></Link>
+        <Bleed className="bg-accent text-accent-ink lg:flex lg:flex-row-reverse lg:gap-12">
+          {photo}
+          <div className="flex flex-col items-start gap-6 py-16 lg:flex-1 lg:py-20">
+            <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-accent-ink"><Weights k="pages.done.none" /></h1>
+            <T k="pages.done.none_line" as="p" className="max-w-[52ch] text-sm text-accent-ink/80" />
+            <Link to="/shop" className="rounded-full bg-ground px-7 py-3 text-sm font-medium text-ink hover:opacity-90"><T k="pages.bag.browse" /></Link>
+          </div>
         </Bleed>
       </div>
     );
   }
   return (
     <div className="pb-8 pt-12">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
+      <div className="flex flex-col gap-8 lg:flex-row-reverse lg:items-stretch lg:gap-12">
+        {photo}
+        <div className="lg:flex-1">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--tint-2)] px-4 py-1.5 text-sm text-ink"><Icon name="done" size={16} /><T k="pages.done.badge" /></p>
           <h1 data-testid="order-confirmed" className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.done.heading" /></h1>
           <p className="mt-4 max-w-[56ch] text-sm leading-relaxed text-ink-soft">
             <T k="pages.done.call_a" /> <span className="font-semibold text-ink">{order.name}</span>{" "}
             <T k="pages.done.call_b" /> <span className="tabular-nums">{shop?.reply_hours ?? 2}</span> <T k="pages.done.call_c" />
           </p>
+          <dl className="mt-6 text-sm">
+            <dt className="text-ink-soft"><T k="pages.done.number" /></dt>
+            <dd className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-ink">{order.number}</dd>
+            <dd className="mt-1 tabular-nums text-ink-soft">{formatDateTime(order.placed)}</dd>
+          </dl>
         </div>
-        <dl className="shrink-0 text-sm lg:text-right">
-          <dt className="text-ink-soft"><T k="pages.done.number" /></dt>
-          <dd className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-ink">{order.number}</dd>
-          <dd className="mt-1 tabular-nums text-ink-soft">{formatDateTime(order.placed)}</dd>
-        </dl>
       </div>
 
       <ol className="-mx-[var(--gutter)] mt-12 grid gap-6 bg-accent p-6 sm:mx-0 sm:grid-cols-4 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none lg:p-10 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+2.5rem)]">
