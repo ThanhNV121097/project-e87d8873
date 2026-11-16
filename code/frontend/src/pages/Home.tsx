@@ -128,7 +128,7 @@ export default function Home() {
               ))}
             </nav>
           </div>
-          <Grid max={3}>{picks.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+          <Grid max={3} phone={1}>{picks.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
         </section>
       )}
 
