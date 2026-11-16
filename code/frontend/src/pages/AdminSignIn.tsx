@@ -24,7 +24,7 @@ export default function AdminSignIn() {
           </div>
         )}
         <div className="bg-accent px-[var(--gutter)] py-8 text-accent-ink lg:px-12 lg:py-12">
-          <h1 className="text-[length:var(--size-h1)] leading-[1.1]"><Weights k="pages.admin.signin.heading" /></h1>
+          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-accent-ink"><Weights k="pages.admin.signin.heading" /></h1>
           <T k="pages.admin.signin.description" as="p" className="mt-3 max-w-[40ch] text-sm opacity-80" />
         </div>
       </div>
