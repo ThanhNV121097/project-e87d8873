@@ -7,7 +7,7 @@ import { SplitHeading } from "../motion";
 import type { Department, Product, Review, ShopInfo } from "../lib/shop";
 import Grid from "../components/Grid";
 import Icon, { type IconName } from "../components/Icon";
-import ProductCard from "../components/ProductCard";
+import ProductCard, { cardViews } from "../components/ProductCard";
 import ProductImage from "../components/ProductImage";
 import ReviewCard from "../components/ReviewCard";
 import DeliveryTerms from "../components/DeliveryTerms";
@@ -17,11 +17,11 @@ import Weights from "../components/Weights";
 const PROMISE_ICONS: IconName[] = ["shipping", "secure", "chat"];
 
 /**
- * THE HOME PAGE, as the owner's template has it. No photograph opens it: a
- * heading over three lines whose words change weight, the dark pill ON its
- * last line, and a short block of proof at its right — then three tall
- * tinted cards with the bikes the shop leads with. The colour on this page is
- * in the cards and in one peach band, nowhere else.
+ * THE HOME PAGE. It opens on the riding: a heading over three lines whose
+ * words change weight, the dark pill ON its last line and a short block of
+ * proof under it, beside a riding photograph that fills the right half and
+ * runs off the screen — then three tall tinted cards with the bikes the shop
+ * leads with. The colour on this page is in the cards and in one peach band.
  *
  * Then the riding types as grey wordmarks between two hairlines, the bike of
  * the month, a grey band of where to start, the three promises, more bikes
@@ -37,9 +37,16 @@ export default function Home() {
   const reviews = useCollection<Review>("reviews", { pageSize: 3 }).items;
   const shop = useCollection<ShopInfo>("shop", { pageSize: 1 }).items[0];
   const nameOf = (id: string) => types.find((d) => d.id === id)?.name;
+  const heroImage = useContent("hero.image");
+  const heroAlt = useContent("hero.image_alt");
+  const pickViews = cardViews(picks);
   return (
     <>
-      <section className="flex flex-col gap-10 pb-12 pt-12 lg:flex-row lg:items-center lg:justify-between lg:pb-10 lg:pt-12">
+      {/* THE FIRST SCREEN: the heading and its proof down the left, and a
+          riding photograph filling the right half, run off the screen's
+          right edge (on a phone, edge to edge under the heading). */}
+      <section className="grid gap-8 pt-10 lg:grid-cols-12 lg:gap-12 lg:pt-12">
+        <div className="flex flex-col justify-between gap-8 lg:col-span-6 lg:py-4">
         <h1 className="text-[length:var(--size-h1)] leading-[1.12] tracking-[-0.01em] text-ink">
           <SplitHeading k="hero.headline.light" as="span" className="block font-light" />
           <SplitHeading k="hero.headline.bold" as="span" className="block font-bold" />
@@ -55,7 +62,7 @@ export default function Home() {
         {/* THE PROOF: three of the shop's own bikes as overlapping rounds, how
             many are in stock — counted from the records — and two lines. */}
         {inStock.total > 0 && (
-          <div className="flex items-start gap-5 lg:w-[24rem]">
+          <div className="flex items-start gap-5">
             <span className="mt-14 hidden h-px w-20 shrink-0 bg-ink lg:block" />
             <div>
               <div className="flex items-center gap-3">
@@ -74,12 +81,20 @@ export default function Home() {
             </div>
           </div>
         )}
+        </div>
+        {heroImage && (
+          <div className="relative -mx-[var(--gutter)] aspect-[4/3] overflow-hidden lg:col-span-6 lg:mx-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto lg:h-[34rem] lg:rounded-l">
+            <Picture src={heroImage} alt={heroAlt} width={1280} height={853} loading="eager" motion="parallax" className="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        )}
       </section>
 
       {lead.length > 0 && (
-        <Grid max={3} phone={1} className="items-stretch">
-          {lead.map((p, i) => <TintCard key={p.id} product={p} tint={i} label={nameOf(p.category)} eager />)}
-        </Grid>
+        <section className="pt-16">
+          <Grid max={3} phone={1} className="items-stretch">
+            {lead.map((p, i) => <TintCard key={p.id} product={p} tint={i} label={nameOf(p.category)} />)}
+          </Grid>
+        </section>
       )}
 
       {/* The departments as wordmarks, between two hairlines. */}
@@ -131,7 +146,7 @@ export default function Home() {
               ))}
             </nav>
           </div>
-          <Grid max={3} phone={1}>{picks.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+          <Grid max={3} phone={1}>{picks.map((p, i) => <ProductCard key={p.id} product={p} view={pickViews[i]} />)}</Grid>
         </section>
       )}
 
@@ -142,7 +157,7 @@ export default function Home() {
             {shop && (
               <p className="text-sm text-ink-soft">
                 <span className="text-2xl font-bold tabular-nums text-ink">{shop.rating}</span>{" "}<T k="home.reviews.from" />{" "}
-                <span className="font-semibold tabular-nums text-ink" data-count="">{shop.review_count}</span>{" "}<T k="home.reviews.ratings" />
+                <span className="font-semibold tabular-nums text-ink">{shop.review_count}</span>{" "}<T k="home.reviews.ratings" />
                 <Link to="/about#reviews" className="ml-4 inline-flex items-center gap-1 font-medium text-ink underline-offset-4 hover:underline"><T k="home.reviews.more" /><Icon name="next" size={15} /></Link>
               </p>
             )}
@@ -178,7 +193,7 @@ function Month({ bike, type }: { bike: Product; type?: string }) {
       <div className="lg:w-5/12">
         <h2 className="text-[length:var(--size-h1)] leading-[1.12] text-ink"><Weights k="home.month" /></h2>
         <p className="mt-5 max-w-[42ch] text-sm leading-relaxed text-ink-soft">{bike.description}</p>
-        <dl className="mt-6 grid max-w-[26rem] grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-5 text-sm">
+        <dl className="mt-6 grid max-w-[26rem] grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-t border-line pt-5 text-sm">
           <dt className="text-ink-soft"><T k="home.month.travel" /></dt><dd className="text-right font-medium text-ink">{bike.travel}</dd>
           <dt className="text-ink-soft"><T k="home.month.weight" /></dt><dd className="text-right font-medium text-ink">{bike.weight}</dd>
         </dl>
