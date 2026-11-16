@@ -106,7 +106,17 @@ export default function Search() {
 
       {/* Nothing typed yet: what people search for, a riding photograph off
           the right edge, and the four riding types to start from instead. */}
-      {!on && (
+      {!on && <StartHere types={types.items} />}
+
+      {on && !loading && sum === 0 && <Nothing q={q} />}
+
+      {show("bikes") && (
+        <Block kind="bikes" count={bikes.total} more={`/shop?q=${encodeURIComponent(q)}`}>
+          <Grid max={3} phone={1}>{bikes.items.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+        </Block>
+      )}
+      {/* MOVED-START */}
+      {false && (
         <>
           <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
             <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:col-span-7 lg:px-10">
