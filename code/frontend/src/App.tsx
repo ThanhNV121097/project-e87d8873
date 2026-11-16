@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
+import Search from "./pages/Search";
 import Shop from "./pages/Shop";
 
 /**
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/search" element={<Search />} />
       </Route>
       <Route path="/admin/sign-in" element={<AdminSignIn />} />
       <Route path="/admin" element={<SignedIn><AdminOverview /></SignedIn>} />
