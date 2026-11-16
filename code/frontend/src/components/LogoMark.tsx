@@ -1,13 +1,13 @@
 /**
- * The design's mark, when the owner has no logo: a placeholder the design
- * replaces with one drawn for this business — a simple geometric SVG in
- * currentColor (a monogram, the shape of what they make), never a picture,
- * never generated text. public/favicon.svg is the same mark.
+ * Đèo's mark: a saddle between two peaks — the shape of a mountain pass,
+ * which is what "đèo" means and what these bikes are bought for. Drawn in
+ * currentColor; public/favicon.svg is the same mark.
  */
 export default function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="16" cy="16" r="13" />
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" fill="currentColor">
+      <path d="M2 26 L11 8 L16.5 18 L20 12 L30 26 Z" />
+      <path d="M9.5 26 L16.5 18 L23.5 26 Z" fill="var(--ground)" opacity="0.35" />
     </svg>
   );
 }
