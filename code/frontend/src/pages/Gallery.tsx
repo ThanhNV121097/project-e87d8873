@@ -41,7 +41,7 @@ export default function Gallery() {
         </div>
         {first && (
           <figure id={`shot-${first.id}`} data-record={`gallery:${first.id}`} className="scroll-mt-24 lg:w-8/12">
-            <div className="overflow-hidden rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
+            <div className="-mx-[var(--gutter)] overflow-hidden sm:mx-0 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
               <Picture src={first.image} alt={first.title} width={1280} height={853} loading="eager" motion="parallax" className="aspect-[3/2] w-full object-cover" />
             </div>
             <Caption shot={first} type={typeOf(first.type)} />
