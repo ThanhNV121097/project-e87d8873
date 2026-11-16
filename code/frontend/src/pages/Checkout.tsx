@@ -34,7 +34,7 @@ export default function Checkout() {
       <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
         <OrderForm className="min-w-0 flex-1" lines={lines} subtotal={subtotal} fee={fee}
-          delivery={delivery} onDelivery={setDelivery} payment={payment} onPayment={setPayment} />
+          delivery={delivery} onDelivery={setDelivery} payment={payment} onPayment={setPayment} terms={shop} />
         <aside className="rounded border border-line p-6 lg:sticky lg:top-6 lg:w-[26rem] lg:shrink-0">
           <T k="pages.checkout.summary" as="h2" className="mb-5 block text-lg font-semibold text-ink" />
           {lines.length === 0 ? (
