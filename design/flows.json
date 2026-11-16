@@ -1,83 +1,60 @@
 [
   {
-    "name": "From the heading's pill to the shop",
+    "name": "From the heading's pill to all the bikes",
     "steps": [
-      {
-        "action": "open",
-        "path": "/"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='hero-cta']"
-      },
-      {
-        "action": "expect",
-        "selector": "[data-testid='shop-count']"
-      }
+      { "action": "open", "path": "/" },
+      { "action": "click", "selector": "[data-testid='hero-cta']" },
+      { "action": "expect", "selector": "[data-testid='shop-count']" }
     ]
   },
   {
-    "name": "Open a thing from its tinted card",
+    "name": "Open a bike from its tinted card",
     "steps": [
-      {
-        "action": "open",
-        "path": "/"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='tint-stoneware-teapot']"
-      },
-      {
-        "action": "expect",
-        "selector": "[data-testid='product-name']",
-        "text": "Stoneware Teapot"
-      }
+      { "action": "open", "path": "/" },
+      { "action": "click", "selector": "[data-testid='tint-stance-0']" },
+      { "action": "expect", "selector": "[data-testid='product-name']", "text": "Stance 0" }
     ]
   },
   {
-    "name": "Put a thing in the bag and check out",
+    "name": "Narrow the bikes to trail bikes and open one",
     "steps": [
-      {
-        "action": "open",
-        "path": "/shop/stoneware-teapot"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='product-add']"
-      },
-      {
-        "action": "open",
-        "path": "/bag"
-      },
-      {
-        "action": "expect",
-        "selector": "[data-testid='bag-line-stoneware-teapot']"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='bag-checkout']"
-      },
-      {
-        "action": "expect",
-        "selector": "[data-testid='place-order']"
-      }
+      { "action": "open", "path": "/shop" },
+      { "action": "click", "selector": "[data-testid='chip-trail']" },
+      { "action": "click", "selector": "[data-testid='card-trance-x-1']" },
+      { "action": "expect", "selector": "[data-testid='product-name']", "text": "Trance X 1" }
+    ]
+  },
+  {
+    "name": "Choose a size, put the bike in the bag and check out",
+    "steps": [
+      { "action": "open", "path": "/shop/talon-2" },
+      { "action": "click", "selector": "[data-testid='size-M']" },
+      { "action": "click", "selector": "[data-testid='product-add']" },
+      { "action": "open", "path": "/bag" },
+      { "action": "expect", "selector": "[data-testid='bag-line-talon-2']" },
+      { "action": "click", "selector": "[data-testid='bag-checkout']" },
+      { "action": "type", "selector": "#order-name", "value": "Minh" },
+      { "action": "click", "selector": "[data-testid='pay-transfer']" },
+      { "action": "expect", "selector": "[data-testid='checkout-total']" },
+      { "action": "expect", "selector": "[data-testid='place-order']" },
+      { "action": "open", "path": "/checkout/done" },
+      { "action": "expect", "selector": "[data-testid='order-confirmed']" }
+    ]
+  },
+  {
+    "name": "Ask the shop about a bike",
+    "steps": [
+      { "action": "open", "path": "/shop/trance-x-1" },
+      { "action": "click", "selector": "[data-testid='product-ask']" },
+      { "action": "expect", "selector": "[data-testid='ask-form']" }
     ]
   },
   {
     "name": "Open a department from its wordmark",
     "steps": [
-      {
-        "action": "open",
-        "path": "/"
-      },
-      {
-        "action": "click",
-        "selector": "[data-testid='mark-audio']"
-      },
-      {
-        "action": "expect",
-        "selector": "[data-testid='card-over-ear']"
-      }
+      { "action": "open", "path": "/" },
+      { "action": "click", "selector": "[data-testid='mark-e-mtb']" },
+      { "action": "expect", "selector": "[data-testid='card-talon-e-plus-1']" }
     ]
   }
 ]
