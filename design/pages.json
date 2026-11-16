@@ -5,6 +5,7 @@
   { "path": "/gallery", "name": "Gallery" },
   { "path": "/about", "name": "About" },
   { "path": "/contact", "name": "Contact" },
+  { "path": "/search", "name": "Search", "example": "/search?q=size" },
   { "path": "/bag", "name": "Bag" },
   { "path": "/checkout", "name": "Check out" },
   { "path": "/checkout/done", "name": "Order received" },

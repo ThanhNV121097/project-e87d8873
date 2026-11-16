@@ -1,9 +1,9 @@
 [
   { "id": "pass-climb", "image": "/images/gallery-pass-climb.jpg", "title": "The long climb to the pass", "caption": "Steady gears and a light bike matter more here than travel.", "type": "hardtail", "_source": "assumed" },
-  { "id": "rocky-descent", "image": "/images/gallery-rocky-descent.jpg", "title": "Loose rock on the way down", "caption": "Where 130 mm of rear suspension earns its place.", "type": "trail", "_source": "assumed" },
-  { "id": "forest-singletrack", "image": "/images/gallery-forest-singletrack.jpg", "title": "Singletrack under the trees", "caption": "Roots, tight turns and grip on damp ground.", "type": "trail", "_source": "assumed" },
-  { "id": "group-ride", "image": "/images/gallery-group-ride.jpg", "title": "Dirt road at dusk", "caption": "Where most riders start: gravel, a group and no hurry.", "type": "hardtail", "_source": "assumed" },
-  { "id": "dirt-jump", "image": "/images/gallery-dirt-jump.jpg", "title": "Air on a dirt line", "caption": "A slack head angle and a dropper post make this feel possible.", "type": "trail", "_source": "assumed" },
-  { "id": "sunset-rest", "image": "/images/gallery-sunset-rest.jpg", "title": "A stop at the top", "caption": "The view is the reason for the climb.", "type": "e-mtb", "_source": "assumed" },
+  { "id": "rocky-descent", "image": "/images/gallery-rocky-descent.jpg", "title": "Rock on the way down", "caption": "Where full suspension and a slack head angle earn their place.", "type": "trail", "_source": "assumed" },
+  { "id": "forest-singletrack", "image": "/images/gallery-forest-singletrack.jpg", "title": "Roots under the trees", "caption": "Tight turns and grip on damp ground.", "type": "trail", "_source": "assumed" },
+  { "id": "group-ride", "image": "/images/gallery-group-ride.jpg", "title": "Laps at the pump track", "caption": "Where many riders start: a short loop, a friend and no hurry.", "type": "hardtail", "_source": "assumed" },
+  { "id": "dirt-jump", "image": "/images/gallery-dirt-jump.jpg", "title": "Air off a rock ledge", "caption": "A slack head angle and a dropper post make this feel possible.", "type": "trail", "_source": "assumed" },
+  { "id": "sunset-rest", "image": "/images/gallery-sunset-rest.jpg", "title": "A group day on e-MTBs", "caption": "Mixed legs, one pace: the motor keeps everyone together on the climbs.", "type": "e-mtb", "_source": "assumed" },
   { "id": "ridge-view", "image": "/images/gallery-ridge-view.jpg", "title": "Ridges above the valley", "caption": "The kind of ground an e-MTB turns into a day ride.", "type": "e-mtb", "_source": "assumed" }
 ]
