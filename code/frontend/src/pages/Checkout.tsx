@@ -36,13 +36,13 @@ export default function Checkout() {
     <div className="pb-8">
       {/* The head on a band to both screen edges, the workshop's close-up
           off its right edge: every bike is built before it leaves. */}
-      <Bleed className="bg-surface lg:grid lg:grid-cols-12 lg:gap-12">
+      <Bleed className="bg-surface lg:flex lg:flex-row-reverse lg:gap-12">
         {image && (
-          <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:mx-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+          <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:mx-0 lg:w-4/12 lg:shrink-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
             <Picture src={image} alt={imageAlt} width={1280} height={853} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
           </div>
         )}
-        <div className="pb-10 pt-10 lg:col-span-8 lg:col-start-1 lg:row-start-1">
+        <div className="min-w-0 pb-10 pt-10 lg:flex-1">
           <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.checkout.heading" /></h1>
           <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
         </div>
