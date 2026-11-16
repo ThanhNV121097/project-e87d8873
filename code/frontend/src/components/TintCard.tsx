@@ -36,9 +36,11 @@ export default function TintCard({ product, tint, label, compact = false, eager 
       <Link to={`/shop/${product.id}`} data-testid={`tint-${product.id}`} className="flex flex-1 flex-col">
         <span className={`flex flex-1 flex-col items-start gap-3 ${compact ? "p-5" : "p-5 pb-6 lg:p-7 lg:pb-7"}`}>
           {label && <span className="rounded-full bg-ground px-3 py-1 text-xs text-ink">{label}</span>}
-          <span className={`leading-[1.08] tracking-tight text-ink ${compact ? "text-xl" : "text-[1.75rem] lg:text-[2rem]"}`}>
+          <span className={`text-balance leading-[1.08] tracking-tight text-ink ${compact ? "text-xl" : "text-[1.75rem] lg:text-[2rem]"}`}>
             <span className="font-light">{product.brand} </span>
-            <span className="font-bold">{product.name}</span>
+            {/* The model's last word is held to the one before it, so a
+                narrow card never leaves "1" alone on a line. */}
+            <span className="font-bold">{product.name.replace(/ (\S+)$/, " $1")}</span>
           </span>
           {product.fact && !compact && <span className="text-sm text-ink-soft">{product.fact}</span>}
         </span>
