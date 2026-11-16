@@ -42,10 +42,12 @@ export default function TintCard({ product, tint, label, compact = false, eager 
           </span>
           {product.fact && !compact && <span className="text-sm text-ink-soft">{product.fact}</span>}
         </span>
-        <ProductImage src={product.image} hover={product.image_back} alt={`${product.brand} ${product.name}`} aspect="4/3"
-          eager={eager} className="rounded-none" />
+        <span className={`block ${compact ? "px-2.5 pb-2.5" : "px-3 pb-3"}`}>
+          <ProductImage src={product.image} hover={product.image_back} alt={`${product.brand} ${product.name}`} aspect="4/3"
+            eager={eager} className="rounded-[var(--radius-sm)]" />
+        </span>
       </Link>
-      <div className="absolute inset-x-3 bottom-3 flex items-center justify-between rounded-full border border-line bg-[var(--glass)] py-1.5 pl-5 pr-1.5 backdrop-blur-md">
+      <div className="absolute inset-x-6 bottom-6 flex items-center justify-between rounded-full border border-line bg-[var(--glass)] py-1.5 pl-5 pr-1.5 shadow-[var(--shadow-sm)] backdrop-blur-md">
         <span className="text-sm font-semibold tabular-nums text-ink">{formatPrice(product.price)}</span>
         <Link to={`/shop/${product.id}#sizes`} aria-label={`${choose} ${product.name}`}
           className="grid h-10 w-10 place-items-center rounded-full bg-accent text-accent-ink hover:opacity-90">
