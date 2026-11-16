@@ -17,11 +17,14 @@ import ProductImage, { type Aspect } from "./ProductImage";
  * under it: the part never invents a second photograph the record does not
  * have.
  */
-export default function ProductGallery({ images, alt, aspect = "4/5", className = "" }: {
+export default function ProductGallery({ images, alt, aspect = "4/5", className = "", mainClassName = "" }: {
   images: readonly (string | null | undefined)[];
   alt: string;
   aspect?: Aspect;
   className?: string;
+  /** Placed on the large picture alone — to run it to the screen's edge
+   *  while the row of small ones stays on the page's own edge. */
+  mainClassName?: string;
 }) {
   const shown = images.filter((s): s is string => Boolean(s));
   const [at, setAt] = useState(0);
@@ -29,7 +32,7 @@ export default function ProductGallery({ images, alt, aspect = "4/5", className 
   return (
     <div data-block="gallery" className={`flex flex-col gap-3 ${className}`}>
       {/* Looked INTO under the pointer, at twice its size (src/motion). */}
-      <div data-lens="">
+      <div data-lens="" className={mainClassName}>
         <ProductImage src={current} alt={alt} aspect={aspect} eager />
       </div>
       {shown.length > 1 && (
