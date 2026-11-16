@@ -8,6 +8,7 @@ import { useDemo } from "../lib/demo";
 import { formatPrice } from "../lib/format";
 import { EXAMPLE_LINES } from "../lib/mock/orders";
 import type { ShopInfo } from "../lib/shop";
+import Bleed from "../components/Bleed";
 import OrderForm, { type Delivery, type Payment } from "../components/OrderForm";
 import ProductImage from "../components/ProductImage";
 import Weights from "../components/Weights";
@@ -29,9 +30,11 @@ export default function Checkout() {
   const subtotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const fee = delivery === "courier" ? shop?.delivery_fee ?? 0 : 0;
   return (
-    <div className="pb-8 pt-10">
-      <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.checkout.heading" /></h1>
-      <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
+    <div className="pb-8">
+      <Bleed className="bg-surface pb-10 pt-10">
+        <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.checkout.heading" /></h1>
+        <T k="pages.checkout.lead" as="p" className="mt-4 max-w-[60ch] text-sm leading-relaxed text-ink-soft" />
+      </Bleed>
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
         <OrderForm className="min-w-0 flex-1" lines={lines} subtotal={subtotal} fee={fee}
           delivery={delivery} onDelivery={setDelivery} payment={payment} onPayment={setPayment} terms={shop} />
