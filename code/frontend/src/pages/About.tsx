@@ -5,6 +5,7 @@ import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
 import { Picture } from "../picture";
 import { formatPrice } from "../lib/format";
+import { useHashScroll } from "../lib/hash";
 import type { Faq, Member, Review, Service, ShopInfo } from "../lib/shop";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
@@ -30,6 +31,7 @@ export default function About() {
   const [more, setMore] = useState(false);
   const allReviews = useCollection<Review>("reviews", { pageSize: 24 }).items;
   const shown = more ? allReviews : reviews.items;
+  useHashScroll(services.length > 0 && faqs.length > 0);
   return (
     <div className="pb-8 pt-10">
       <section className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
@@ -97,7 +99,7 @@ export default function About() {
             </thead>
             <tbody>
               {services.map((s) => (
-                <tr key={s.id} data-record={`services:${s.id}`} className="border-b border-line align-top">
+                <tr key={s.id} id={`job-${s.id}`} data-record={`services:${s.id}`} className="scroll-mt-24 border-b border-line align-top">
                   <td className="py-4 pr-4"><span className="block font-semibold text-ink">{s.name}</span><span className="mt-1 block text-xs text-ink-soft">{s.line}</span></td>
                   <td className="hidden py-4 text-right text-ink-soft sm:table-cell">{s.time}</td>
                   <td className="py-4 text-right font-semibold tabular-nums text-ink">{s.price > 0 ? formatPrice(s.price) : <T k="pages.about.included" />}</td>
@@ -127,14 +129,14 @@ export default function About() {
       )}
 
       {faqs.length > 0 && (
-        <section className="grid gap-10 pt-24 lg:grid-cols-12">
+        <section id="faq" className="grid scroll-mt-24 gap-10 pt-24 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <h2 className="text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.about.faq" /></h2>
             <Link to="/contact" className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink"><T k="pages.about.ask" /><Icon name="arrow" size={16} /></Link>
           </div>
           <div className="divide-y divide-line border-y border-line lg:col-span-8">
             {faqs.map((f) => (
-              <details key={f.id} data-record={`faqs:${f.id}`} className="group py-5">
+              <details key={f.id} id={`faq-${f.id}`} data-record={`faqs:${f.id}`} className="group scroll-mt-24 py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-semibold text-ink">
                   {f.q}
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-line group-open:rotate-45"><Icon name="plus" size={15} /></span>
