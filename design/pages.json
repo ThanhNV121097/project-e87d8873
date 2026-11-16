@@ -1,13 +1,17 @@
 [
   { "path": "/", "name": "Home" },
-  { "path": "/shop", "name": "Shop" },
-  { "path": "/shop/:id", "name": "Product", "example": "/shop/stoneware-teapot" },
+  { "path": "/shop", "name": "Bikes" },
+  { "path": "/shop/:id", "name": "Bike", "example": "/shop/stance-0" },
+  { "path": "/gallery", "name": "Gallery" },
+  { "path": "/about", "name": "About" },
+  { "path": "/contact", "name": "Contact" },
+  { "path": "/search", "name": "Search", "example": "/search?q=size" },
   { "path": "/bag", "name": "Bag" },
   { "path": "/checkout", "name": "Check out" },
-  { "path": "/contact", "name": "Contact" },
+  { "path": "/checkout/done", "name": "Order received" },
   { "path": "/admin/sign-in", "name": "Sign in" },
   { "path": "/admin", "name": "Overview", "auth": true, "dashboard": true },
-  { "path": "/admin/products", "name": "Products", "auth": true, "dashboard": true },
-  { "path": "/admin/products/:id", "name": "Product", "example": "/admin/products/stoneware-teapot", "auth": true, "dashboard": true },
-  { "path": "/admin/kinds", "name": "Departments", "auth": true, "dashboard": true }
+  { "path": "/admin/products", "name": "Bikes", "auth": true, "dashboard": true },
+  { "path": "/admin/products/:id", "name": "Bike", "example": "/admin/products/stance-0", "auth": true, "dashboard": true },
+  { "path": "/admin/kinds", "name": "Riding types", "auth": true, "dashboard": true }
 ]

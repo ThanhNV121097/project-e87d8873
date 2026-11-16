@@ -23,8 +23,10 @@ import { useCollection, type Filter } from "../data";
  * It draws nothing at all when there is nothing else — no heading over an
  * empty row — and never the record itself.
  */
-export default function RelatedRow<T extends { id: string }>({ collection, exclude, where, max = 4, title, children, className = "" }: {
+export default function RelatedRow<T extends { id: string }>({ collection, exclude, where, max = 4, phone = 2, title, children, className = "" }: {
   collection: string;
+  /** Columns on a phone: 1 for things that need the width, as a bike does. */
+  phone?: 1 | 2;
   /** The record whose page this is. */
   exclude?: string;
   where?: Record<string, Filter | undefined>;
@@ -43,8 +45,8 @@ export default function RelatedRow<T extends { id: string }>({ collection, exclu
   return (
     <section data-block="related" className={`flex flex-col gap-[var(--space-8)] ${className}`}>
       {title}
-      <Grid max={max}>
-        {rows.map((row) => <div key={row.id}>{children(row)}</div>)}
+      <Grid max={max} phone={phone}>
+        {rows.map((row) => <div key={row.id} className="h-full">{children(row)}</div>)}
       </Grid>
     </section>
   );

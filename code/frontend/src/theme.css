@@ -11,7 +11,9 @@
   --ground: #FFFFFF;
   --surface: #F6F6F6;
   --ink: #191A2E;
-  --ink-soft: #767A8A;
+  /* The template's grey, a step darker: #767A8A read 4.27:1 on white and
+     under 4:1 on the tints, below WCAG AA. Same hue, same role. */
+  --ink-soft: #5F6373;
   --accent: #191A2E;
   --accent-ink: #FFFFFF;
   /* WHAT IS ABOUT TO BE LOST, and nothing else. A site's palette is the four
@@ -83,11 +85,11 @@
   /* The tile behind a product picture (ProductImage), seen until the
      photograph loads — and round a transparent .png, the one picture drawn
      with a margin. Light, so neither shows as a hole in the grid. */
-  --product-ground: #F6F6F6;
+  --product-ground: #FFFFFF;
   /* Words drawn ON that tile — a <Picture> block's caption where a product
      has no photograph yet. The tile is light in both modes, so --ink-soft
      (light on a dark site) was invisible there. */
-  --product-ground-ink: #767A8A;
+  --product-ground-ink: #5F6373;
 
   /* The ground and the ink of a <Picture> block standing where a photograph
      is not there yet. The site's own surface by default; <ProductImage>
@@ -104,7 +106,10 @@
   --tint-3: #EFE2FE;
   --tint-4: #FFEFE2;
   /* The bar across a tinted card's foot. */
-  --glass: rgba(255, 255, 255, 0.72);
+  --glass: rgba(255, 255, 255, 0.78);
+  /* The soft tint of the accent, for the one band of colour a page carries
+     beyond its cards (a saving, a chosen option). */
+  --accent-soft: #FFEBED;
 }
 
 /* THE MANAGEMENT AREA IS AN APPLICATION, AND IT IS NOT THIS SITE.

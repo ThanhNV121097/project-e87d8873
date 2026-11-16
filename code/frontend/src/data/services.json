@@ -1,0 +1,8 @@
+[
+  { "id": "build", "name": "Build and set-up of a new bike", "line": "Assembled, brakes bled, gears indexed, suspension set to your weight.", "time": "Included", "price": 0, "_source": "assumed" },
+  { "id": "fit", "name": "Bike fit", "line": "Saddle height and setback, bar, levers and cleats, on your bike.", "time": "60 min", "price": 600000, "_source": "assumed" },
+  { "id": "service", "name": "Full service", "line": "Clean, check and adjust everything; bearings, cables and chain wear.", "time": "1 day", "price": 450000, "_source": "assumed" },
+  { "id": "fork", "name": "Fork lower service", "line": "New oil and seals in the fork lowers.", "time": "2 hours", "price": 650000, "_source": "assumed" },
+  { "id": "bleed", "name": "Brake bleed", "line": "Fresh fluid, firm lever, per brake.", "time": "30 min", "price": 250000, "_source": "assumed" },
+  { "id": "tubeless", "name": "Tubeless set-up", "line": "Tape, valves and sealant for both wheels.", "time": "45 min", "price": 200000, "_source": "assumed" }
+]

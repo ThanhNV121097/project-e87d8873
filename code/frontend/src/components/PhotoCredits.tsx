@@ -50,7 +50,7 @@ export default function PhotoCredits({ className = "" }: { className?: string })
   const label = useContent<string | undefined>("credits.label");
   if (shown.length === 0) return null;
   return (
-    <p className={`text-xs leading-relaxed text-ink-soft ${className}`}>
+    <p className={`text-xs leading-relaxed ${className || "text-ink-soft"}`}>
       {label && (
         <>
           <T k="credits.label" />:{" "}

@@ -1,133 +1,115 @@
 {
   "collections": {
     "products": {
-      "label": "Products",
+      "label": "Bikes",
       "fields": [
-        {
-          "key": "image",
-          "label": "Photograph",
-          "type": "image",
-          "section": "Basics",
-          "hint": "A photograph of the thing on a plain pale backdrop. It fills the picture of a tinted card."
-        },
-        {
-          "key": "name",
-          "label": "Name",
-          "type": "text",
-          "required": true,
-          "section": "Basics"
-        },
-        {
-          "key": "category",
-          "label": "Department",
-          "type": "ref:categories",
-          "section": "Basics"
-        },
-        {
-          "key": "price",
-          "label": "Price",
-          "type": "price",
-          "currency": "VND",
-          "section": "Basics"
-        },
-        {
-          "key": "was",
-          "label": "Price before",
-          "type": "price",
-          "currency": "VND",
-          "section": "Basics",
-          "hint": "Shown struck through beside the price. Leave empty when nothing was reduced."
-        },
-        {
-          "key": "fact",
-          "label": "One fact under the name",
-          "type": "text",
-          "section": "Basics",
-          "hint": "A size, a capacity, how long it lasts — what a buyer compares by."
-        },
-        {
-          "key": "stock",
-          "label": "In stock",
-          "type": "number",
-          "section": "Basics"
-        },
-        {
-          "key": "status",
-          "label": "Status",
-          "type": "text",
-          "options": [
-            [
-              "draft",
-              "Draft"
-            ],
-            [
-              "live",
-              "Live"
-            ]
-          ],
-          "section": "Basics"
-        },
-        {
-          "key": "deal",
-          "label": "Lead with it",
-          "type": "bool",
-          "section": "Basics",
-          "hint": "Shown on a tinted card on the home page. The first five are used."
-        },
-        {
-          "key": "description",
-          "label": "Description",
-          "type": "longtext",
-          "section": "Basics"
-        },
-        {
-          "key": "options",
-          "label": "Options",
-          "type": "list",
-          "section": "Details",
-          "hint": "Colours or sizes a buyer chooses between."
-        },
-        {
-          "key": "material",
-          "label": "Made of",
-          "type": "text",
-          "section": "Details"
-        },
-        {
-          "key": "care",
-          "label": "Care",
-          "type": "longtext",
-          "section": "Details"
-        },
-        {
-          "key": "image_back",
-          "label": "A second picture",
-          "type": "image",
-          "section": "More pictures"
-        },
-        {
-          "key": "image_detail",
-          "label": "A detail",
-          "type": "image",
-          "section": "More pictures"
-        }
+        { "key": "image", "label": "Photograph", "type": "image", "section": "Basics", "hint": "The whole bike, side on, on a plain white backdrop. Every bike card is 4:3." },
+        { "key": "name", "label": "Model", "type": "text", "required": true, "section": "Basics" },
+        { "key": "brand", "label": "Brand", "type": "text", "options": ["Giant", "Liv"], "section": "Basics" },
+        { "key": "category", "label": "Riding type", "type": "ref:categories", "section": "Basics" },
+        { "key": "year", "label": "Model year", "type": "number", "section": "Basics" },
+        { "key": "price", "label": "Price", "type": "price", "currency": "VND", "section": "Basics" },
+        { "key": "was", "label": "Price before", "type": "price", "currency": "VND", "section": "Basics", "hint": "Shown struck through beside the price. Leave empty when nothing was reduced." },
+        { "key": "price_listed", "label": "Price on the maker's page", "type": "text", "section": "Basics", "hidden": true },
+        { "key": "fact", "label": "One line under the name", "type": "text", "section": "Basics", "hint": "Wheel, travel and gears — what a rider compares by." },
+        { "key": "status", "label": "Status", "type": "text", "options": [["draft", "Draft"], ["live", "Live"]], "section": "Basics" },
+        { "key": "stock", "label": "Bikes in stock", "type": "number", "section": "Stock", "hint": "0 shows 'Out of stock' and turns the button into 'Ask when it is back'." },
+        { "key": "sizes", "label": "Frame sizes", "type": "list", "section": "Stock" },
+        { "key": "sizes_out", "label": "Sizes out of stock", "type": "list", "section": "Stock" },
+        { "key": "size_fit", "label": "Rider height for each size", "type": "list", "section": "Stock", "hint": "One line per size, in the order of Frame sizes: 163–172 cm." },
+        { "key": "deal", "label": "Lead with it", "type": "bool", "section": "Stock", "hint": "Shown on a tinted card on the home page. The first three are used." },
+        { "key": "month", "label": "Bike of the month", "type": "bool", "section": "Stock" },
+        { "key": "wheel", "label": "Wheel size", "type": "text", "options": [["29", "29 inch"], ["mixed", "Mixed 29 / 27.5 inch"]], "section": "Specification" },
+        { "key": "travel", "label": "Suspension travel", "type": "text", "section": "Specification" },
+        { "key": "frame", "label": "Frame", "type": "text", "section": "Specification" },
+        { "key": "fork", "label": "Fork", "type": "text", "section": "Specification" },
+        { "key": "shock", "label": "Rear shock", "type": "text", "section": "Specification" },
+        { "key": "motor", "label": "Motor and battery", "type": "text", "section": "Specification" },
+        { "key": "drivetrain", "label": "Drivetrain", "type": "text", "section": "Specification" },
+        { "key": "brakes", "label": "Brakes", "type": "text", "section": "Specification" },
+        { "key": "wheels", "label": "Wheels", "type": "text", "section": "Specification" },
+        { "key": "tyres", "label": "Tyres", "type": "text", "section": "Specification" },
+        { "key": "weight", "label": "Weight", "type": "text", "section": "Specification" },
+        { "key": "colour", "label": "Colour", "type": "text", "section": "Specification" },
+        { "key": "description", "label": "What it is for", "type": "longtext", "section": "Words" },
+        { "key": "ride", "label": "What it is like to own", "type": "longtext", "section": "Words" },
+        { "key": "rating", "label": "Rating", "type": "number", "section": "Words" },
+        { "key": "review_count", "label": "Number of ratings", "type": "number", "section": "Words" },
+        { "key": "image_back", "label": "Close-up: drivetrain", "type": "image", "section": "Basics" },
+        { "key": "image_detail", "label": "Close-up: cockpit and fork", "type": "image", "section": "Basics" },
+        { "key": "_invented", "label": "Invented fields", "type": "list", "hidden": true }
       ]
     },
     "categories": {
-      "label": "Departments",
+      "label": "Riding types",
       "fields": [
-        {
-          "key": "image",
-          "label": "Picture for the circle",
-          "type": "image",
-          "hint": "A photograph of one thing from the department, on a plain pale backdrop. It fills a disc."
-        },
-        {
-          "key": "name",
-          "label": "Name",
-          "type": "text",
-          "required": true
-        }
+        { "key": "name", "label": "Name", "type": "text", "required": true },
+        { "key": "line", "label": "Who it is for", "type": "text" },
+        { "key": "terrain", "label": "Where it rides best", "type": "text" }
+      ]
+    },
+    "reviews": {
+      "label": "What riders say",
+      "fields": [
+        { "key": "name", "label": "First name", "type": "text", "required": true },
+        { "key": "rating", "label": "Stars", "type": "number" },
+        { "key": "date", "label": "Date", "type": "text" },
+        { "key": "bike", "label": "Bike", "type": "ref:products" },
+        { "key": "text", "label": "Review", "type": "longtext" }
+      ]
+    },
+    "team": {
+      "label": "The team",
+      "fields": [
+        { "key": "name", "label": "Name", "type": "text", "required": true },
+        { "key": "role", "label": "Role", "type": "text" },
+        { "key": "line", "label": "One line", "type": "text" },
+        { "key": "rides", "label": "Rides", "type": "text" }
+      ]
+    },
+    "gallery": {
+      "label": "Gallery",
+      "fields": [
+        { "key": "image", "label": "Photograph", "type": "image", "required": true },
+        { "key": "title", "label": "Title", "type": "text" },
+        { "key": "caption", "label": "Caption", "type": "text" },
+        { "key": "type", "label": "Riding type", "type": "ref:categories" }
+      ]
+    },
+    "services": {
+      "label": "Workshop prices",
+      "fields": [
+        { "key": "name", "label": "Job", "type": "text", "required": true },
+        { "key": "line", "label": "What is done", "type": "text" },
+        { "key": "time", "label": "How long", "type": "text" },
+        { "key": "price", "label": "Price", "type": "price", "currency": "VND" }
+      ]
+    },
+    "faqs": {
+      "label": "Questions",
+      "fields": [
+        { "key": "q", "label": "Question", "type": "text", "required": true },
+        { "key": "a", "label": "Answer", "type": "longtext" }
+      ]
+    },
+    "shop": {
+      "label": "The shop's own numbers",
+      "fields": [
+        { "key": "founded", "label": "Open since", "type": "number" },
+        { "key": "bikes_built", "label": "Bikes built and sold", "type": "number" },
+        { "key": "rating", "label": "Average rating", "type": "number" },
+        { "key": "review_count", "label": "Ratings", "type": "number" },
+        { "key": "reply_hours", "label": "We reply within (hours)", "type": "number" },
+        { "key": "warranty_years", "label": "Frame warranty (years)", "type": "number" },
+        { "key": "free_service_months", "label": "Free first service within (months)", "type": "number" },
+        { "key": "delivery_local", "label": "Delivery in town", "type": "text" },
+        { "key": "delivery_nationwide", "label": "Delivery elsewhere in Vietnam", "type": "text" },
+        { "key": "delivery_fee", "label": "Courier charge outside town", "type": "price", "currency": "VND" },
+        { "key": "pickup", "label": "Collect from the shop", "type": "text" },
+        { "key": "payment", "label": "How customers pay", "type": "list" },
+        { "key": "confirm", "label": "How an order is confirmed", "type": "longtext" },
+        { "key": "stock_rule", "label": "How stock is kept", "type": "longtext" },
+        { "key": "_invented", "label": "Invented fields", "type": "list", "hidden": true }
       ]
     }
   }

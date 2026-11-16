@@ -11,10 +11,14 @@ import AdminProduct from "./pages/AdminProduct";
 import AdminProducts from "./pages/AdminProducts";
 import AdminSignIn from "./pages/AdminSignIn";
 import Bag from "./pages/Bag";
+import About from "./pages/About";
 import Checkout from "./pages/Checkout";
+import CheckoutDone from "./pages/CheckoutDone";
 import Contact from "./pages/Contact";
+import Gallery from "./pages/Gallery";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
+import Search from "./pages/Search";
 import Shop from "./pages/Shop";
 
 /**
@@ -29,7 +33,7 @@ import Shop from "./pages/Shop";
  */
 function Shell() {
   return (
-    <div className="min-h-screen bg-ground font-body text-ink">
+    <div className="min-h-screen overflow-x-clip bg-ground font-body text-ink">
       {/* The motion the owner chose, on every page (src/motion). */}
       <Motion />
       <SiteHeader />
@@ -59,7 +63,11 @@ export default function App() {
         <Route path="/shop/:id" element={<Product />} />
         <Route path="/bag" element={<Bag />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/done" element={<CheckoutDone />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/search" element={<Search />} />
       </Route>
       <Route path="/admin/sign-in" element={<AdminSignIn />} />
       <Route path="/admin" element={<SignedIn><AdminOverview /></SignedIn>} />
