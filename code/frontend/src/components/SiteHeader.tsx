@@ -15,8 +15,9 @@ import MobileMenu from "./MobileMenu";
  * quiet row BETWEEN TWO HAIRLINES that stop at the page's measure. Nothing
  * in it is coloured: the colour on this site belongs to the cards.
  *
- * Search opens a field under the row and sends what is typed to the bikes,
- * where it is matched against model, brand, riding type and specification.
+ * Search opens a field under the row and sends what is typed to /search,
+ * which looks through the bikes, the riding types, the workshop's jobs and
+ * prices, the buying questions and the gallery.
  */
 export default function SiteHeader() {
   const searchLabel = useContent("header.search");
@@ -34,7 +35,7 @@ export default function SiteHeader() {
     e.preventDefault();
     setSearch(false);
     setMenu(false);
-    go(q.trim() ? `/shop?q=${encodeURIComponent(q.trim())}` : "/shop");
+    go(q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search");
   };
   const iconButton = "grid h-10 w-10 place-items-center rounded-full hover:bg-wash";
   return (
