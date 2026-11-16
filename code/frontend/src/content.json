@@ -307,6 +307,9 @@
         "tail": ""
       },
       "heading_plain": "Your bag",
+      "image": "/images/bag-bars.jpg",
+      "image_alt": "A mountain bike's bars and grips seen from the saddle, a field and trees beyond",
+      "lead": "Check the bike and the size. How it reaches you is chosen on the next step.",
       "remove": "Remove",
       "size": "Size",
       "subtotal": "Bikes",
