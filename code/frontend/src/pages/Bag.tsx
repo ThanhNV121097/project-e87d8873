@@ -7,6 +7,8 @@ import { useDemo } from "../lib/demo";
 import { formatPrice } from "../lib/format";
 import { EXAMPLE_LINES } from "../lib/mock/orders";
 import type { Department, ShopInfo } from "../lib/shop";
+import { Picture } from "../picture";
+import Bleed from "../components/Bleed";
 import DeliveryTerms from "../components/DeliveryTerms";
 import Icon from "../components/Icon";
 import ProductImage from "../components/ProductImage";
@@ -28,9 +30,23 @@ export default function Bag() {
   const remove = useContent("pages.bag.remove");
   const types = useCollection<Department>("categories", { pageSize: 12 }).items;
   const shop = useCollection<ShopInfo>("shop", { pageSize: 1 }).items[0];
+  const image = useContent("pages.bag.image");
+  const imageAlt = useContent("pages.bag.image_alt");
   return (
-    <div className="pb-8 pt-10">
-      <h1 className="mb-10 text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.bag.heading" /></h1>
+    <div className="pb-8">
+      {/* The head on a band to both screen edges, a rider's-eye view of the
+          bars off its right edge (on a phone, a strip across the top). */}
+      <Bleed className="mb-10 bg-surface lg:flex lg:flex-row-reverse lg:gap-12">
+        {image && (
+          <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:mx-0 lg:w-4/12 lg:shrink-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+            <Picture src={image} alt={imageAlt} width={1280} height={852} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="min-w-0 pb-10 pt-10 lg:flex-1">
+          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.bag.heading" /></h1>
+          <T k="pages.bag.lead" as="p" className="mt-4 max-w-[60ch] text-[0.9375rem] leading-relaxed text-ink-soft" />
+        </div>
+      </Bleed>
       {lines.length === 0 ? (
         <div className="flex flex-col items-start gap-6 rounded bg-[var(--tint-1)] px-8 py-14 lg:px-14">
           <T k="pages.bag.empty" as="p" className="text-2xl text-ink" />
@@ -46,11 +62,11 @@ export default function Bag() {
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
           <ul className="min-w-0 flex-1 divide-y divide-line border-y border-line">
             {lines.map((l) => (
-              <li key={lineKey(l)} data-testid={`bag-line-${l.id}`} className="grid grid-cols-[7rem_1fr] items-center gap-x-5 gap-y-3 py-5 sm:grid-cols-[10rem_1fr_auto_8rem_auto]">
+              <li key={lineKey(l)} data-testid={`bag-line-${l.id}`} data-record={`products:${l.id}`} className="grid grid-cols-[7rem_1fr] items-center gap-x-5 gap-y-3 py-5 sm:grid-cols-[10rem_1fr_auto_8rem_auto]">
                 <Link to={`/shop/${l.id}`} className="row-span-2 sm:row-span-1"><ProductImage src={l.image} alt={l.name} aspect="4/3" className="border border-line" /></Link>
                 <div className="min-w-0">
                   <Link to={`/shop/${l.id}`} className="text-base font-semibold text-ink hover:underline">{l.name}</Link>
-                  <p className="mt-1 text-xs text-ink-soft">
+                  <p className="mt-1 text-sm text-ink-soft">
                     {l.variant && <><T k="pages.bag.size" /> {l.variant} · </>}<span className="tabular-nums">{formatPrice(l.price)}</span>
                   </p>
                 </div>
@@ -77,7 +93,7 @@ export default function Bag() {
               <T k="pages.bag.checkout" /><Icon name="arrow" size={16} />
             </Link>
             {shop && (
-              <ul className="mt-6 flex flex-col gap-2.5 text-xs text-ink">
+              <ul className="mt-6 flex flex-col gap-2.5 text-sm text-ink">
                 <li className="flex items-start gap-2.5"><Icon name="shipping" size={16} /><DeliveryTerms shop={shop} /></li>
                 <li className="flex items-start gap-2.5"><Icon name="secure" size={16} /><span><span className="tabular-nums">{shop.warranty_years}</span> <T k="pages.product.warranty" /></span></li>
                 <li className="flex items-start gap-2.5"><Icon name="phone" size={16} /><T k="pages.bag.call_note" /></li>
