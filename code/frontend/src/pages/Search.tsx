@@ -200,6 +200,7 @@ export default function Search() {
 function StartHere({ types }: { types: Department[] }) {
   const suggestions = useList<string>("pages.search.suggestions");
   const image = useContent("pages.search.image");
+  const imageAlt = useContent("pages.search.image_alt");
   return (
     <>
       <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
