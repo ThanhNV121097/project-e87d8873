@@ -30,7 +30,7 @@ export default function CheckoutDone() {
   // The page's own photograph, off the right edge beside the words (on a
   // phone, a strip above them, edge to edge) — the same in both states.
   const photo = image ? (
-    <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:mx-0 lg:w-5/12 lg:shrink-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+    <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:mx-0 lg:w-6/12 lg:shrink-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
       <Picture src={image} alt={imageAlt} width={1280} height={960} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
     </div>
   ) : null;
@@ -86,7 +86,7 @@ export default function CheckoutDone() {
           <T k="pages.done.ordered" as="h2" className="mb-5 block text-lg font-semibold text-ink" />
           <ul className="divide-y divide-line border-y border-line">
             {order.lines.map((l) => (
-              <li key={`${l.id}-${l.variant ?? ""}`} className="flex items-center gap-5 py-4">
+              <li key={`${l.id}-${l.variant ?? ""}`} data-record={`products:${l.id}`} className="flex items-center gap-5 py-4">
                 <span className="w-32 shrink-0"><ProductImage src={l.image} alt={l.name} aspect="4/3" className="border border-line" /></span>
                 <span className="min-w-0 flex-1 text-sm">
                   <span className="block font-semibold text-ink">{l.name}</span>
