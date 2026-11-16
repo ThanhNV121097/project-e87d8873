@@ -5,6 +5,9 @@ import ProductImage from "./ProductImage";
 import { formatPrice } from "../lib/format";
 import type { Product } from "../lib/shop";
 
+/** A space a line may not break at. */
+const NBSP = String.fromCharCode(160);
+
 // Written out whole so Tailwind finds every class in the source.
 export const TINTS = ["bg-[var(--tint-1)]", "bg-[var(--tint-2)]", "bg-[var(--tint-3)]", "bg-[var(--tint-4)]"] as const;
 
@@ -40,7 +43,7 @@ export default function TintCard({ product, tint, label, compact = false, eager 
             <span className="font-light">{product.brand} </span>
             {/* The model's last word is held to the one before it, so a
                 narrow card never leaves "1" alone on a line. */}
-            <span className="font-bold">{product.name.replace(/ (\S+)$/, " $1")}</span>
+            <span className="font-bold">{product.name.replace(/ (\S+)$/, `${NBSP}$1`)}</span>
           </span>
           {product.fact && !compact && <span className="text-sm text-ink-soft">{product.fact}</span>}
         </span>
