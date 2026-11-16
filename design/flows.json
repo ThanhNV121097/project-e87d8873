@@ -48,6 +48,17 @@
     ]
   },
   {
+    "name": "Search the whole shop for a workshop job",
+    "steps": [
+      { "action": "open", "path": "/" },
+      { "action": "click", "selector": "[data-testid='open-search']" },
+      { "action": "type", "selector": "[data-testid='search-input']", "value": "bleed" },
+      { "action": "press", "selector": "[data-testid='search-input']", "key": "Enter" },
+      { "action": "click", "selector": "[data-testid='search-in-services']" },
+      { "action": "expect", "selector": "[data-testid='search-services']", "text": "250.000" }
+    ]
+  },
+  {
     "name": "Open a department from its wordmark",
     "steps": [
       { "action": "open", "path": "/" },
