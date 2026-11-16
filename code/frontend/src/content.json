@@ -1,240 +1,526 @@
 {
-  "site": {
-    "name": "Sample & Co.",
-    "logo": "",
-    "description": "A small shop of things for the kitchen, the house and the desk.",
-    "locale": "vi-VN"
+  "ask": {
+    "height": "Your height (cm)",
+    "message": "Anything else — where you ride, a test ride",
+    "send": "Ask the shop to call",
+    "sent": "Thank you — we have your details and will call you back with an answer.",
+    "size": "Size you are thinking of",
+    "unsure": "Not sure yet"
   },
-  "nav": {
-    "links": [
-      {
-        "label": "Home",
-        "href": "/"
+  "card": {
+    "ask": "Ask when it is back",
+    "choose": "Choose a size"
+  },
+  "checkout": {
+    "address": "Delivery address",
+    "delivery": {
+      "courier": {
+        "title": "Courier, anywhere in Vietnam"
       },
-      {
-        "label": "Shop",
-        "href": "/shop"
+      "local": {
+        "title": "Delivered in town"
       },
-      {
-        "label": "Kitchen",
-        "href": "/shop?category=kitchen"
-      },
-      {
-        "label": "Bags",
-        "href": "/shop?category=bags"
-      },
-      {
-        "label": "Contact",
-        "href": "/contact"
+      "pickup": {
+        "title": "Collect from the shop"
       }
-    ],
-    "cta": {
-      "label": "Shop",
-      "href": "/shop"
     },
-    "menu": {
-      "open": "Open menu",
-      "close": "Close menu"
-    }
-  },
-  "header": {
-    "search": "Search the shop",
-    "account": "Sign in",
-    "bag": "Bag"
-  },
-  "hero": {
-    "headline": {
-      "light": "Everyday things,",
-      "bold": "Chosen. Carefully",
-      "tail": "For you"
-    },
-    "cta": {
-      "label": "Explore products",
-      "href": "/shop"
-    },
-    "proof": {
-      "count": "things in the shop",
-      "line": "Each one in stock, and sent the next working day."
-    }
-  },
-  "home": {
-    "month": {
-      "light": "What we lead with",
-      "bold": "this month",
-      "tail": "",
-      "line": "Two things from the shelf we would put in anybody's hands first."
-    },
-    "start": {
-      "light": "Not sure where to",
-      "bold": "start?",
-      "tail": "",
-      "line": "Three parts of the house, and what we keep for each of them.",
-      "row": "See everything in this department",
-      "image": ""
-    },
-    "features": [
-      {
-        "bold": "Pay your way",
-        "light": "Card, transfer or cash when it arrives."
+    "how": "How it reaches you",
+    "name": "Your name",
+    "note": "A note for the shop (optional)",
+    "pay": "How you pay",
+    "payment": {
+      "cod": {
+        "line": "Pay when the bike arrives. In town only.",
+        "title": "Cash on delivery"
       },
-      {
-        "bold": "Thirty-day returns",
-        "light": "Send it back within thirty days."
+      "shop": {
+        "line": "Card or cash when you collect.",
+        "title": "At the shop"
       },
-      {
-        "bold": "A person answers",
-        "light": "Write to us and somebody replies the same day."
+      "transfer": {
+        "line": "We send a VietQR code when we call to confirm.",
+        "title": "Bank transfer"
       }
-    ],
-    "picks": {
-      "light": "Everything else,",
-      "bold": "in one place",
-      "tail": "",
-      "line": "The whole shelf, four to a row.",
-      "all": "All products"
     },
-    "add": "Add to cart"
-  },
-  "footer": {
-    "line": "Sample & Co. — things for the kitchen, the house and the desk.",
-    "departments": "Departments",
-    "help": "Help",
-    "contact": "Contact us",
-    "bag": "Your bag",
-    "admin": "Shop sign-in"
-  },
-  "credits": {
-    "label": "Photos"
+    "phone": "Phone number",
+    "place": "Place order",
+    "who": "Who it is for"
   },
   "contact": {
-    "heading": "Ask us anything",
-    "phone": "",
-    "zalo": "",
-    "email": "",
     "address": "",
-    "hours": "",
     "dock": {
       "call": "Call us",
       "zalo": "Message us on Zalo"
     },
+    "email": "",
     "form": {
-      "name": "Your name",
-      "reply_to": "Phone or email",
-      "message": "Your message",
-      "send": "Send",
-      "sending": "Sending…",
-      "sent": "Thank you — we have your message and will answer soon.",
-      "offline": "This form is not connected yet — call or message us instead.",
       "fields": {
-        "address": "Where to deliver"
+        "address": "Where to deliver",
+        "bike": "Which bike (if you know)",
+        "height": "Your height in cm"
+      },
+      "message": "Your message",
+      "name": "Your name",
+      "offline": "This form is not connected yet — please try again later.",
+      "reply_to": "Phone or email",
+      "send": "Send message",
+      "sending": "Sending…",
+      "sent": "Thank you — we have your message and will answer soon."
+    },
+    "heading": "Ask us anything",
+    "hours": "",
+    "phone": "",
+    "zalo": ""
+  },
+  "credits": {
+    "label": "Photos"
+  },
+  "footer": {
+    "admin": "Shop sign-in",
+    "bag": "Your bag",
+    "contact": "Contact us",
+    "departments": "Riding types",
+    "help": "Help",
+    "independent": "Đèo Bikes is an independent shop. Giant and Liv are their makers' trademarks; this site is not run by or affiliated with them. Prices in đồng are samples until the shop confirms them.",
+    "line": "Mountain bikes for passes, trails and rough ground — chosen, built and set up by people who ride them.",
+    "message": "Send us a message",
+    "pages": "Pages",
+    "reach": "Reach us",
+    "types": "Riding types"
+  },
+  "header": {
+    "account": "Shop sign-in",
+    "bag": "Bag",
+    "search": "Search bikes",
+    "search_go": "Search",
+    "search_hint": "Model, brand or riding type — Stance, Liv, e-MTB"
+  },
+  "hero": {
+    "cta": {
+      "href": "/shop",
+      "label": "See all bikes"
+    },
+    "headline": {
+      "bold": "Passes. Trails",
+      "light": "Built for",
+      "tail": "\u0026 rough ground"
+    },
+    "proof": {
+      "count": "bikes in stock",
+      "line": "From a first hardtail to a carbon race bike — each one built and set up before it leaves."
+    }
+  },
+  "home": {
+    "add": "",
+    "features": [],
+    "month": {
+      "bold": "the month",
+      "cta": "See the bike",
+      "image": "/images/month-ride.jpg",
+      "light": "Bike of",
+      "line": "",
+      "tail": "",
+      "travel": "Travel",
+      "weight": "Weight"
+    },
+    "picks": {
+      "all": "All bikes",
+      "bold": "picks",
+      "light": "Favourite",
+      "line": "More from the shop floor — from first-trail hardtails to carbon race bikes.",
+      "tail": ""
+    },
+    "promises": [
+      {
+        "bold": "Delivered built",
+        "light": ""
+      },
+      {
+        "bold": "years of frame warranty",
+        "light": "From the shop, on top of the maker's own warranty."
+      },
+      {
+        "bold": "A reply within",
+        "light": "Message us and a rider answers — about sizes, trails or an order.",
+        "unit": "hours"
       }
+    ],
+    "reviews": {
+      "bold": "say",
+      "from": "from",
+      "light": "What riders",
+      "more": "All reviews",
+      "ratings": "ratings",
+      "tail": ""
+    },
+    "start": {
+      "bold": "where to start?",
+      "image": "/images/start-ride.jpg",
+      "light": "Not sure",
+      "line": "Four kinds of mountain bike, and the riding each one is for.",
+      "row": "",
+      "tail": ""
+    },
+    "workshop_mark": "Workshop"
+  },
+  "nav": {
+    "cta": {
+      "href": "/shop",
+      "label": "See all bikes"
+    },
+    "links": [
+      {
+        "href": "/shop",
+        "label": "Bikes"
+      },
+      {
+        "href": "/gallery",
+        "label": "Gallery"
+      },
+      {
+        "href": "/about",
+        "label": "About"
+      },
+      {
+        "href": "/contact",
+        "label": "Contact"
+      }
+    ],
+    "menu": {
+      "close": "Close menu",
+      "open": "Open menu"
     }
   },
   "pages": {
-    "home": {
-      "title": "Sample & Co.",
-      "description": "A small shop of things for the kitchen, the house and the desk."
-    },
-    "shop": {
-      "title": "Shop",
-      "description": "Everything in the shop, by department.",
-      "heading": "All departments",
-      "crumb": "Shop",
-      "count": "products",
-      "filter_department": "Department",
-      "clear": "Show everything",
-      "empty": "Nothing in the shop matches that.",
-      "searching": "Results for",
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "product": {
-      "missing": "That is not in the shop any more.",
-      "back": "Back to the shop",
-      "option": "Choose",
-      "quantity": "Quantity",
-      "add": "Add to bag",
-      "added": "In your bag",
-      "in_stock": "In stock",
-      "low": "Only a few left",
-      "out": "Out of stock",
-      "saved": "You save",
-      "delivery": "Sent the next working day",
-      "returns": "Fourteen days to send it back",
-      "tab_about": "About it",
-      "tab_details": "Details",
-      "tab_care": "Care",
-      "spec_department": "Department",
-      "spec_material": "Made of",
-      "spec_options": "Comes in",
-      "related": "More from this department"
-    },
-    "bag": {
-      "title": "Your bag",
-      "description": "What you have chosen.",
-      "heading": "Your bag",
-      "empty": "Nothing in your bag yet.",
-      "browse": "See the shop",
-      "total": "Total",
-      "checkout": "Check out",
-      "remove": "Remove",
-      "drawer_pay": "Check out"
-    },
-    "checkout": {
-      "title": "Check out",
-      "description": "Tell us where to send it.",
-      "heading": "Check out",
-      "lead": "Send your order and we confirm it by message, with the delivery charge. Nothing is charged on this page.",
-      "summary": "Your order",
-      "total": "Total",
-      "empty": "Your bag is empty."
-    },
-    "contact": {
-      "title": "Contact",
-      "description": "How to reach the shop.",
-      "lead": "Message us about an order, a product or a return. We answer the same day.",
-      "phone": "Phone",
-      "email": "Email",
-      "address": "Find us",
-      "hours": "Open"
+    "about": {
+      "ask": "Ask us anything",
+      "built": "Bikes built",
+      "col_job": "Job",
+      "col_price": "Price",
+      "col_time": "Time",
+      "description": "Who builds your bike, what the workshop costs and what riders say.",
+      "faq": {
+        "bold": "you buy",
+        "light": "Before",
+        "tail": ""
+      },
+      "free_a": "First service free within",
+      "free_b": "months",
+      "heading": {
+        "bold": "ride. Advice",
+        "light": "Bikes we",
+        "tail": "we would take"
+      },
+      "image": "/images/about-workshop.jpg",
+      "included": "Included",
+      "lead": "We are a small shop of riders. Every bike is built in our workshop and set up for the person riding it.",
+      "more_reviews": "Show all reviews",
+      "rated": "Average rating",
+      "rides": "Rides:",
+      "since": "Open since",
+      "story": "We sell the bikes we would choose ourselves, tell you when a cheaper one will do, and look after it when it comes back muddy.",
+      "team": {
+        "bold": "people",
+        "light": "The",
+        "line": "Four riders who build, fit and deliver every bike.",
+        "tail": ""
+      },
+      "title": "About the shop",
+      "workshop": {
+        "bold": "prices",
+        "light": "Workshop",
+        "line": "Every bike we sell is built and set up free. After that, this is what work costs.",
+        "tail": ""
+      }
     },
     "admin": {
+      "kinds": {
+        "title": "Riding types"
+      },
       "nav": {
+        "catalogue": "Shop",
+        "kinds": "Riding types",
         "overview": "Overview",
-        "catalogue": "Catalogue",
-        "products": "Products",
-        "kinds": "Departments"
+        "products": "Bikes"
       },
       "overview": {
-        "title": "Overview",
-        "products": "Products",
+        "col_kind": "Riding type",
+        "col_product": "Bike",
+        "col_stock": "In stock",
         "drafts": "still in draft",
-        "kinds": "Departments",
+        "kinds": "Riding types",
         "low": "Running low",
-        "low_note": "under ten left",
-        "worth": "Stock on the shelf",
-        "worth_note": "at the prices shown",
-        "low_title": "Running low",
         "low_none": "Nothing is running low.",
-        "col_product": "Product",
-        "col_kind": "Department",
-        "col_stock": "In stock"
+        "low_note": "under ten in stock",
+        "low_title": "Running low",
+        "products": "Bikes",
+        "title": "Overview",
+        "worth": "Stock on the floor",
+        "worth_note": "at the prices shown"
       },
       "products": {
-        "title": "Products",
-        "search": "Search by name",
-        "status": "Status",
+        "draft": "Draft",
         "live": "Live",
-        "draft": "Draft"
-      },
-      "kinds": {
-        "title": "Departments"
+        "search": "Search by model",
+        "status": "Status",
+        "title": "Bikes"
       },
       "signin": {
-        "title": "Welcome back",
-        "description": "Sign in to run the shop.",
-        "note": "Ask the shop's owner for an account."
+        "description": "Sign in to run Đèo Bikes.",
+        "note": "Ask the shop's owner for an account.",
+        "title": "Welcome back"
       }
+    },
+    "bag": {
+      "browse": "See all bikes",
+      "call_note": "We call to confirm before anything is charged.",
+      "checkout": "Check out",
+      "delivery_note": "Chosen at checkout",
+      "description": "The bikes you have chosen.",
+      "drawer_pay": "Check out",
+      "empty": "Your bag is empty.",
+      "empty_line": "Start from the riding you do — each kind of bike is one click away.",
+      "heading": {
+        "bold": "bag",
+        "light": "Your",
+        "tail": ""
+      },
+      "heading_plain": "Your bag",
+      "remove": "Remove",
+      "size": "Size",
+      "subtotal": "Bikes",
+      "title": "Your bag",
+      "total": "Total"
+    },
+    "checkout": {
+      "delivery": "Delivery",
+      "description": "Where your bike goes and how you pay.",
+      "empty": "Your bag is empty.",
+      "free": "Free",
+      "heading": {
+        "bold": "out",
+        "light": "Check",
+        "tail": ""
+      },
+      "includes": "Every bike is built, checked and set up for you before it leaves the shop.",
+      "lead": "Three steps. We confirm by phone before anything is charged.",
+      "summary": "Your order",
+      "title": "Check out",
+      "total": "Total"
+    },
+    "contact": {
+      "address": "Find us",
+      "description": "Ask about a bike, a size, a test ride or an order.",
+      "email": "Email",
+      "heading": {
+        "bold": "anything.",
+        "light": "Ask us",
+        "tail": ""
+      },
+      "hours": "Open",
+      "image": "/images/contact-shop.jpg",
+      "lead": "About a bike, a size, a test ride or an order. Tell us your height and where you ride, and we answer with the bike that fits.",
+      "lead_old": "",
+      "phone": "Phone",
+      "reasons": [
+        {
+          "bold": "Which size?",
+          "light": "Send your height and inside-leg and we tell you which frame fits."
+        },
+        {
+          "bold": "A test ride",
+          "light": "Name the bike and a day, and we have it ready on our loop."
+        },
+        {
+          "bold": "Workshop work",
+          "light": "Book a service, a fit or a suspension job."
+        }
+      ],
+      "reply_a": "We reply within",
+      "reply_b": "hours",
+      "title": "Contact"
+    },
+    "done": {
+      "ask": "Questions about this order?",
+      "badge": "Order received",
+      "call_a": "We will call",
+      "call_b": "within",
+      "call_c": "hours of opening to confirm the size and delivery.",
+      "description": "Your order and what happens next.",
+      "goes": "How it reaches you",
+      "heading": {
+        "bold": "Your bike",
+        "light": "Thank you.",
+        "tail": "is on hold"
+      },
+      "message": "Message us",
+      "none": {
+        "bold": "yet",
+        "light": "No order",
+        "tail": ""
+      },
+      "none_line": "Orders you place on this browser show here.",
+      "number": "Order number",
+      "ordered": "What you ordered",
+      "paid": "How you pay",
+      "steps": [
+        {
+          "line": "Your bike is held for you.",
+          "title": "Order received"
+        },
+        {
+          "line": "Size, delivery and payment confirmed.",
+          "title": "We call you"
+        },
+        {
+          "line": "Assembled, adjusted and test-ridden.",
+          "title": "Built and checked"
+        },
+        {
+          "line": "Delivered, sent or ready to collect.",
+          "title": "On its way"
+        }
+      ],
+      "title": "Order received"
+    },
+    "gallery": {
+      "close": {
+        "bold": "your kind",
+        "light": "Seen",
+        "tail": "of riding?"
+      },
+      "count": "photographs",
+      "cta": "See the bikes for it",
+      "description": "The riding these bikes are bought for.",
+      "heading": {
+        "bold": "these bikes",
+        "light": "Where",
+        "tail": "go"
+      },
+      "lead": "Climbs to the pass, rock on the way down, dirt roads at dusk — the riding our customers buy their bikes for.",
+      "title": "Gallery"
+    },
+    "home": {
+      "description": "Hardtail, trail, cross-country and electric mountain bikes, built and set up for you. See prices, sizes and stock, and order online.",
+      "title": "Đèo Bikes — mountain bikes for passes and trails"
+    },
+    "product": {
+      "add": "Add to bag",
+      "added": "In your bag",
+      "added_line": "Added to your bag.",
+      "ask": "Ask about it",
+      "ask_back": "Ask when it is back",
+      "ask_light": "Ask about the",
+      "ask_line": "Leave your number and your height. We call back with the right size and when you can ride it.",
+      "ask_line_out": "This one has sold out. Leave your number and we call you when the next one arrives.",
+      "back": "See all bikes",
+      "d_confirm": "Confirming",
+      "d_local": "In town",
+      "d_nation": "Elsewhere in Vietnam",
+      "d_pay": "Payment",
+      "d_pickup": "Collect",
+      "description": "Price, sizes by rider height, full specification and stock.",
+      "guide_bold": "size?",
+      "guide_height": "Rider height",
+      "guide_light": "Which",
+      "guide_note": "Heights are the maker's guide. Long legs or a short back can move you a size — send us both and we will check.",
+      "guide_size": "Size",
+      "guide_stock": "Stock",
+      "in_stock": "In stock",
+      "low": "Only a few left",
+      "missing": "That bike is no longer in the shop.",
+      "option": "Size",
+      "out": "Out of stock",
+      "quantity": "Quantity",
+      "ratings": "ratings",
+      "related_light": "More",
+      "reply": "A reply within",
+      "reply_unit": "hours, seven days a week",
+      "saved": "You save",
+      "size": "Frame size",
+      "size_guide": "Size guide",
+      "spec": {
+        "brakes": "Brakes",
+        "colour": "Colour",
+        "drivetrain": "Drivetrain",
+        "fork": "Fork",
+        "frame": "Frame",
+        "motor": "Motor and battery",
+        "shock": "Rear shock",
+        "tyres": "Tyres",
+        "weight": "Weight",
+        "wheels": "Wheels"
+      },
+      "spec_bold": "specification",
+      "spec_light": "The",
+      "tab_about": "What it is for",
+      "tab_delivery": "Delivery and payment",
+      "tab_reviews": "Reviews",
+      "tab_ride": "Owning it",
+      "title": "A bike from Đèo Bikes",
+      "to_bag": "See your bag",
+      "warranty": "years of frame warranty from the shop"
+    },
+    "shop": {
+      "all": "All types",
+      "band": {
+        "25-70": "25–70 million ₫",
+        "70-100": "70–100 million ₫",
+        "over-100": "Over 100 million ₫",
+        "under-25": "Under 25 million ₫"
+      },
+      "bikes_word": "bikes",
+      "clear": "Clear filters",
+      "clear_search": "Clear search",
+      "count": "bikes",
+      "crumb": "Bikes",
+      "description": "Every bike in the shop, by riding type, frame size, wheel, brand and price.",
+      "empty": "No bike matches all of that.",
+      "empty_line": "Take one filter off — or tell us what you need and we will order it in.",
+      "filter_brand": "Brand",
+      "filter_department": "Riding type",
+      "filter_price": "Price",
+      "filter_size": "Frame size",
+      "filter_wheel": "Wheel size",
+      "heading": {
+        "bold": "bikes",
+        "light": "All the",
+        "tail": ""
+      },
+      "help": {
+        "bold": "two sizes?",
+        "cta": "Ask about sizing",
+        "light": "Between",
+        "line": "Send us your height and inside-leg and we will tell you which — or book a test ride.",
+        "tail": ""
+      },
+      "lead": "Hardtails for first trails, full suspension for rough ground, carbon for racing and e-MTBs for the longest days.",
+      "loading": "Loading bikes…",
+      "more": "Show more bikes",
+      "next": "Next",
+      "previous": "Previous",
+      "searching": "Results for",
+      "sort": "Sort bikes",
+      "sort_default": "Recommended",
+      "sort_high": "Price: high to low",
+      "sort_low": "Price: low to high",
+      "title": "Mountain bikes",
+      "wheel_29": "29 inch",
+      "wheel_mixed": "Mixed 29 / 27.5 inch"
     }
+  },
+  "site": {
+    "description": "Mountain bikes for passes, trails and rough ground — hardtails, trail, cross-country and e-MTBs, built and set up before they leave the shop.",
+    "locale": "vi-VN",
+    "logo": "",
+    "name": "Đèo Bikes"
+  },
+  "stock": {
+    "in": "In stock",
+    "left": "left",
+    "out": "Out of stock"
+  },
+  "tint": {
+    "choose": "Choose a size for"
   }
 }
