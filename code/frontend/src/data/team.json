@@ -1,0 +1,6 @@
+[
+  { "id": "quang", "name": "Quang", "role": "Founder · bike fitting", "line": "Opened the shop after ten years of riding the northern passes on bikes that did not fit.", "rides": "Trail, hardtail", "_source": "assumed" },
+  { "id": "thu", "name": "Thu", "role": "Workshop lead", "line": "Builds every bike before it leaves and does the suspension and brake work.", "rides": "Cross-country", "_source": "assumed" },
+  { "id": "bao", "name": "Bảo", "role": "Advice and test rides", "line": "Takes riders round the test loop and answers the messages that come in at night.", "rides": "Trail, e-MTB", "_source": "assumed" },
+  { "id": "van", "name": "Vân", "role": "Orders and delivery", "line": "Calls every buyer to confirm size and delivery, and packs the bikes that travel by courier.", "rides": "Hardtail", "_source": "assumed" }
+]

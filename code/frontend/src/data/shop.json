@@ -1,0 +1,21 @@
+[
+  {
+    "id": "shop",
+    "founded": 2016,
+    "bikes_built": 3200,
+    "rating": 4.9,
+    "review_count": 412,
+    "reply_hours": 2,
+    "warranty_years": 2,
+    "free_service_months": 3,
+    "delivery_local": "Free, built and set up, in 1–2 days",
+    "delivery_nationwide": "By courier in a box, 90% built, in 3–5 days",
+    "delivery_fee": 350000,
+    "pickup": "Collect from the shop, built and fitted, the next day",
+    "payment": ["Bank transfer (VietQR)", "Cash on delivery (in town)", "Card or cash at the shop"],
+    "confirm": "We call within two hours of opening time to confirm the size, the stock and the delivery. Nothing is charged before that call.",
+    "stock_rule": "Each bike has a number in stock, kept by the shop. An order holds the bike until the confirming call; a size at zero shows as out of stock.",
+    "_source": "assumed",
+    "_invented": ["founded", "bikes_built", "rating", "review_count", "reply_hours", "warranty_years", "free_service_months", "delivery_local", "delivery_nationwide", "delivery_fee", "pickup", "payment", "confirm", "stock_rule"]
+  }
+]

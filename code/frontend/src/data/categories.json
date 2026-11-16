@@ -1,51 +1,6 @@
 [
-  {
-    "id": "kitchen",
-    "name": "Kitchen",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "home",
-    "name": "Home",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "audio",
-    "name": "Audio",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "bags",
-    "name": "Bags",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "desk",
-    "name": "Desk",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "garden",
-    "name": "Garden",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  },
-  {
-    "id": "wellness",
-    "name": "Wellness",
-    "image": "",
-    "_source": "assumed",
-    "_sample": true
-  }
+  { "id": "hardtail", "name": "Hardtail", "line": "A suspension fork, a rigid back end: light, simple and the easiest to look after.", "terrain": "Pass roads, gravel and your first trails", "_source": "assumed" },
+  { "id": "cross-country", "name": "Cross-country", "line": "Light carbon bikes with short travel, built to climb fast and race.", "terrain": "Long climbs, fast singletrack, race days", "_source": "assumed" },
+  { "id": "trail", "name": "Trail", "line": "Suspension front and back for rock, roots and steep ground.", "terrain": "Rough trails, broken roads, steep descents", "_source": "assumed" },
+  { "id": "e-mtb", "name": "E-MTB", "line": "A motor that adds to your pedalling, for longer days and steeper climbs.", "terrain": "Big days, high passes, the climbs you used to walk", "_source": "assumed" }
 ]
