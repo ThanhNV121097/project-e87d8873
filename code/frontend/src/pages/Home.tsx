@@ -60,8 +60,8 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <span className="flex -space-x-3">
                   {inStock.items.map((p) => (
-                    <span key={p.id} className="block w-11 overflow-hidden rounded-full ring-2 ring-[var(--ground)]">
-                      <ProductImage src={p.image_back ?? p.image} alt="" aspect="1/1" eager className="rounded-none" />
+                    <span key={p.id} className="block w-12 overflow-hidden rounded-full border border-line ring-2 ring-[var(--ground)]">
+                      <ProductImage src={p.image_detail ?? p.image} alt="" aspect="1/1" eager className="rounded-none" />
                     </span>
                   ))}
                 </span>
