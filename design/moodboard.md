@@ -138,6 +138,21 @@ the house-style ceilings are untouched.
 - **The look:** the shop's mark and name; the dark pill button.
 - **From what I looked at:** https://dribbble.com/search/contact-page — the single-form screen with one clear action.
 
+## Crit notes (what changed after watching the build)
+
+- **Round 1 (preview at 1440 and 390, then the walk):** every page stopped at the same margin. Each page now
+  lets ONE thing run off the screen's edge — the Bike-of-the-month photograph off the left on the home page,
+  the sizing band off the right on `/shop`, the "Ask about this bike" band on a bike's page, the photographs
+  on `/gallery`, `/about` and `/contact`, the steps band on `/checkout/done`. The home page's first screen
+  keeps the template's arrangement, which has no bleed.
+- On a phone the Bike-of-the-month card was squeezed beside its photograph and its price bar clipped: the
+  photograph now runs edge to edge above a full-width card. The department wordmarks wrap left-aligned
+  at a smaller size instead of being pushed to both edges.
+- The footer's photo credits were 2.9:1 on navy; now they're above 7:1.
+- The tinted cards lost 24px of air under the name so more of each bike shows in the first screen.
+- **Round 2:** the management area's overview figure for stock value was too wide at 1180px; it is now the
+  count of bikes out of stock, and "Running low" is a searchable, filterable, paged table.
+
 ## COMMITMENTS
 
 1. At 1440×790 the first screen has no photograph above the cards: a three-line heading whose words change between Inter Light and Inter Bold ("Built for / Passes. Trails / & rough ground") with the dark "See all bikes" pill on its last line, and the tops of the three tinted cards in view.
@@ -148,3 +163,4 @@ the house-style ceilings are untouched.
 6. Every bike card in a grid is a white 4:3 tile with a hairline edge holding the maker's photograph, a heart at its top right, the name and the price on one line, the stock status in the owner's words ("In stock" / "Out of stock") with its icon, and an outlined pill.
 7. On a bike's own page, frame sizes are pills that each show the rider height they fit (M · 169–179 cm), and the specification is a two-column table: frame, fork, shock, drivetrain, brakes, wheels, tyres, weight.
 8. Lively motion a reviewer can watch: the hero heading's words rise one after another, the hero pill leans to the pointer, the bike count counts up, the three tinted cards tilt under the pointer, grid cards show the drivetrain close-up under the pointer, and the bike page's main picture is looked into under the pointer.
+9. One thing per page runs off the screen's edge: the Bike-of-the-month photograph off the left edge of the home page, the lilac sizing band off the right edge of `/shop`, the grey "Ask about this bike" band off the right edge of a bike's page, and the opening photograph off the right edge of `/gallery`, `/about` and `/contact`.
