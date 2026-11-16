@@ -64,7 +64,7 @@ export default function SiteFooter() {
         </div>
         <div className="mt-12 flex flex-col gap-3 border-t border-accent-ink/20 pt-6 text-xs text-accent-ink/75 lg:flex-row lg:justify-between lg:gap-10">
           <T k="footer.independent" as="p" className="max-w-[70ch]" />
-          <PhotoCredits className="max-w-[70ch] text-accent-ink/75 [&_a]:text-accent-ink/90" />
+          <PhotoCredits className="max-w-[70ch] text-accent-ink/80 [&_a]:text-accent-ink" />
         </div>
       </div>
     </footer>
