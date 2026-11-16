@@ -35,8 +35,8 @@
         { "key": "ride", "label": "What it is like to own", "type": "longtext", "section": "Words" },
         { "key": "rating", "label": "Rating", "type": "number", "section": "Words" },
         { "key": "review_count", "label": "Number of ratings", "type": "number", "section": "Words" },
-        { "key": "image_back", "label": "Close-up: drivetrain", "type": "image", "section": "More pictures" },
-        { "key": "image_detail", "label": "Close-up: cockpit and fork", "type": "image", "section": "More pictures" },
+        { "key": "image_back", "label": "Close-up: drivetrain", "type": "image", "section": "Basics" },
+        { "key": "image_detail", "label": "Close-up: cockpit and fork", "type": "image", "section": "Basics" },
         { "key": "_invented", "label": "Invented fields", "type": "list", "hidden": true }
       ]
     },
