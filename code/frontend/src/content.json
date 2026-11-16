@@ -9,7 +9,12 @@
   },
   "card": {
     "ask": "Ask when it is back",
-    "choose": "Choose a size"
+    "choose": "Choose a size",
+    "view": {
+      "drive": "drivetrain close-up",
+      "front": "fork and cockpit close-up",
+      "whole": "the whole bike"
+    }
   },
   "checkout": {
     "address": "Delivery address",
@@ -105,6 +110,8 @@
       "light": "Built for",
       "tail": "\u0026 rough ground"
     },
+    "image": "/images/hero-pass.jpg",
+    "image_alt": "A rider leaning a full-suspension mountain bike through a dusty corner under the trees",
     "proof": {
       "count": "bikes in stock",
       "line": "From a first hardtail to a carbon race bike — each one built and set up before it leaves."
