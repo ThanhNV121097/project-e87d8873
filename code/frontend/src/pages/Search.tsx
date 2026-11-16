@@ -216,7 +216,7 @@ function StartHere({ types }: { types: Department[] }) {
         </div>
         {image && (
           <div className="overflow-hidden rounded lg:col-span-5 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
-            <Picture src={image} alt="" width={1280} height={960} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
+            <Picture src={image} alt={imageAlt} width={1280} height={960} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
           </div>
         )}
       </div>
