@@ -376,6 +376,8 @@
         "light": "Thank you.",
         "tail": "is on hold"
       },
+      "image": "/images/done-tyre.jpg",
+      "image_alt": "Muddy mountain-bike tyres side by side in a rack, waiting to go out",
       "message": "Message us",
       "none": {
         "bold": "yet",
