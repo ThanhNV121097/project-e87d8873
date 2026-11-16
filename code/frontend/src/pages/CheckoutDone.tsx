@@ -6,6 +6,7 @@ import { useDemo } from "../lib/demo";
 import { formatDateTime, formatPrice } from "../lib/format";
 import { EXAMPLE_ORDER, lastOrder } from "../lib/mock/orders";
 import type { ShopInfo } from "../lib/shop";
+import Bleed from "../components/Bleed";
 import Icon, { type IconName } from "../components/Icon";
 import ProductImage from "../components/ProductImage";
 import Weights from "../components/Weights";
@@ -25,10 +26,14 @@ export default function CheckoutDone() {
   const shop = useCollection<ShopInfo>("shop", { pageSize: 1 }).items[0];
   if (!order) {
     return (
-      <div className="flex flex-col items-start gap-6 py-20">
-        <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.done.none" /></h1>
-        <T k="pages.done.none_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
-        <Link to="/shop" className="rounded-full bg-accent px-7 py-3 text-sm font-medium text-accent-ink"><T k="pages.bag.browse" /></Link>
+      <div className="pb-8">
+        {/* Nothing ordered on this browser yet: said once, on the shop's navy
+            run to both screen edges, with the one way on. */}
+        <Bleed className="flex flex-col items-start gap-6 bg-accent py-20 text-accent-ink">
+          <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-accent-ink"><Weights k="pages.done.none" /></h1>
+          <T k="pages.done.none_line" as="p" className="max-w-[52ch] text-sm text-accent-ink/80" />
+          <Link to="/shop" className="rounded-full bg-ground px-7 py-3 text-sm font-medium text-ink hover:opacity-90"><T k="pages.bag.browse" /></Link>
+        </Bleed>
       </div>
     );
   }
