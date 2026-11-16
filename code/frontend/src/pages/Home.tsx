@@ -10,6 +10,7 @@ import Icon, { type IconName } from "../components/Icon";
 import ProductCard from "../components/ProductCard";
 import ProductImage from "../components/ProductImage";
 import ReviewCard from "../components/ReviewCard";
+import DeliveryTerms from "../components/DeliveryTerms";
 import TintCard from "../components/TintCard";
 import Weights from "../components/Weights";
 
@@ -107,9 +108,11 @@ export default function Home() {
                 {i === 1 && <><span className="tabular-nums">{n}</span>{" "}<T k="home.promises.1.bold" /></>}
                 {i === 2 && <><T k="home.promises.2.bold" />{" "}<span className="tabular-nums">{n}</span>{" "}<T k="home.promises.2.unit" /></>}
               </p>
-              <p className="mt-1 max-w-[28ch] text-xs leading-relaxed text-ink-soft">
-                {i === 0 ? shop.delivery_local : <T k={`home.promises.${i}.light`} />}
-              </p>
+              {i === 0 ? (
+                <DeliveryTerms shop={shop} className="mt-1 max-w-[34ch] text-xs leading-relaxed text-ink-soft" />
+              ) : (
+                <p className="mt-1 max-w-[28ch] text-xs leading-relaxed text-ink-soft"><T k={`home.promises.${i}.light`} /></p>
+              )}
             </div>
           ))}
         </section>
