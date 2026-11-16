@@ -323,6 +323,8 @@
         "light": "Check",
         "tail": ""
       },
+      "image": "/images/checkout-build.jpg",
+      "image_alt": "A bicycle chain running over the teeth of a cassette, close up",
       "includes": "Every bike is built, checked and set up for you before it leaves the shop.",
       "lead": "Three steps. We confirm by phone before anything is charged.",
       "summary": "Your order",
@@ -565,6 +567,8 @@
         "line": "Send us your height and inside-leg and we will tell you which — or book a test ride.",
         "tail": ""
       },
+      "image": "/images/shop-floor.jpg",
+      "image_alt": "Forested ridges fading into morning mist, the kind of country these bikes are ridden through",
       "lead": "Hardtails for first trails, full suspension for rough ground, carbon for racing and e-MTBs for the longest days.",
       "loading": "Loading bikes…",
       "more": "Show more bikes",
