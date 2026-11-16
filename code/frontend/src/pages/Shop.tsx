@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { T, useContent } from "../editable";
 import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
+import { Picture } from "../picture";
 import { useTableQuery } from "../lib/table";
 import { inBand, PRICE_BANDS, type Department, type Product } from "../lib/shop";
 import FilterRail from "../components/FilterRail";
@@ -54,12 +55,22 @@ export default function Shop() {
   const bandWords = useContent<Record<string, string>>("pages.shop.band");
   const bandLabels = PRICE_BANDS.map((b) => bandWords?.[b.id] ?? b.id);
   const sortLabel = useContent("pages.shop.sort");
+  const image = useContent("pages.shop.image");
+  const imageAlt = useContent("pages.shop.image_alt");
   const pick = (id: string) => { t.set("category", chosen.length === 1 && chosen[0] === id ? [] : [id]); setShown(PAGE); };
   return (
     <div className="pb-8">
       {/* The head of the catalogue on a band that runs to both screen edges:
-          where you are, how many, and the riding types to choose from. */}
-      <Bleed className="bg-surface pb-8 pt-8">
+          where you are and the riding types to choose from at the left, and
+          the country these bikes are for off the right edge (on a phone, a
+          strip across the top of the band). */}
+      <Bleed className="bg-surface lg:grid lg:grid-cols-12 lg:gap-12">
+      {image && (
+        <div className="relative -mx-[var(--gutter)] aspect-[21/9] overflow-hidden lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:mx-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto">
+          <Picture src={image} alt={imageAlt} width={1280} height={730} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+        </div>
+      )}
+      <div className="pb-8 pt-8 lg:col-span-8 lg:col-start-1 lg:row-start-1">
       <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-ink-soft">
         <Link to="/" className="hover:text-ink"><Icon name="home" size={16} label="Home" /></Link>
         <Icon name="next" size={14} />
@@ -73,14 +84,6 @@ export default function Shop() {
             {one ? <><span className="font-light">{one.name} </span><span className="font-bold"><T k="pages.shop.bikes_word" /></span></> : <Weights k="pages.shop.heading" />}
           </h1>
           <p className="mt-5 max-w-[56ch] text-sm leading-relaxed text-ink-soft">{one ? one.line : <T k="pages.shop.lead" />}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-4">
-          <p data-testid="shop-count" className="text-sm text-ink-soft">
-            <span className="text-2xl font-bold tabular-nums text-ink">{found.length}</span>{" "}<T k="pages.shop.count" />
-          </p>
-          <Select aria-label={sortLabel} value={t.sort} onChange={(v) => t.set("sort", v)}
-            options={[{ value: "", label: sortLabels[0] }, { value: "price", label: sortLabels[1] }, { value: "-price", label: sortLabels[2] }]}
-            className="w-52" />
         </div>
       </div>
 
@@ -99,6 +102,7 @@ export default function Shop() {
           );
         })}
       </nav>
+      </div>
       </Bleed>
 
       {t.q && (
@@ -117,6 +121,15 @@ export default function Shop() {
             { key: "price", label: <T k="pages.shop.filter_price" />, options: PRICE_BANDS.map((b, i) => [b.id, bandLabels[i]] as const) },
           ]} />
         <div className="min-w-0 flex-1">
+          {/* How many, and in what order — over the grid they describe. */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <p data-testid="shop-count" className="text-sm text-ink-soft">
+              <span className="text-2xl font-bold tabular-nums text-ink">{found.length}</span>{" "}<T k="pages.shop.count" />
+            </p>
+            <Select aria-label={sortLabel} value={t.sort} onChange={(v) => t.set("sort", v)}
+              options={[{ value: "", label: sortLabels[0] }, { value: "price", label: sortLabels[1] }, { value: "-price", label: sortLabels[2] }]}
+              className="w-52" />
+          </div>
           {loading ? (
             <p className="py-16 text-sm text-ink-soft"><T k="pages.shop.loading" /></p>
           ) : found.length === 0 ? (
