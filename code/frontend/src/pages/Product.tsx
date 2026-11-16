@@ -49,7 +49,8 @@ export default function Product() {
       <Crumbs bike={item} type={type} />
       <section className="flex flex-col gap-10 lg:flex-row lg:gap-12">
         <div className="lg:w-7/12">
-          <ProductGallery images={picturesOf(item)} alt={`${item.brand} ${item.name}`} aspect="4/3" />
+          <ProductGallery images={picturesOf(item)} alt={`${item.brand} ${item.name}`} aspect="4/3"
+            mainClassName="-mx-[var(--gutter)] sm:mx-0 lg:-ml-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))]" />
         </div>
         <div data-record={`products:${item.id}`} className="flex flex-col gap-6 lg:w-5/12">
           <Head bike={item} type={type} tint={typeIndex} />
