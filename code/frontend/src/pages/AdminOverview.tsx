@@ -2,7 +2,6 @@ import { T, useContent } from "../editable";
 import OverviewPage from "../components/admin/OverviewPage";
 import AdminLowStock from "../components/AdminLowStock";
 import { useCollection } from "../data";
-import { formatPrice } from "../lib/format";
 import type { Product } from "../lib/shop";
 import { useAdminNav } from "./admin-nav";
 
@@ -17,7 +16,7 @@ export default function AdminOverview() {
   const kinds = useCollection("categories", { pageSize: 1 });
   const low = products.filter((p) => (p.stock ?? 0) < 10);
   const drafts = products.filter((p) => p.status === "draft").length;
-  const worth = products.reduce((sum, p) => sum + p.price * (p.stock ?? 0), 0);
+  const out = products.filter((p) => (p.stock ?? 0) === 0).length;
   const columns = [
     useContent("pages.admin.overview.col_product"),
     useContent("pages.admin.overview.col_kind"),
@@ -34,8 +33,8 @@ export default function AdminOverview() {
           note: useContent("pages.admin.overview.kinds_note") },
         { label: useContent("pages.admin.overview.low"), value: low.length, icon: "alert", to: "/admin/products",
           note: useContent("pages.admin.overview.low_note") },
-        { label: useContent("pages.admin.overview.worth"), value: formatPrice(worth), icon: "cash",
-          note: useContent("pages.admin.overview.worth_note") },
+        { label: useContent("pages.admin.overview.out"), value: out, icon: "package", to: "/admin/products",
+          note: useContent("pages.admin.overview.out_note") },
       ]}
       panels={[{
         title: useContent("pages.admin.overview.low_title"),
