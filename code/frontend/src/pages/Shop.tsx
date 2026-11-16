@@ -134,7 +134,7 @@ export default function Shop() {
               )}
             </>
           )}
-          <aside className="mt-16 flex flex-col gap-5 rounded bg-[var(--tint-3)] px-6 py-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+          <aside className="-mx-[var(--gutter)] mt-16 flex flex-col gap-5 bg-[var(--tint-3)] px-6 py-8 sm:mx-0 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:flex-row lg:items-center lg:justify-between lg:rounded-r-none lg:pl-10 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+2.5rem)]">
             <div>
               <p className="text-xl leading-tight text-ink"><Weights k="pages.shop.help" /></p>
               <T k="pages.shop.help.line" as="p" className="mt-2 max-w-[52ch] text-sm text-ink-soft" />
