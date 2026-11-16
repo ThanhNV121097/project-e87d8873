@@ -258,7 +258,7 @@
         "low_note": "under ten in stock",
         "low_title": "Running low",
         "out": "Out of stock",
-        "out_note": "shown as 'Out of stock' on the site",
+        "out_note": "marked out of stock",
         "products": "Bikes",
         "search": "Search bikes",
         "title": "Overview",
