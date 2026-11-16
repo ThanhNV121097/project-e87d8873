@@ -12,8 +12,10 @@ import type { Department, Product } from "../lib/shop";
  * A BIKE IN A GRID: the maker's photograph on a white 4:3 tile with a
  * hairline edge (the tile and the photograph's sweep are one surface), a
  * heart at its top right; then the brand and riding type in small capitals,
- * the name and the price on one line, the one line a rider compares by, the
- * stock in the owner's words, and an outlined pill to the bike's sizes.
+ * the name with the one line a rider compares by under it at the left, and
+ * at the right a column of its own for the price with the old price struck
+ * through beneath it — both right-aligned, however long the line beside them
+ * runs; the stock in the owner's words, and an outlined pill to the sizes.
  * Under the pointer the tile shows the drivetrain close-up.
  */
 export default function ProductCard({ product }: { product: Product }) {
@@ -26,15 +28,17 @@ export default function ProductCard({ product }: { product: Product }) {
         <ProductImage src={product.image} hover={product.image_back} alt={`${product.brand} ${product.name}`} aspect="4/3"
           className="rounded border border-line" />
         <span className="mt-4 block text-xs uppercase tracking-[0.14em] text-ink-soft">{product.brand}{type ? ` · ${type}` : ""}</span>
-        <span className="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-          <span className="text-base font-semibold text-ink underline-offset-4 group-hover:underline">{product.name}</span>
-          <span className="shrink-0 text-base font-bold tabular-nums text-ink">{formatPrice(product.price)}</span>
-        </span>
-        <span className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 text-sm text-ink-soft">
-          <span>{product.fact}</span>
-          {product.was !== undefined && product.was > product.price && (
-            <span className="shrink-0 tabular-nums line-through">{formatPrice(product.was)}</span>
-          )}
+        <span className="mt-1.5 flex items-start justify-between gap-4">
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-ink underline-offset-4 group-hover:underline">{product.name}</span>
+            {product.fact && <span className="mt-1 block text-sm text-ink-soft">{product.fact}</span>}
+          </span>
+          <span className="flex shrink-0 flex-col items-end text-right">
+            <span className="text-base font-bold tabular-nums text-ink">{formatPrice(product.price)}</span>
+            {product.was !== undefined && product.was > product.price && (
+              <span data-testid={`card-was-${product.id}`} className="mt-1 text-sm tabular-nums text-ink-soft line-through">{formatPrice(product.was)}</span>
+            )}
+          </span>
         </span>
       </Link>
       <StockLine stock={product.stock ?? 0} className="mt-3" />
