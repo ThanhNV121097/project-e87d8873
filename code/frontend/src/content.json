@@ -116,7 +116,7 @@
     "month": {
       "bold": "the month",
       "cta": "See the bike",
-      "image": "/images/gallery-rocky-descent.jpg",
+      "image": "/images/month-scene.jpg",
       "light": "Bike of",
       "line": "",
       "tail": "",
@@ -249,6 +249,7 @@
         "col_stock": "In stock",
         "drafts": "still in draft",
         "kinds": "Riding types",
+        "kinds_note": "shown on the site",
         "low": "Running low",
         "low_none": "Nothing is running low.",
         "low_note": "under ten in stock",
@@ -266,7 +267,14 @@
         "title": "Bikes"
       },
       "signin": {
+        "back": "Back to the shop",
         "description": "Sign in to run Đèo Bikes.",
+        "heading": {
+          "bold": "back",
+          "light": "Welcome",
+          "tail": ""
+        },
+        "image": "/images/start-ride.jpg",
         "note": "Ask the shop's owner for an account.",
         "title": "Welcome back"
       }
@@ -402,7 +410,7 @@
     },
     "home": {
       "description": "Hardtail, trail, cross-country and electric mountain bikes, built and set up for you. See prices, sizes and stock, and order online.",
-      "title": "Đèo Bikes — mountain bikes for passes and trails"
+      "title": "Mountain bikes for passes and trails"
     },
     "product": {
       "add": "Add to bag",
