@@ -193,7 +193,7 @@ function Sizes({ sizes, choice, onPick }: { sizes: Size[]; choice: string; onPic
 function SizePill({ s, on, onPick }: { s: Size; on: boolean; onPick: (s: string) => void }) {
   return (
     <button type="button" role="radio" aria-checked={on} disabled={s.out} onClick={() => onPick(s.size)} data-testid={`size-${s.size}`}
-      className={`flex min-w-[5.5rem] flex-1 flex-col items-center rounded-[var(--radius-sm)] border px-2 py-2.5 text-center ${on ? "border-ink bg-accent text-accent-ink" : "border-field text-ink hover:border-ink"} disabled:cursor-not-allowed disabled:border-line disabled:text-ink-soft disabled:line-through`}>
+      className={`flex min-w-[4.5rem] flex-1 flex-col items-center rounded-[var(--radius-sm)] border px-2 py-2.5 text-center ${on ? "border-ink bg-accent text-accent-ink" : "border-field text-ink hover:border-ink"} disabled:cursor-not-allowed disabled:border-line disabled:text-ink-soft disabled:line-through`}>
       <span className="text-sm font-semibold">{s.size}</span>
       {s.fit && <span className={`text-[0.6875rem] tabular-nums ${on ? "text-accent-ink" : "text-ink-soft"}`}>{s.fit}</span>}
     </button>
