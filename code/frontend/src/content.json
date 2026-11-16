@@ -1,0 +1,240 @@
+{
+  "site": {
+    "name": "Sample & Co.",
+    "logo": "",
+    "description": "A small shop of things for the kitchen, the house and the desk.",
+    "locale": "vi-VN"
+  },
+  "nav": {
+    "links": [
+      {
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "label": "Shop",
+        "href": "/shop"
+      },
+      {
+        "label": "Kitchen",
+        "href": "/shop?category=kitchen"
+      },
+      {
+        "label": "Bags",
+        "href": "/shop?category=bags"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "cta": {
+      "label": "Shop",
+      "href": "/shop"
+    },
+    "menu": {
+      "open": "Open menu",
+      "close": "Close menu"
+    }
+  },
+  "header": {
+    "search": "Search the shop",
+    "account": "Sign in",
+    "bag": "Bag"
+  },
+  "hero": {
+    "headline": {
+      "light": "Everyday things,",
+      "bold": "Chosen. Carefully",
+      "tail": "For you"
+    },
+    "cta": {
+      "label": "Explore products",
+      "href": "/shop"
+    },
+    "proof": {
+      "count": "things in the shop",
+      "line": "Each one in stock, and sent the next working day."
+    }
+  },
+  "home": {
+    "month": {
+      "light": "What we lead with",
+      "bold": "this month",
+      "tail": "",
+      "line": "Two things from the shelf we would put in anybody's hands first."
+    },
+    "start": {
+      "light": "Not sure where to",
+      "bold": "start?",
+      "tail": "",
+      "line": "Three parts of the house, and what we keep for each of them.",
+      "row": "See everything in this department",
+      "image": ""
+    },
+    "features": [
+      {
+        "bold": "Pay your way",
+        "light": "Card, transfer or cash when it arrives."
+      },
+      {
+        "bold": "Thirty-day returns",
+        "light": "Send it back within thirty days."
+      },
+      {
+        "bold": "A person answers",
+        "light": "Write to us and somebody replies the same day."
+      }
+    ],
+    "picks": {
+      "light": "Everything else,",
+      "bold": "in one place",
+      "tail": "",
+      "line": "The whole shelf, four to a row.",
+      "all": "All products"
+    },
+    "add": "Add to cart"
+  },
+  "footer": {
+    "line": "Sample & Co. — things for the kitchen, the house and the desk.",
+    "departments": "Departments",
+    "help": "Help",
+    "contact": "Contact us",
+    "bag": "Your bag",
+    "admin": "Shop sign-in"
+  },
+  "credits": {
+    "label": "Photos"
+  },
+  "contact": {
+    "heading": "Ask us anything",
+    "phone": "",
+    "zalo": "",
+    "email": "",
+    "address": "",
+    "hours": "",
+    "dock": {
+      "call": "Call us",
+      "zalo": "Message us on Zalo"
+    },
+    "form": {
+      "name": "Your name",
+      "reply_to": "Phone or email",
+      "message": "Your message",
+      "send": "Send",
+      "sending": "Sending…",
+      "sent": "Thank you — we have your message and will answer soon.",
+      "offline": "This form is not connected yet — call or message us instead.",
+      "fields": {
+        "address": "Where to deliver"
+      }
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "Sample & Co.",
+      "description": "A small shop of things for the kitchen, the house and the desk."
+    },
+    "shop": {
+      "title": "Shop",
+      "description": "Everything in the shop, by department.",
+      "heading": "All departments",
+      "crumb": "Shop",
+      "count": "products",
+      "filter_department": "Department",
+      "clear": "Show everything",
+      "empty": "Nothing in the shop matches that.",
+      "searching": "Results for",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "product": {
+      "missing": "That is not in the shop any more.",
+      "back": "Back to the shop",
+      "option": "Choose",
+      "quantity": "Quantity",
+      "add": "Add to bag",
+      "added": "In your bag",
+      "in_stock": "In stock",
+      "low": "Only a few left",
+      "out": "Out of stock",
+      "saved": "You save",
+      "delivery": "Sent the next working day",
+      "returns": "Fourteen days to send it back",
+      "tab_about": "About it",
+      "tab_details": "Details",
+      "tab_care": "Care",
+      "spec_department": "Department",
+      "spec_material": "Made of",
+      "spec_options": "Comes in",
+      "related": "More from this department"
+    },
+    "bag": {
+      "title": "Your bag",
+      "description": "What you have chosen.",
+      "heading": "Your bag",
+      "empty": "Nothing in your bag yet.",
+      "browse": "See the shop",
+      "total": "Total",
+      "checkout": "Check out",
+      "remove": "Remove",
+      "drawer_pay": "Check out"
+    },
+    "checkout": {
+      "title": "Check out",
+      "description": "Tell us where to send it.",
+      "heading": "Check out",
+      "lead": "Send your order and we confirm it by message, with the delivery charge. Nothing is charged on this page.",
+      "summary": "Your order",
+      "total": "Total",
+      "empty": "Your bag is empty."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "How to reach the shop.",
+      "lead": "Message us about an order, a product or a return. We answer the same day.",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Find us",
+      "hours": "Open"
+    },
+    "admin": {
+      "nav": {
+        "overview": "Overview",
+        "catalogue": "Catalogue",
+        "products": "Products",
+        "kinds": "Departments"
+      },
+      "overview": {
+        "title": "Overview",
+        "products": "Products",
+        "drafts": "still in draft",
+        "kinds": "Departments",
+        "low": "Running low",
+        "low_note": "under ten left",
+        "worth": "Stock on the shelf",
+        "worth_note": "at the prices shown",
+        "low_title": "Running low",
+        "low_none": "Nothing is running low.",
+        "col_product": "Product",
+        "col_kind": "Department",
+        "col_stock": "In stock"
+      },
+      "products": {
+        "title": "Products",
+        "search": "Search by name",
+        "status": "Status",
+        "live": "Live",
+        "draft": "Draft"
+      },
+      "kinds": {
+        "title": "Departments"
+      },
+      "signin": {
+        "title": "Welcome back",
+        "description": "Sign in to run the shop.",
+        "note": "Ask the shop's owner for an account."
+      }
+    }
+  }
+}
