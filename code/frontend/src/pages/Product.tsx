@@ -7,6 +7,7 @@ import { addToCart } from "../lib/cart";
 import { formatPrice } from "../lib/format";
 import { inStock, picturesOf, sizesOf, type Department, type Product as Bike, type Review, type ShopInfo } from "../lib/shop";
 import AskForm from "../components/AskForm";
+import DeliveryTerms from "../components/DeliveryTerms";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
@@ -206,7 +207,7 @@ function Promises() {
   if (!shop) return null;
   return (
     <ul className="flex flex-col gap-3 rounded border border-line p-5 text-sm text-ink">
-      <li className="flex items-start gap-3"><Icon name="shipping" size={18} className="text-ink-soft" /><span>{shop.delivery_local}</span></li>
+      <li className="flex items-start gap-3"><Icon name="shipping" size={18} className="text-ink-soft" /><DeliveryTerms shop={shop} /></li>
       <li className="flex items-start gap-3"><Icon name="secure" size={18} className="text-ink-soft" />
         <span><span className="tabular-nums">{shop.warranty_years}</span> <T k="pages.product.warranty" /></span></li>
       <li className="flex items-start gap-3"><Icon name="chat" size={18} className="text-ink-soft" />
