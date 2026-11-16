@@ -61,7 +61,7 @@ export default function Checkout() {
             <>
               <ul className="flex flex-col gap-4">
                 {lines.map((l) => (
-                  <li key={`${l.id}-${l.variant ?? ""}`} className="flex items-center gap-4">
+                  <li key={`${l.id}-${l.variant ?? ""}`} data-record={`products:${l.id}`} className="flex items-center gap-4">
                     <span className="w-24 shrink-0"><ProductImage src={l.image} alt={l.name} aspect="4/3" className="border border-line" /></span>
                     <span className="min-w-0 flex-1 text-sm">
                       <span className="block font-semibold text-ink">{l.name}</span>
