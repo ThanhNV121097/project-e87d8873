@@ -7,7 +7,6 @@ export default function LogoMark({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true" fill="currentColor">
       <path d="M2 26 L11 8 L16.5 18 L20 12 L30 26 Z" />
-      <path d="M9.5 26 L16.5 18 L23.5 26 Z" fill="var(--ground)" opacity="0.35" />
     </svg>
   );
 }
