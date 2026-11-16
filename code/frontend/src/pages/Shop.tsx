@@ -67,7 +67,7 @@ export default function Shop() {
           <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink">
             {one ? <><span className="font-light">{one.name} </span><span className="font-bold"><T k="pages.shop.bikes_word" /></span></> : <Weights k="pages.shop.heading" />}
           </h1>
-          <p className="mt-3 max-w-[56ch] text-sm leading-relaxed text-ink-soft">{one ? one.line : <T k="pages.shop.lead" />}</p>
+          <p className="mt-5 max-w-[56ch] text-sm leading-relaxed text-ink-soft">{one ? one.line : <T k="pages.shop.lead" />}</p>
         </div>
         <div className="flex shrink-0 items-center gap-4">
           <p data-testid="shop-count" className="text-sm text-ink-soft">
@@ -123,7 +123,7 @@ export default function Shop() {
             </div>
           ) : (
             <>
-              <Grid max={3}>{found.slice(0, shown).map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+              <Grid max={3} phone={1}>{found.slice(0, shown).map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
               {found.length > shown && (
                 <div className="mt-12 flex justify-center">
                   <button type="button" onClick={() => setShown((n) => n + PAGE)} data-testid="shop-more"
