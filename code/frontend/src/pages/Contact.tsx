@@ -44,10 +44,11 @@ export default function Contact() {
           )}
           <ContactForm className="mt-10 max-w-[40rem]" fields={[{ key: "bike" }, { key: "height", type: "number" }]} />
         </div>
-        <aside className="flex flex-col gap-6 lg:col-span-5">
+        {/* On a phone the photograph leads, edge to edge, above the heading. */}
+        <aside className="order-first flex flex-col gap-6 lg:order-none lg:col-span-5">
           {photo && (
             <div className="-mx-[var(--gutter)] overflow-hidden sm:mx-0 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
-              <Picture src={photo} alt="" width={853} height={1280} loading="eager" className="aspect-[4/5] w-full object-cover" />
+              <Picture src={photo} alt="" width={853} height={1280} loading="eager" className="aspect-[3/2] w-full object-cover lg:aspect-[4/5]" />
             </div>
           )}
           {given.length > 0 && (
