@@ -22,14 +22,14 @@ export default function Gallery() {
   const typeOf = (id?: string) => types.find((d) => d.id === id);
   return (
     <div className="pb-8 pt-10">
-      <section className="grid gap-10 lg:grid-cols-12 lg:items-end">
-        <div className="lg:col-span-4">
+      <section className="flex flex-col gap-10 lg:flex-row lg:items-start">
+        <div className="lg:w-4/12 lg:pt-6">
           <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.gallery.heading" /></h1>
           <T k="pages.gallery.lead" as="p" className="mt-5 max-w-[40ch] text-sm leading-relaxed text-ink-soft" />
           <p className="mt-6 text-sm text-ink-soft"><span className="text-2xl font-bold tabular-nums text-ink">{total}</span> <T k="pages.gallery.count" /></p>
         </div>
         {first && (
-          <figure data-record={`gallery:${first.id}`} className="lg:col-span-8">
+          <figure data-record={`gallery:${first.id}`} className="lg:w-8/12">
             <div className="overflow-hidden rounded">
               <Picture src={first.image} alt={first.title} width={1280} height={853} loading="eager" motion="parallax" className="aspect-[3/2] w-full object-cover" />
             </div>
