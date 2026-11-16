@@ -66,7 +66,7 @@ export default function Product() {
         </div>
         <div className="lg:w-8/12"><AskForm bike={`${item.brand} ${item.name}`} sizes={sizes.map((s) => s.size)} /></div>
       </section>
-      <RelatedRow<Bike> collection="products" exclude={item.id} where={{ category: item.category, status: "live" }} max={3} className="pt-24"
+      <RelatedRow<Bike> collection="products" exclude={item.id} where={{ category: item.category, status: "live" }} max={3} phone={1} className="pt-24"
         title={<h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><span className="font-light"><T k="pages.product.related_light" /> </span><span className="font-bold">{type?.name}</span></h2>}>
         {(p) => <ProductCard product={p} />}
       </RelatedRow>
@@ -104,7 +104,7 @@ function Head({ bike, type, tint }: { bike: Bike; type?: Department; tint: numbe
       <h1 data-testid="product-name" className="mt-4 text-[length:var(--size-h2)] leading-[1.08] tracking-tight text-ink">
         <span className="font-light">{bike.brand} </span><span className="font-bold">{bike.name}</span>
       </h1>
-      <p className="mt-2 text-sm text-ink-soft">{bike.fact}{bike.year ? ` · ${bike.year}` : ""}</p>
+      <p className="mt-3 text-sm text-ink-soft">{bike.fact}{bike.year ? ` · ${bike.year}` : ""}</p>
       {bike.rating !== undefined && (
         <p className="mt-3 flex items-center gap-2 text-sm text-ink">
           <Rating value={bike.rating} size={15} />
