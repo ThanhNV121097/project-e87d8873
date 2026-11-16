@@ -51,7 +51,7 @@ export default function About() {
           )}
         </div>
         {photo && (
-          <div className="overflow-hidden rounded lg:col-span-7 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
+          <div className="-mx-[var(--gutter)] overflow-hidden sm:mx-0 sm:rounded lg:col-span-7 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
             <Picture src={photo} alt="" width={1280} height={854} loading="eager" motion="parallax" className="aspect-[4/3] w-full object-cover" />
           </div>
         )}
