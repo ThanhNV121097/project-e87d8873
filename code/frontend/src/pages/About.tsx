@@ -49,7 +49,7 @@ export default function About() {
           )}
         </div>
         {photo && (
-          <div className="overflow-hidden rounded lg:col-span-7">
+          <div className="overflow-hidden rounded lg:col-span-7 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
             <Picture src={photo} alt="" width={1280} height={854} loading="eager" motion="parallax" className="aspect-[4/3] w-full object-cover" />
           </div>
         )}
@@ -75,17 +75,19 @@ export default function About() {
       )}
 
       {services.length > 0 && (
-        <section id="workshop" className="grid scroll-mt-24 gap-10 pt-24 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <h2 className="text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.about.workshop" /></h2>
-            <T k="pages.about.workshop.line" as="p" className="mt-4 max-w-[40ch] text-sm leading-relaxed text-ink-soft" />
+        <section id="workshop" className="scroll-mt-24 pt-24">
+          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h2 className="text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.about.workshop" /></h2>
+              <T k="pages.about.workshop.line" as="p" className="mt-4 max-w-[52ch] text-sm leading-relaxed text-ink-soft" />
+            </div>
             {shop && (
-              <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--tint-2)] px-4 py-2 text-sm text-ink">
+              <p className="inline-flex items-center gap-2 self-start whitespace-nowrap rounded-full bg-[var(--tint-2)] px-4 py-2 text-sm text-ink lg:self-auto">
                 <Icon name="gift" size={16} /><T k="pages.about.free_a" /> <span className="tabular-nums">{shop.free_service_months}</span> <T k="pages.about.free_b" />
               </p>
             )}
           </div>
-          <table className="w-full text-sm lg:col-span-8">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-ink text-left text-xs uppercase tracking-wider text-ink-soft">
                 <th className="pb-3 font-medium"><T k="pages.about.col_job" /></th>
