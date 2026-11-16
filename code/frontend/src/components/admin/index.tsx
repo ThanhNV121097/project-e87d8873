@@ -143,7 +143,7 @@ export function Field({ label, hint, error, children, className, group }: {
 }
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <UiInput {...props} className={cn("bg-surface font-normal", props.className)} />;
+  return <UiInput {...props} className={cn("appearance-none bg-surface font-normal", props.className)} />;
 }
 
 export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
