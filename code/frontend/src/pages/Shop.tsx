@@ -8,7 +8,8 @@ import { inBand, PRICE_BANDS, type Department, type Product } from "../lib/shop"
 import FilterRail from "../components/FilterRail";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
-import ProductCard from "../components/ProductCard";
+import Bleed from "../components/Bleed";
+import ProductCard, { cardViews } from "../components/ProductCard";
 import Select from "../components/Select";
 import Weights from "../components/Weights";
 
@@ -44,6 +45,7 @@ export default function Shop() {
   const found = items.filter((p) =>
     (sizes.length === 0 || sizes.some((s) => (p.sizes ?? []).includes(s))) &&
     (bands.length === 0 || bands.some((b) => inBand(p.price, b))));
+  const views = cardViews(found);
   const one = chosen.length === 1 ? types.find((d) => d.id === chosen[0]) : undefined;
   const brands = [...new Set(all.map((p) => p.brand))].sort();
   const sortLabels = [useContent("pages.shop.sort_default"), useContent("pages.shop.sort_low"), useContent("pages.shop.sort_high")];
@@ -54,7 +56,10 @@ export default function Shop() {
   const sortLabel = useContent("pages.shop.sort");
   const pick = (id: string) => { t.set("category", chosen.length === 1 && chosen[0] === id ? [] : [id]); setShown(PAGE); };
   return (
-    <div className="pb-8 pt-10">
+    <div className="pb-8">
+      {/* The head of the catalogue on a band that runs to both screen edges:
+          where you are, how many, and the riding types to choose from. */}
+      <Bleed className="bg-surface pb-8 pt-8">
       <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-ink-soft">
         <Link to="/" className="hover:text-ink"><Icon name="home" size={16} label="Home" /></Link>
         <Icon name="next" size={14} />
@@ -94,6 +99,7 @@ export default function Shop() {
           );
         })}
       </nav>
+      </Bleed>
 
       {t.q && (
         <p className="mt-6 flex items-center gap-3 text-sm text-ink-soft">
@@ -123,7 +129,7 @@ export default function Shop() {
             </div>
           ) : (
             <>
-              <Grid max={3} phone={1}>{found.slice(0, shown).map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+              <Grid max={3} phone={1}>{found.slice(0, shown).map((p, i) => <ProductCard key={p.id} product={p} view={views[i]} />)}</Grid>
               {found.length > shown && (
                 <div className="mt-12 flex justify-center">
                   <button type="button" onClick={() => setShown((n) => n + PAGE)} data-testid="shop-more"
