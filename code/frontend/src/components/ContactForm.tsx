@@ -47,7 +47,7 @@ export default function ContactForm({ fields = [], className = "" }: { fields?: 
   // nearly invisible, and a field that borrows it has no edge a reader can
   // find. The walk measures this (field-edge) and one run reported it ten
   // times — every input on the site.
-  const input = "w-full rounded border border-field bg-ground px-4 py-3 text-ink";
+  const input = "w-full appearance-none rounded-[var(--radius-sm)] border border-field bg-ground px-4 py-3 text-ink";
   return (
     <form onSubmit={(e) => void submit(e)} className={`flex flex-col gap-4 ${className}`}>
       <Field k="name"><input name="name" autoComplete="name" required className={input} /></Field>
@@ -59,7 +59,7 @@ export default function ContactForm({ fields = [], className = "" }: { fields?: 
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
       {state === "failed" && <p role="alert" className="text-sm text-ink">{problem}</p>}
       {!canSend && <p className="text-sm text-ink-soft">{offline}</p>}
-      <button type="submit" disabled={state === "sending"} className="self-start rounded bg-accent px-6 py-3 text-accent-ink disabled:opacity-60">
+      <button type="submit" disabled={state === "sending"} data-testid="contact-send" className="self-start whitespace-nowrap rounded-full bg-accent px-7 py-3 text-sm font-medium text-accent-ink disabled:opacity-60">
         <T k={state === "sending" ? "contact.form.sending" : "contact.form.send"} />
       </button>
     </form>
