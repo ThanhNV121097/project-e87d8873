@@ -4,6 +4,7 @@ import { T, useContent } from "../editable";
 import { clearCart, type CartLine } from "../lib/cart";
 import { formatPrice } from "../lib/format";
 import { newOrderNumber, saveOrder, type Order } from "../lib/mock/orders";
+import type { ShopInfo } from "../lib/shop";
 import { canSend, sendEnquiry } from "../site";
 import Icon, { type IconName } from "./Icon";
 
@@ -25,8 +26,10 @@ const PAYMENTS: { id: Payment; icon: IconName }[] = [
  * goes to the owner as one message (src/site.ts, the same inbox the contact
  * form reaches); nothing is charged on this page — the shop calls first.
  */
-export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, payment, onPayment, className = "" }: {
+export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, payment, onPayment, terms, className = "" }: {
   lines: CartLine[];
+  /** The shop's own delivery and confirming terms (src/data/shop.json). */
+  terms?: ShopInfo;
   subtotal: number;
   fee: number;
   delivery: Delivery;
@@ -78,7 +81,8 @@ export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, 
         <div className="grid gap-3 sm:grid-cols-3" role="radiogroup">
           {DELIVERIES.map((d) => (
             <Option key={d.id} on={delivery === d.id} onPick={() => { onDelivery(d.id); if (d.id !== "local" && payment === "cod") onPayment("transfer"); }}
-              icon={d.icon} title={`checkout.delivery.${d.id}.title`} line={`checkout.delivery.${d.id}.line`} testid={`deliver-${d.id}`}
+              icon={d.icon} title={`checkout.delivery.${d.id}.title`} testid={`deliver-${d.id}`}
+              line={d.id === "local" ? terms?.delivery_local : d.id === "courier" ? terms?.delivery_nationwide : terms?.pickup}
               extra={d.id === "courier" && fee > 0 ? formatPrice(fee) : undefined} />
           ))}
         </div>
@@ -93,7 +97,7 @@ export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, 
         <div className="grid gap-3 sm:grid-cols-3" role="radiogroup">
           {PAYMENTS.map((p) => (
             <Option key={p.id} on={payment === p.id} disabled={p.id === "cod" && delivery !== "local"} onPick={() => onPayment(p.id)}
-              icon={p.icon} title={`checkout.payment.${p.id}.title`} line={`checkout.payment.${p.id}.line`} testid={`pay-${p.id}`} />
+              icon={p.icon} title={`checkout.payment.${p.id}.title`} line={<T k={`checkout.payment.${p.id}.line`} />} testid={`pay-${p.id}`} />
           ))}
         </div>
         <div className="mt-4">
@@ -104,7 +108,7 @@ export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, 
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
 
       <div className="flex flex-col gap-4 rounded bg-[var(--tint-2)] p-6">
-        <p className="flex items-start gap-3 text-sm text-ink"><Icon name="phone" size={18} /><T k="checkout.after" /></p>
+        {terms && <p className="flex items-start gap-3 text-sm text-ink"><Icon name="phone" size={18} /><span>{terms.confirm}</span></p>}
         {state === "failed" && <p role="alert" className="text-sm text-danger">{problem}</p>}
         {!canSend && <p className="text-sm text-ink-soft">{offline}</p>}
         <button type="submit" disabled={state === "sending" || lines.length === 0} data-testid="place-order"
@@ -139,7 +143,7 @@ function Field({ k, children }: { k: string; children: ReactNode }) {
 }
 
 function Option({ on, onPick, icon, title, line, testid, extra, disabled = false }: {
-  on: boolean; onPick: () => void; icon: IconName; title: string; line: string; testid: string; extra?: string; disabled?: boolean;
+  on: boolean; onPick: () => void; icon: IconName; title: string; line?: ReactNode; testid: string; extra?: string; disabled?: boolean;
 }) {
   return (
     <button type="button" role="radio" aria-checked={on} disabled={disabled} onClick={onPick} data-testid={testid}
@@ -151,7 +155,7 @@ function Option({ on, onPick, icon, title, line, testid, extra, disabled = false
         </span>
       </span>
       <T k={title} className="text-sm font-semibold text-ink" />
-      <T k={line} className="text-xs leading-relaxed text-ink-soft" />
+      {line && <span className="text-xs leading-relaxed text-ink-soft">{line}</span>}
       {extra && <span className="text-xs font-semibold tabular-nums text-ink">{extra}</span>}
     </button>
   );
