@@ -50,7 +50,7 @@ export default function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex shrink-0 items-center gap-1 lg:ml-0">
-          <button type="button" onClick={() => setSearch((s) => !s)} aria-label={searchLabel} aria-expanded={search}
+          <button type="button" onClick={() => { setMenu(false); setSearch((s) => !s); }} aria-label={searchLabel} aria-expanded={search}
             data-testid="open-search" className={iconButton}>
             <Icon name={search ? "close" : "search"} size={19} />
           </button>
@@ -61,19 +61,31 @@ export default function SiteHeader() {
               <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[0.625rem] tabular-nums text-accent-ink">{count}</span>
             )}
           </button>
-          <MenuToggle open={menu} onToggle={() => setMenu((o) => !o)} className="lg:hidden" />
+          <MenuToggle open={menu} onToggle={() => { setSearch(false); setMenu((o) => !o); }} className="lg:hidden" />
         </div>
       </div>
 
       {search && (
-        <form role="search" onSubmit={submit} className="flex items-center gap-3 border-b border-line py-4">
+        <form role="search" onSubmit={submit} className="hidden items-center gap-3 border-b border-line py-4 lg:flex">
           <Icon name="search" size={20} className="text-ink-soft" />
           <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} aria-label={searchLabel} placeholder={searchHint}
             data-testid="search-input"
             className="min-w-0 flex-1 appearance-none bg-transparent text-lg text-ink outline-none placeholder:text-ink-soft" />
-          <button type="submit" className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-ink"><T k="header.search_go" /></button>
+          <button type="submit" className="whitespace-nowrap rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-ink"><T k="header.search_go" /></button>
         </form>
       )}
+
+      {/* Below 1024px search is a solid panel over the screen, as the menu is. */}
+      <MobileMenu open={search} onClose={() => setSearch(false)}>
+        <form role="search" onSubmit={submit} className="flex flex-col gap-4">
+          <T k="header.search" as="p" className="text-3xl font-light tracking-tight text-ink" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} aria-label={searchLabel} placeholder={searchHint}
+            className="w-full appearance-none rounded-[var(--radius-sm)] border border-field bg-ground px-4 py-3 text-ink placeholder:text-ink-soft" />
+          <button type="submit" className="inline-flex items-center justify-center gap-2 self-start whitespace-nowrap rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink">
+            <Icon name="search" size={16} /><T k="header.search_go" />
+          </button>
+        </form>
+      </MobileMenu>
 
       <MobileMenu open={menu} onClose={() => setMenu(false)}>
         <nav className="flex flex-col gap-5 text-3xl font-light tracking-tight text-ink" aria-label="Main">
