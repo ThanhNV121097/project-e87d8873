@@ -38,7 +38,7 @@ export default function Home() {
   const nameOf = (id: string) => types.find((d) => d.id === id)?.name;
   return (
     <>
-      <section className="flex flex-col gap-10 pb-12 pt-12 lg:flex-row lg:items-center lg:justify-between lg:pb-14 lg:pt-16">
+      <section className="flex flex-col gap-10 pb-12 pt-12 lg:flex-row lg:items-center lg:justify-between lg:pb-10 lg:pt-12">
         <h1 className="text-[length:var(--size-h1)] leading-[1.12] tracking-[-0.01em] text-ink">
           <SplitHeading k="hero.headline.light" as="span" className="block font-light" />
           <SplitHeading k="hero.headline.bold" as="span" className="block font-bold" />
@@ -83,13 +83,13 @@ export default function Home() {
 
       {/* The departments as wordmarks, between two hairlines. */}
       {types.length > 0 && (
-        <nav aria-label="Departments" className="mt-20 flex flex-wrap items-center justify-between gap-x-10 gap-y-5 border-y border-line py-9">
+        <nav aria-label="Departments" className="mt-20 flex flex-wrap items-center gap-x-8 gap-y-4 border-y border-line py-9 lg:justify-between lg:gap-x-10">
           {types.map((d) => (
             <Link key={d.id} to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`mark-${d.id}`}
-              className="text-lg font-semibold uppercase tracking-[0.2em] text-ink-soft hover:text-ink">{d.name}</Link>
+              className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-soft hover:text-ink lg:text-lg">{d.name}</Link>
           ))}
           <Link to="/about#workshop" data-testid="mark-workshop"
-            className="text-lg font-semibold uppercase tracking-[0.2em] text-ink-soft hover:text-ink"><T k="home.workshop_mark" /></Link>
+            className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-soft hover:text-ink lg:text-lg"><T k="home.workshop_mark" /></Link>
         </nav>
       )}
 
@@ -161,13 +161,14 @@ function Month({ bike, type }: { bike: Product; type?: string }) {
   const scene = useContent("home.month.image");
   return (
     <section className="flex flex-col gap-10 pt-24 lg:flex-row lg:items-center lg:gap-16">
-      <div className="flex items-end gap-4 lg:w-7/12 lg:gap-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end lg:w-7/12 lg:gap-5">
+        {/* The riding photograph runs off the left edge of the screen. */}
         {scene && (
-          <div className="w-5/12 overflow-hidden rounded">
-            <Picture src={scene} alt="" width={853} height={1280} motion="parallax" className="aspect-[3/4] h-full w-full object-cover" />
+          <div className="-mx-[var(--gutter)] overflow-hidden sm:mx-0 sm:min-w-0 sm:flex-1 sm:rounded lg:-ml-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-l-none">
+            <Picture src={scene} alt="" width={853} height={1280} motion="parallax" className="aspect-[16/10] h-full w-full object-cover sm:aspect-[3/4]" />
           </div>
         )}
-        <div className="w-7/12">
+        <div className="sm:w-7/12 sm:shrink-0">
           <TintCard product={bike} tint={2} label={type} />
         </div>
       </div>
