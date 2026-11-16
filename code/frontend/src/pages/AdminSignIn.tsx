@@ -14,13 +14,13 @@ import Weights from "../components/Weights";
 export default function AdminSignIn() {
   const photo = useContent("pages.admin.signin.image");
   return (
-    <div className="flex min-h-screen bg-ground font-body text-ink">
+    <div className="flex min-h-screen flex-col bg-ground font-body text-ink lg:flex-row">
       {photo && (
-        <div className="relative hidden w-1/2 overflow-hidden lg:block">
+        <div className="relative h-56 overflow-hidden sm:h-80 lg:h-auto lg:w-1/2">
           <Picture src={photo} alt="" width={850} height={1280} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
         </div>
       )}
-      <div className="flex flex-1 items-center px-[var(--gutter)] py-16">
+      <div className="flex flex-1 items-center px-[var(--gutter)] py-12 lg:py-16">
         <div className="w-full max-w-md">
           <Link to="/" className="inline-flex"><Logo /></Link>
           <h1 className="mt-12 text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.admin.signin.heading" /></h1>
