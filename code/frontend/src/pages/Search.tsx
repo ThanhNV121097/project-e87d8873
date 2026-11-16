@@ -9,7 +9,7 @@ import { useTableQuery } from "../lib/table";
 import type { Department, Faq, Product, Service, Shot } from "../lib/shop";
 import Grid from "../components/Grid";
 import Icon from "../components/Icon";
-import ProductCard from "../components/ProductCard";
+import ProductCard, { cardViews } from "../components/ProductCard";
 import { TINTS } from "../components/TintCard";
 import Weights from "../components/Weights";
 
@@ -39,6 +39,8 @@ export default function Search() {
   const label = useContent("header.search");
   const placeholder = useContent("pages.search.placeholder");
   const filterLabel = useContent("pages.search.filter");
+  const image = useContent("pages.search.image");
+  const imageAlt = useContent("pages.search.image_alt");
 
   const bikes = useCollection<Product>("products", {
     where: { status: "live" }, q, pageSize: BIKES_SHOWN,
@@ -52,6 +54,7 @@ export default function Search() {
     bikes: bikes.total, types: types.total, services: services.total, faqs: faqs.total, gallery: shots.total,
   };
   const sum = KINDS.reduce((n, k) => n + counts[k], 0);
+  const bikeViews = cardViews(bikes.items);
   const asked = t.get("in") as Kind | "";
   // A kind chosen for an earlier search that finds nothing for this one shows everything.
   const kind = asked && KINDS.includes(asked) && counts[asked] > 0 ? asked : "";
@@ -65,7 +68,12 @@ export default function Search() {
 
   return (
     <div className="pb-8 pt-10">
-      <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      {/* The head: heading, field and the kinds found down the left, and the
+          page's own riding photograph beside them, run off the right edge —
+          in every state, typed or not (on a phone, edge to edge under it). */}
+      <section className="grid gap-8 lg:grid-cols-12 lg:gap-12">
+        <div className="lg:col-span-7">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[length:var(--size-h1)] leading-[1.1] text-ink"><Weights k="pages.search.heading" /></h1>
           <T k="pages.search.lead" as="p" className="mt-5 max-w-[56ch] text-sm leading-relaxed text-ink-soft" />
@@ -75,7 +83,7 @@ export default function Search() {
             <span className="text-2xl font-bold tabular-nums text-ink">{sum}</span>{" "}<T k="pages.search.count" />
           </p>
         )}
-      </section>
+        </div>
 
       {/* The field is the pill: its own edge, the dark button set inside its line. */}
       <form role="search" onSubmit={submit} className="relative mt-8">
@@ -101,16 +109,23 @@ export default function Search() {
           ))}
         </nav>
       )}
+        </div>
+        {image && (
+          <div className="relative -mx-[var(--gutter)] aspect-[16/9] overflow-hidden lg:col-span-5 lg:mx-0 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:aspect-auto lg:min-h-[16rem] lg:rounded-l">
+            <Picture src={image} alt={imageAlt} width={1280} height={960} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        )}
+      </section>
 
-      {/* Nothing typed yet: what people search for, a riding photograph off
-          the right edge, and the four riding types to start from instead. */}
+      {/* Nothing typed yet: what people search for, and the four riding
+          types to start from instead. */}
       {!on && <StartHere types={types.items} />}
 
       {on && !loading && sum === 0 && <Nothing q={q} />}
 
       {show("bikes") && (
         <Block kind="bikes" count={bikes.total} more={`/shop?q=${encodeURIComponent(q)}`}>
-          <Grid max={3} phone={1}>{bikes.items.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
+          <Grid max={3} phone={1}>{bikes.items.map((p, i) => <ProductCard key={p.id} product={p} view={bikeViews[i]} />)}</Grid>
         </Block>
       )}
 
@@ -194,17 +209,14 @@ export default function Search() {
 }
 
 /**
- * Nothing typed yet: what people search for on a tinted panel, a riding
- * photograph off the right edge, and the four riding types to start from.
+ * Nothing typed yet: what people search for on a tinted panel, and the four
+ * riding types to start from.
  */
 function StartHere({ types }: { types: Department[] }) {
   const suggestions = useList<string>("pages.search.suggestions");
-  const image = useContent("pages.search.image");
-  const imageAlt = useContent("pages.search.image_alt");
   return (
     <>
-      <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
-        <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:col-span-7 lg:px-10">
+        <div className="mt-12 flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:px-10">
           <T k="pages.search.prompt" as="p" className="text-[length:var(--size-h2)] font-light leading-tight text-ink" />
           <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
           <div className="flex flex-wrap gap-2 text-sm">
@@ -214,12 +226,6 @@ function StartHere({ types }: { types: Department[] }) {
             ))}
           </div>
         </div>
-        {image && (
-          <div className="overflow-hidden rounded lg:col-span-5 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
-            <Picture src={image} alt={imageAlt} width={1280} height={960} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
-          </div>
-        )}
-      </div>
       {types.length > 0 && (
         <section className="pt-16">
           <h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.search.start" /></h2>
