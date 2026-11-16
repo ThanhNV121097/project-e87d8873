@@ -59,7 +59,7 @@ export default function Product() {
       </section>
       <Specification bike={item} sizes={sizes} />
       <Longer bike={item} />
-      <section id="ask" className="mt-24 flex scroll-mt-24 flex-col gap-10 rounded bg-surface p-6 lg:flex-row lg:p-12">
+      <section id="ask" className="-mx-[var(--gutter)] mt-24 flex scroll-mt-24 flex-col gap-10 bg-surface p-6 sm:mx-0 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:flex-row lg:rounded-r-none lg:p-12 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+3rem)]">
         <div className="lg:w-4/12">
           <h2 className="text-[length:var(--size-h2)] leading-tight text-ink"><span className="font-light"><T k="pages.product.ask_light" /> </span><span className="font-bold">{item.name}</span></h2>
           <T k={inStock(item) ? "pages.product.ask_line" : "pages.product.ask_line_out"} as="p" className="mt-4 max-w-[40ch] text-sm leading-relaxed text-ink-soft" />
