@@ -43,7 +43,7 @@ export default function ProductGallery({ images, alt, aspect = "4/5", className 
               aria-pressed={i === at}
               className={`w-16 overflow-hidden rounded-sm border sm:w-20 ${i === at ? "border-ink" : "border-line opacity-70 hover:opacity-100"}`}
             >
-              <ProductImage src={src} alt="" aspect="1/1" />
+              <ProductImage src={src} alt="" aspect={aspect} />
             </button>
           ))}
         </div>
