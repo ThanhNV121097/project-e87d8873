@@ -244,6 +244,7 @@
         "products": "Bikes"
       },
       "overview": {
+        "any_kind": "Any riding type",
         "col_kind": "Riding type",
         "col_product": "Bike",
         "col_stock": "In stock",
@@ -251,10 +252,15 @@
         "kinds": "Riding types",
         "kinds_note": "shown on the site",
         "low": "Running low",
+        "low_caption": "Bikes running low",
+        "low_empty": "No bike running low matches. Clear the search or the riding type to see them all.",
         "low_none": "Nothing is running low.",
         "low_note": "under ten in stock",
         "low_title": "Running low",
+        "out": "Out of stock",
+        "out_note": "shown as 'Out of stock' on the site",
         "products": "Bikes",
+        "search": "Search bikes",
         "title": "Overview",
         "worth": "Stock on the floor",
         "worth_note": "at the prices shown"
