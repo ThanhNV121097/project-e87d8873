@@ -50,7 +50,7 @@ export default function CheckoutDone() {
         </dl>
       </div>
 
-      <ol className="mt-12 grid gap-6 rounded bg-[var(--tint-2)] p-6 sm:grid-cols-4 lg:p-10">
+      <ol className="-mx-[var(--gutter)] mt-12 grid gap-6 bg-[var(--tint-2)] p-6 sm:mx-0 sm:grid-cols-4 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none lg:p-10 lg:pr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter)+2.5rem)]">
         {STEPS.map((icon, i) => (
           <li key={icon} className="flex items-start gap-3 sm:flex-col">
             <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 0 ? "bg-accent text-accent-ink" : "bg-ground text-ink"}`}><Icon name={icon} size={19} /></span>
