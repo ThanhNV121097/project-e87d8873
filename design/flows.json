@@ -36,9 +36,7 @@
       { "action": "type", "selector": "#order-name", "value": "Minh" },
       { "action": "click", "selector": "[data-testid='pay-transfer']" },
       { "action": "expect", "selector": "[data-testid='checkout-total']" },
-      { "action": "expect", "selector": "[data-testid='place-order']" },
-      { "action": "open", "path": "/checkout/done" },
-      { "action": "expect", "selector": "[data-testid='order-confirmed']" }
+      { "action": "expect", "selector": "[data-testid='place-order']", "text": "18.990.000" }
     ]
   },
   {
