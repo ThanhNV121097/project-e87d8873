@@ -7,6 +7,7 @@ import { useDemo } from "../lib/demo";
 import { formatPrice } from "../lib/format";
 import { EXAMPLE_LINES } from "../lib/mock/orders";
 import type { Department, ShopInfo } from "../lib/shop";
+import DeliveryTerms from "../components/DeliveryTerms";
 import Icon from "../components/Icon";
 import ProductImage from "../components/ProductImage";
 import QuantityStepper from "../components/QuantityStepper";
@@ -77,7 +78,7 @@ export default function Bag() {
             </Link>
             {shop && (
               <ul className="mt-6 flex flex-col gap-2.5 text-xs text-ink">
-                <li className="flex items-start gap-2.5"><Icon name="shipping" size={16} />{shop.delivery_local}</li>
+                <li className="flex items-start gap-2.5"><Icon name="shipping" size={16} /><DeliveryTerms shop={shop} /></li>
                 <li className="flex items-start gap-2.5"><Icon name="secure" size={16} /><span><span className="tabular-nums">{shop.warranty_years}</span> <T k="pages.product.warranty" /></span></li>
                 <li className="flex items-start gap-2.5"><Icon name="phone" size={16} /><T k="pages.bag.call_note" /></li>
               </ul>
