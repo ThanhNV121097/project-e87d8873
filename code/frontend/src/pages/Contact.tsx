@@ -46,7 +46,7 @@ export default function Contact() {
         </div>
         <aside className="flex flex-col gap-6 lg:col-span-5">
           {photo && (
-            <div className="overflow-hidden rounded">
+            <div className="-mx-[var(--gutter)] overflow-hidden sm:mx-0 sm:rounded lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
               <Picture src={photo} alt="" width={853} height={1280} loading="eager" className="aspect-[4/5] w-full object-cover" />
             </div>
           )}
