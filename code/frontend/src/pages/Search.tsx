@@ -39,8 +39,6 @@ export default function Search() {
   const label = useContent("header.search");
   const placeholder = useContent("pages.search.placeholder");
   const filterLabel = useContent("pages.search.filter");
-  const suggestions = useList<string>("pages.search.suggestions");
-  const image = useContent("pages.search.image");
 
   const bikes = useCollection<Product>("products", {
     where: { status: "live" }, q, pageSize: BIKES_SHOWN,
@@ -109,67 +107,6 @@ export default function Search() {
       {!on && <StartHere types={types.items} />}
 
       {on && !loading && sum === 0 && <Nothing q={q} />}
-
-      {show("bikes") && (
-        <Block kind="bikes" count={bikes.total} more={`/shop?q=${encodeURIComponent(q)}`}>
-          <Grid max={3} phone={1}>{bikes.items.map((p) => <ProductCard key={p.id} product={p} />)}</Grid>
-        </Block>
-      )}
-      {/* MOVED-START */}
-      {false && (
-        <>
-          <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
-            <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:col-span-7 lg:px-10">
-              <T k="pages.search.prompt" as="p" className="text-[length:var(--size-h2)] font-light leading-tight text-ink" />
-              <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
-              <div className="flex flex-wrap gap-2 text-sm">
-                {suggestions.map((s, i) => (
-                  <Link key={s} to={`/search?q=${encodeURIComponent(s)}`} data-testid={`search-suggest-${i}`}
-                    className="rounded-full bg-ground px-4 py-2 text-ink hover:bg-accent hover:text-accent-ink">{s}</Link>
-                ))}
-              </div>
-            </div>
-            {image && (
-              <div className="overflow-hidden rounded lg:col-span-5 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
-                <Picture src={image} alt="" width={1280} height={853} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
-              </div>
-            )}
-          </div>
-          {types.items.length > 0 && (
-            <section className="pt-16">
-              <h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.search.start" /></h2>
-              <Grid max={4} phone={1}>
-                {types.items.map((d, i) => (
-                  <Link key={d.id} to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`search-type-${d.id}`}
-                    className={`group flex h-full flex-col gap-3 rounded p-6 ${TINTS[i % TINTS.length]}`}>
-                    <span className="text-[1.75rem] font-bold leading-none tracking-tight text-ink">{d.name}</span>
-                    <span className="flex-1 text-sm leading-relaxed text-ink">{d.line}</span>
-                    <span className="flex items-center justify-between gap-4 border-t border-line pt-3 text-xs text-ink-soft">
-                      {d.terrain}
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-ink"><Icon name="arrow" size={15} /></span>
-                    </span>
-                  </Link>
-                ))}
-              </Grid>
-            </section>
-          )}
-        </>
-      )}
-
-      {on && !loading && sum === 0 && (
-        <div data-testid="search-none" className="mt-12 flex flex-col items-start gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:px-10">
-          <p className="text-xl text-ink"><T k="pages.search.none" />{" "}<span className="font-semibold">“{q}”</span></p>
-          <T k="pages.search.none_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
-          <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink">
-              <T k="pages.search.ask" /><Icon name="arrow" size={16} />
-            </Link>
-            <Link to="/shop" className="inline-flex items-center whitespace-nowrap rounded-full border border-ink px-6 py-3 text-sm font-medium text-ink hover:bg-ground">
-              <T k="pages.search.browse" />
-            </Link>
-          </div>
-        </div>
-      )}
 
       {show("bikes") && (
         <Block kind="bikes" count={bikes.total} more={`/shop?q=${encodeURIComponent(q)}`}>
@@ -252,6 +189,72 @@ export default function Search() {
           </Grid>
         </Block>
       )}
+    </div>
+  );
+}
+
+/**
+ * Nothing typed yet: what people search for on a tinted panel, a riding
+ * photograph off the right edge, and the four riding types to start from.
+ */
+function StartHere({ types }: { types: Department[] }) {
+  const suggestions = useList<string>("pages.search.suggestions");
+  const image = useContent("pages.search.image");
+  return (
+    <>
+      <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:items-stretch">
+        <div className="flex flex-col items-start justify-center gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:col-span-7 lg:px-10">
+          <T k="pages.search.prompt" as="p" className="text-[length:var(--size-h2)] font-light leading-tight text-ink" />
+          <T k="pages.search.prompt_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
+          <div className="flex flex-wrap gap-2 text-sm">
+            {suggestions.map((s, i) => (
+              <Link key={s} to={`/search?q=${encodeURIComponent(s)}`} data-testid={`search-suggest-${i}`}
+                className="rounded-full bg-ground px-4 py-2 text-ink hover:bg-accent hover:text-accent-ink">{s}</Link>
+            ))}
+          </div>
+        </div>
+        {image && (
+          <div className="overflow-hidden rounded lg:col-span-5 lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))] lg:rounded-r-none">
+            <Picture src={image} alt="" width={1280} height={853} loading="eager" className="aspect-[3/2] h-full w-full object-cover" />
+          </div>
+        )}
+      </div>
+      {types.length > 0 && (
+        <section className="pt-16">
+          <h2 className="mb-8 text-[length:var(--size-h2)] leading-tight text-ink"><Weights k="pages.search.start" /></h2>
+          <Grid max={4} phone={1}>
+            {types.map((d, i) => (
+              <Link key={d.id} to={`/shop?category=${d.id}`} data-record={`categories:${d.id}`} data-testid={`search-type-${d.id}`}
+                className={`group flex h-full flex-col gap-3 rounded p-6 ${TINTS[i % TINTS.length]}`}>
+                <span className="text-[1.75rem] font-bold leading-none tracking-tight text-ink">{d.name}</span>
+                <span className="flex-1 text-sm leading-relaxed text-ink">{d.line}</span>
+                <span className="flex items-center justify-between gap-4 border-t border-line pt-3 text-xs text-ink-soft">
+                  {d.terrain}
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-ink"><Icon name="arrow" size={15} /></span>
+                </span>
+              </Link>
+            ))}
+          </Grid>
+        </section>
+      )}
+    </>
+  );
+}
+
+/** Nothing found: say what was looked for, and the two ways on. */
+function Nothing({ q }: { q: string }) {
+  return (
+    <div data-testid="search-none" className="mt-12 flex flex-col items-start gap-5 rounded bg-[var(--tint-1)] px-6 py-10 lg:px-10">
+      <p className="text-xl text-ink"><T k="pages.search.none" />{" "}<span className="font-semibold">“{q}”</span></p>
+      <T k="pages.search.none_line" as="p" className="max-w-[52ch] text-sm text-ink-soft" />
+      <div className="flex flex-wrap gap-3">
+        <Link to="/contact" className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-ink">
+          <T k="pages.search.ask" /><Icon name="arrow" size={16} />
+        </Link>
+        <Link to="/shop" className="inline-flex items-center whitespace-nowrap rounded-full border border-ink px-6 py-3 text-sm font-medium text-ink hover:bg-ground">
+          <T k="pages.search.browse" />
+        </Link>
+      </div>
     </div>
   );
 }
