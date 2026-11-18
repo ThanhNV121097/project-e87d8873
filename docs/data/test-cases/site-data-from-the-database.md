@@ -101,7 +101,7 @@ Check: fetch_url
 **Scenario**: TC-05 — Values the move could lose arrive unchanged
 **Given**: The seeded stack.
 **When**: `GET /api/v1/services/build`, `/api/v1/products/pique-advanced-sl-se`, `/api/v1/products/talon-29-3`, `/api/v1/products/talon-2`, `/api/v1/reviews/r-thao`, `/api/v1/team/bao`, `/api/v1/team/van` and `/api/v1/shop/shop` are read.
-**Then**: Each value of Appendix A3 is returned exactly: `build.price` is the number `0` (the key is present); `pique-advanced-sl-se.stock` is the number `0` and `.rating` is the number `5`; `talon-29-3.deal` is the boolean `false` (the key is present); `talon-2.size_fit[0]` is `155–166 cm` with U+2013 and `talon-2.fact` is `29 in · 100 mm fork · 1×9`; the names are `Thảo`, `Bảo` and `Vân` as precomposed letters; `shop.payment` is the three strings of A3 in that order; `shop.delivery_fee` is `350000` and `shop.rating` is `4.9`.
+**Then**: Each value of Appendix A3 is returned exactly: the job `build` has the key `price` present with the number `0`; the bike `pique-advanced-sl-se` has `stock` the number `0` and `rating` the number `5`; the bike `talon-29-3` has the key `deal` present with the boolean `false`; the bike `talon-2` has `size_fit[0]` equal to `155–166 cm` with U+2013 and `fact` equal to `29 in · 100 mm fork · 1×9`; the names are `Thảo`, `Bảo` and `Vân` as precomposed letters; the shop record's `payment` is the three strings of A3 in that order, its `delivery_fee` is `350000` and its `rating` is `4.9`.
 Traces: SC-2 (DATA-001 AC-2, Behaviour 3)
 Check: fetch_url
 
