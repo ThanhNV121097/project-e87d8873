@@ -1,4 +1,6 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { createElement } from "react";
+import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 // THE OWNER'S SESSION, WITH THE NETWORK FAKED.
@@ -28,10 +30,35 @@ function serve(handler: Handler) {
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 const owner = (email = "owner@deo.test") => json(200, { email });
+const notSignedIn = () => json(401, { error: "You are not signed in.", code: "UNAUTHENTICATED" });
 const hint = (email = "owner@deo.test") => localStorage.setItem(KEY, JSON.stringify({ email }));
 const kept = () => localStorage.getItem(KEY);
 
+/**
+ * Runs a hook in a component and hands back its latest value. The updates are
+ * flushed by hand and waited for with a timer: react's act() is not in the
+ * production build the test run may be given.
+ */
+const mounted: (() => void)[] = [];
+function mount<T>(hook: () => T) {
+  const root = createRoot(document.createElement("div"));
+  const result = { current: undefined as T };
+  const Probe = () => {
+    result.current = hook();
+    return null;
+  };
+  flushSync(() => root.render(createElement(Probe)));
+  mounted.push(() => flushSync(() => root.unmount()));
+  return result;
+}
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+async function until(check: () => boolean) {
+  for (let tries = 0; tries < 50 && !check(); tries += 1) await settle();
+  expect(check()).toBe(true);
+}
+
 afterEach(() => {
+  mounted.splice(0).forEach((unmount) => unmount());
   vi.unstubAllGlobals();
   localStorage.clear();
 });
@@ -40,9 +67,9 @@ describe("the session module", () => {
   it("keeps its four names, and the site has no roles", async () => {
     const m = await fresh();
     expect([m.useSession, m.signIn, m.signOut, m.useRole].every((f) => typeof f === "function")).toBe(true);
-    serve((url) => (url.endsWith("/me") ? owner("lan.tran@deo.test") : new Error("unexpected")));
+    serve(() => owner("lan.tran@deo.test"));
     hint("lan.tran@deo.test");
-    const { result } = renderHook(() => ({ session: m.useSession(), role: m.useRole() }));
+    const result = mount(() => ({ session: m.useSession(), role: m.useRole() }));
     expect(result.current.role).toBe("");
     // The name is made from the email: the foot of the sidebar shows "Lan Tran".
     expect(result.current.session).toEqual({ email: "lan.tran@deo.test", name: "Lan Tran" });
@@ -85,41 +112,40 @@ describe("the question asked once per page load: who is this?", () => {
     const m = await fresh();
     serve(() => owner("owner@deo.test"));
     hint("old@deo.test");
-    const { result } = renderHook(() => m.useSession());
+    const result = mount(() => m.useSession());
     expect(result.current?.email).toBe("old@deo.test");
-    await waitFor(() => expect(result.current?.email).toBe("owner@deo.test"));
+    await until(() => result.current?.email === "owner@deo.test");
     expect(JSON.parse(kept() ?? "null")).toEqual({ email: "owner@deo.test" });
   });
 
   it("clears the hint when the server says nobody is signed in", async () => {
     const m = await fresh();
-    serve(() => json(401, { error: "You are not signed in.", code: "UNAUTHENTICATED" }));
+    serve(notSignedIn);
     hint();
-    const { result } = renderHook(() => m.useSession());
+    const result = mount(() => m.useSession());
     expect(result.current?.email).toBe("owner@deo.test");
-    await waitFor(() => expect(result.current).toBeNull());
+    await until(() => result.current === null);
     expect(kept()).toBeNull();
   });
 
   it("clears the hint when the server cannot be reached or answers anything but 200", async () => {
-    const answers = [new TypeError("Failed to fetch"), json(503, { error: "The service is not ready.", code: "UNAVAILABLE" })];
-    for (const answer of answers) {
+    const answers = () => [new TypeError("Failed to fetch"), json(503, { error: "The service is not ready.", code: "UNAVAILABLE" })];
+    for (const index of [0, 1]) {
       const m = await fresh();
-      serve(() => answer);
+      serve(() => answers()[index]);
       hint();
-      const { result, unmount } = renderHook(() => m.useSession());
-      await waitFor(() => expect(result.current).toBeNull());
+      const result = mount(() => m.useSession());
+      await until(() => result.current === null);
       expect(kept()).toBeNull();
-      unmount();
     }
   });
 
   it("finds a valid cookie that has no hint", async () => {
     const m = await fresh();
     serve(() => owner());
-    const { result } = renderHook(() => m.useSession());
+    const result = mount(() => m.useSession());
     expect(result.current).toBeNull();
-    await waitFor(() => expect(result.current?.email).toBe("owner@deo.test"));
+    await until(() => result.current?.email === "owner@deo.test");
   });
 
   it("does not undo a sign-in that finished while the question was still out", async () => {
@@ -127,10 +153,13 @@ describe("the question asked once per page load: who is this?", () => {
     let reply: (r: Response) => void = () => {};
     const me = new Promise<Response>((resolve) => { reply = resolve; });
     serve((url) => (url.endsWith("/me") ? me : owner()));
-    const { result } = renderHook(() => m.useSession());
-    await act(async () => { await m.signIn("owner@deo.test", "right"); });
+    const result = mount(() => m.useSession());
+    await m.signIn("owner@deo.test", "right");
+    await settle();
     expect(result.current?.email).toBe("owner@deo.test");
-    await act(async () => { reply(json(401, { error: "You are not signed in.", code: "UNAUTHENTICATED" })); await me; });
+    reply(notSignedIn());
+    await me;
+    await settle();
     expect(result.current?.email).toBe("owner@deo.test");
   });
 });
@@ -140,8 +169,9 @@ describe("signing out", () => {
     const m = await fresh();
     const calls = serve((url, init) => (init.method === "DELETE" ? new Response(null, { status: 204 }) : owner()));
     hint();
-    const { result } = renderHook(() => m.useSession());
-    await act(async () => { await m.signOut(); });
+    const result = mount(() => m.useSession());
+    await m.signOut();
+    await settle();
     expect(calls.some((c) => c.url === "/api/v1/sessions/current" && c.init.method === "DELETE")).toBe(true);
     expect(result.current).toBeNull();
     expect(kept()).toBeNull();
@@ -149,12 +179,16 @@ describe("signing out", () => {
 
   it("leaves the owner signed in when the server does not say so", async () => {
     const m = await fresh();
-    const answers: (Response | Error)[] = [new TypeError("Failed to fetch"), json(500, { error: "Something went wrong. Please try again.", code: "INTERNAL" })];
+    const answers: (Response | Error)[] = [
+      new TypeError("Failed to fetch"),
+      json(500, { error: "Something went wrong. Please try again.", code: "INTERNAL" }),
+    ];
     serve((url) => (url.endsWith("/me") ? owner() : answers.shift() ?? new Error("no answer was queued")));
     hint();
-    const { result } = renderHook(() => m.useSession());
-    await act(async () => { await m.signOut(); });
-    await act(async () => { await m.signOut(); });
+    const result = mount(() => m.useSession());
+    await m.signOut();
+    await m.signOut();
+    await settle();
     expect(result.current?.email).toBe("owner@deo.test");
     expect(kept()).not.toBeNull();
   });
@@ -165,12 +199,14 @@ describe("a session the server ended under a write", () => {
     const m = await fresh();
     serve((url) => (url.endsWith("/me") ? owner() : json(401, { error: "That email and password do not match.", code: "UNAUTHENTICATED" })));
     hint();
-    const { result } = renderHook(() => ({ session: m.useSession(), ended: m.useSessionEnded() }));
+    const result = mount(() => ({ session: m.useSession(), ended: m.useSessionEnded() }));
     expect(result.current.ended).toBe("");
-    act(() => m.endSession());
+    m.endSession();
+    await settle();
     expect(result.current.session).toBeNull();
     expect(result.current.ended).toBe("Your session has ended. Sign in again.");
-    await act(async () => { await m.signIn("owner@deo.test", "wrong").catch(() => undefined); });
+    await m.signIn("owner@deo.test", "wrong").catch(() => undefined);
+    await settle();
     expect(result.current.ended).toBe("");
   });
 });
