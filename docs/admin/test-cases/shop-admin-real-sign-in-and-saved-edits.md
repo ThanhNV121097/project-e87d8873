@@ -579,7 +579,7 @@ Check: fetch_url
 **Given**: A valid `SESSION`; `T` and its `ETag` `E`.
 **When**: `PUT /v1/products/T` with a valid body and no `If-Match`; then with `If-Match` set to `7` (unquoted), `W/"7"`, `*`, `"abc"` and `"7", "8"`.
 **Then**: The first is 428 `PRECONDITION_REQUIRED`; each of the five malformed values is 400 `MALFORMED_REQUEST`; `T` is unchanged. `T` is deleted afterwards.
-Traces: SC-33 (ADMIN-008 AC-1 (the token); contract §3.5 steps 7)
+Traces: SC-33 (ADMIN-008 AC-1, the token it needs; contract §3.5 step 7)
 Check: fetch_url
 
 **Scenario**: SC-34a — Saving a stock and then an order leaves the lower stock
