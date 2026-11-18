@@ -766,7 +766,7 @@ Check: interact_page
 **Given**: The owner signed in through the form, on `/admin` (loaded while the backend was up); then the backend stopped.
 **When**: Press "Sign out"; then start the backend and press "Sign out" again.
 **Then**: After the first press the location is still `/admin`, the sidebar still shows `owner@deo.test` and the "Sign out" button (nothing else on screen changes); after the second press the location is `/admin/sign-in`.
-Traces: SC-44 (story decision 6/7; contract §3.9)
+Traces: SC-44 (story decision 7; contract §3.9)
 Check: interact_page
 
 **Scenario**: SC-45a — The sidebar foot shows the owner's initial, name, email and "Sign out"
