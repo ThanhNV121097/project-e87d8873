@@ -86,7 +86,7 @@ Check: interact_page
 **Scenario**: TC-05 The same wait holds on a phone: 390×844, nothing of the page and no not-found view while the answer is awaited
 **Given**: The story is running; the viewport is 390×844 (a phone); the state log is registered; the response to `GET /api/v1/products/stance-0` is held for 3000 ms.
 **When**: `/shop/stance-0` is opened by a full page load and read at 500 ms, 1500 ms and 2800 ms, then the answer is let through.
-**Then**: At each reading and in every waiting entry of the log, `main` contains no text, no element (`mainChildren` is 0) and no `h1`, and the not-found marker is absent; the `header` and `footer` elements are present with text. After the answer `[data-testid='product-name']` reads `Giant Stance 0`, and the document is not wider than 390 px (`document.documentElement.scrollWidth` is at most 390).
+**Then**: At each reading and in every waiting entry of the log, `main` contains no text, no element (`mainChildren` is 0) and no `h1`, and the not-found marker is absent; the `header` and `footer` elements are present with text. After the answer `[data-testid='product-name']` reads `Giant Stance 0`, and the page has no horizontal scroll (the document's scroll width is at most the 390 px viewport width).
 Traces: SC-1 (SITE-016 AC-1), SC-3 (SITE-016 Behaviour 1)
 Check: interact_page
 
