@@ -247,7 +247,8 @@ Reason: the state (record in hand while the shop is asked again) is reached only
 **When**: The PR's changed-file list and diff are read, and the CI result of that head commit is read.
 **Then**: The changed files are exactly `code/frontend/src/pages/Product.tsx` — no other page, component, library, data-module file, `content.json`, `theme.css` or `index.css`. The diff reads `loading` and `error` from `useRecord` and decides in this order: a record in hand → the bike's page; none and (`loading` or `error`) → `null`; none, not loading, no error → `<Missing />`; the `Missing` function, the markup of the bike's page and every class on it are unchanged; `useCollection("categories", …)` and `usePageMeta(…)` are still called before the first early return, in the same order; no new key is added to `content.json` and no spinner, skeleton or "Loading…" text is added. The CI jobs `npm run lint`, the type-check and the build are green on the head commit.
 Traces: SC-8 (SITE-016 AC-4)
-Check: manual — *Reason:* a statement about the PR's contents and CI status, not about anything a response or a rendered page shows; read with `get_pr` and `get_ci_logs`. Every other case in this file only runs if the build compiled, which is independent evidence that type-check and build pass.
+Check: manual
+Reason: a statement about the PR's contents and CI status, not about anything a response or a rendered page shows; read with `get_pr` and `get_ci_logs`. Every other case in this file only runs if the build compiled, which is independent evidence that type-check and build pass.
 
 **Scenario**: TC-26 The order of hooks never changes: waiting → bike, and waiting → not found, draw without a React error
 **Given**: The story is running at 1280×800; the response to `GET /api/v1/products/stance-0` is held for 3000 ms in the first run and the response to `GET /api/v1/products/no-such-bike` in the second; the driver records page errors and console errors.
