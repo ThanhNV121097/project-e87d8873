@@ -75,7 +75,7 @@ const json = (status: number, body: unknown, headers: Record<string, string> = {
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
 
 const sentBody = (call: { init: RequestInit }) => JSON.parse(String(call.init.body)) as Record<string, unknown>;
-const headerOf = (call: { init: RequestInit }, name: string) => (call.init.headers as Record<string, string>)[name];
+const headerOf = (call: { init: RequestInit }, name: string) => ((call.init.headers ?? {}) as Record<string, string>)[name];
 
 describe("what Save does against the service", () => {
   const rows: Row[] = [
