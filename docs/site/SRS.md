@@ -272,7 +272,7 @@ Behaviour:
 | AC-2 | A bike with three photographs | The page opens | The main picture and two thumbnails are drawn; the first picture is shown large |
 | AC-3 | A bike with three photographs | The second thumbnail is pressed | That photograph is shown large and that thumbnail is `aria-pressed` true |
 | AC-4 | A bike with one photograph | The page opens | No thumbnail strip is drawn |
-| AC-5 | A bike with a rating of 4.8 from 52 ratings | The head is read | Five stars (four and a bit filled), "4.8" and "(52 ratings)" are shown |
+| AC-5 | A bike with a rating of 4.8 from 52 ratings | The head is read | A row of five stars filled to the rating, "4.8" and "(52 ratings)" are shown |
 | AC-6 | A bike with no rating | The head is read | No stars row is drawn |
 | AC-7 | A bike priced 18.990.000 ₫ | The page opens | "18.990.000 ₫" is shown in large bold figures |
 | AC-8 | A bike priced 60.000.000 ₫ with an earlier price 66.000.000 ₫ | The page opens | The earlier price is struck through beside the price and a pill reads "You save 6.000.000 ₫" |
