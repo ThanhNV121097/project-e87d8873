@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
@@ -137,8 +138,8 @@ func methodNotAllowed(w http.ResponseWriter) {
 	httpx.WriteCoded(w, http.StatusMethodNotAllowed, httpx.CodeMethodNotAllowed, sentenceMethod, "")
 }
 
-// storeFailed answers a failed read: 503 only when the database refused the
-// connection or is going away, 500 for everything else. The real error is
+// storeFailed answers a failed read: 503 only when the database cannot be
+// reached (refused, not found, lost) or is going away, 500 for everything else. The real error is
 // logged with the request id and the collection, never with the query string:
 // a visitor's search words are private. The answer carries one generic
 // sentence and nothing of the statement, the host or a constraint.
@@ -157,21 +158,40 @@ func storeFailed(w http.ResponseWriter, r *http.Request, collection, op string, 
 }
 
 // unavailable reports whether err means the database cannot be reached right
-// now: a refused connection, or a server that is shutting down or not yet
-// accepting (SQLSTATE class 08, 57P01 to 57P03). Anything else, a deadline
-// and a failed statement included, is a bug or a slow query, and retrying
-// does not fix it.
+// now, however the stack under it says so: a refused connection, a host name
+// that no longer resolves (a stopped database container), a connection that
+// was reset or closed under the query, a request that never left (pgconn's
+// SafeToRetry), or a server that is shutting down or not yet accepting
+// (SQLSTATE class 08, 57P01 to 57P03). Anything else is a bug or a slow query
+// and retrying does not fix it: a failed statement, a deadline (the 5 s read
+// bound, or a wait for a free pool connection) and an abandoned request are
+// all INTERNAL.
 func unavailable(err error) bool {
-	if errors.Is(err, syscall.ECONNREFUSED) {
-		return true
+	if err == nil || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+		return false
 	}
-	var op *net.OpError
-	if errors.As(err, &op) && op.Op == "dial" {
-		return true
-	}
+	// A server's own answer decides on its SQLSTATE alone: a refused password
+	// or a missing table is a PgError too, and is not a lost connection.
 	var pg *pgconn.PgError
 	if errors.As(err, &pg) {
 		return strings.HasPrefix(pg.Code, "08") || pg.Code == "57P01" || pg.Code == "57P02" || pg.Code == "57P03"
 	}
-	return false
+	// A network timeout is a deadline in another form.
+	var timeout net.Error
+	if errors.As(err, &timeout) && timeout.Timeout() {
+		return false
+	}
+	var (
+		op  *net.OpError
+		dns *net.DNSError
+	)
+	switch {
+	case errors.As(err, &op), errors.As(err, &dns):
+		return true
+	case errors.Is(err, syscall.ECONNREFUSED), errors.Is(err, io.EOF), errors.Is(err, io.ErrUnexpectedEOF), errors.Is(err, net.ErrClosed):
+		return true
+	}
+	// pgx does not export the error of a connection it could not open in
+	// this version; its text always begins "failed to connect to".
+	return pgconn.SafeToRetry(err) || strings.Contains(err.Error(), "failed to connect to")
 }
