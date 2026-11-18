@@ -273,7 +273,7 @@ Check: interact_page
 | SC-3 | TC-05, TC-09 (empty `main`, header and footer stay), TC-10 (title) | interact_page |
 | SC-4 | TC-11, TC-13, TC-16 (render_url); TC-12 (measure_styles); TC-14, TC-15, TC-17 (interact_page) | render_url, measure_styles, interact_page |
 | SC-5 | TC-02 (404 envelope, fetch_url); TC-18, TC-19 (interact_page); TC-20 (measure_styles) | fetch_url, interact_page, measure_styles |
-| SC-6 | TC-21 (unreachable), TC-22 (500), TC-23 (503, real and missing bike) | interact_page |
+| SC-6 | TC-21 (unreachable: request aborted, and gateway `502`, both arranged by request interception), TC-22 (`500` `INTERNAL` envelope, arranged by request interception), TC-23 (real `503` from the backend with the database away, real and missing bike) | interact_page |
 | SC-7 | TC-24 (manual — no instrument can force "record in hand while asking again"); TC-17 for the reachable part | manual, interact_page |
 | SC-8 | TC-25 (manual — repository diff and CI), TC-26 (hook order at runtime) | manual, interact_page |
 
