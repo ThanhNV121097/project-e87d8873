@@ -127,7 +127,7 @@ Check: fetch_url
 **Scenario**: A price the owner changes applies to the next order and an earlier order keeps its price
 **Given**: Seed state R. Order A for 1 × `talon-2` size M is accepted at 18990000. Then `talon-2`'s price is changed to 17990000 with `set_db_state` (put back at the end).
 **When**: Order B for 1 × `talon-2` size M is posted, then `order_lines` is read by SQL.
-**Then**: B is 201 with `lines[0].price` 17990000, `subtotal` 17990000, `total` 17990000. The database holds A's line with `unit_price` 18990000 (unchanged) and B's line with 17990000.
+**Then**: B is 201 with the first line's `price` 17990000, `subtotal` 17990000, `total` 17990000. The database holds A's line with `unit_price` 18990000 (unchanged) and B's line with 17990000.
 Traces: SC-11 (ORD-002 AC-7; ORD-002.3)
 Check: fetch_url with the database read by SQL in the verification step
 
