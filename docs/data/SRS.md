@@ -270,7 +270,8 @@ Behaviour:
 5. `loading` is true from the moment a request goes out until it is answered. `error` is an `Error` when a request fails — the network, or an answer that is not a success — and `null` again after a later request succeeds. When the query changes, `items` start again from the first page of the new query and never mix records of two queries; the answer of an earlier query that arrives late is discarded.
 6. `useRecord` asks for one record: `item` is empty until it is answered and stays empty when the answer is 404; `loading` is true while waiting; `error` is `null` for a 404 and an `Error` for any other failure.
 7. When another module saves or deletes a record of a collection, every list and record on screen for that collection asks again and is redrawn, without a reload. (The management area uses this, ADMIN-007.)
-8. This function changes no page or component. Where a page reads only `item` and so would say "missing" while the record is on its way, the page's own follow-up change is specified elsewhere: SITE-016 for the bike page, and ADMIN-013 for the management record page and overview.
+8. `collections()` keeps returning, for each collection, the records the module has loaded so far, so that code that looks a record up by its id — the management lists' "Riding type" column — still finds it. The management screens, not this module, load the collections they refer to (ADMIN-010).
+9. This function changes no page or component. Where a page reads only `item` and so would say "missing" while the record is on its way, the page's own follow-up change is specified elsewhere: SITE-016 for the bike page, and ADMIN-013 for the management record page and overview.
 
 **Acceptance criteria**
 
