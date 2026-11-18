@@ -68,8 +68,8 @@ CI has no database, so the proof splits three ways. Test writes each case in one
 | Mode | Proves | Criteria |
 |---|---|---|
 | **Unit, no database** | The hook against a stubbed `fetch`; the backend's parsing of every query parameter, every 400 sentence and code, the 404s, the 5xx for a failing database, and that every value reaches SQL as a bound parameter | SC-15, SC-16, SC-19, SC-29, SC-30, SC-40, SC-41, SC-49, SC-54 to SC-67 |
-| **Running stack** (`docker compose --profile local up --build --wait`, seeded Postgres 16, HTTP calls) | What is stored, its order, counts, accent and case folding, natural order, `NULLS LAST`, constraints, idempotent migrations, performance | SC-1 to SC-14, SC-17 to SC-28, SC-31 to SC-39, SC-42 to SC-48, SC-50 to SC-53, SC-82 |
-| **Browser on the running stack** | Page parity with the build before the move | SC-68 to SC-81 |
+| **Running stack** (`docker compose --profile local up --build --wait`, seeded Postgres 16, HTTP calls) | What is stored, its order, counts, accent and case folding, natural order, `NULLS LAST`, constraints, idempotent migrations, performance | SC-1 to SC-14, SC-17, SC-18, SC-20 to SC-28, SC-31 to SC-39, SC-42 to SC-48, SC-50 to SC-53, SC-82 |
+| **Browser on the running stack** | Page parity with the build before the move | SC-69 to SC-81 (SC-68 is read from the change's file list) |
 
 **Records the seed does not have.** Four cases need a record the seed lacks. The case inserts it into a throwaway database or transaction and removes it afterwards; none becomes part of the seed: a record whose text holds "Cửa Lò" and one holding "Đèo" (SC-35); a bike with no `stock` (SC-48); a bike naming a riding type that does not exist (SC-6); a seed file with a broken reference (SC-9).
 
