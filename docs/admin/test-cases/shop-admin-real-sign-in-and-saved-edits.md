@@ -1046,7 +1046,7 @@ Check: interact_page
 **Scenario**: SC-62d — The panel's foot: range, rows per page, export and page buttons
 **Given**: `/admin` open on the seeded data.
 **When**: Read the foot of the "Running low" panel; press "Export these 14".
-**Then**: The range reads "1–14 of 14"; a "rows per page" select offers 20, 50 and 100; the button reads "Export these 14"; "Previous" is disabled, a page button "1" and "Next" are present; pressing "Export these 14" downloads a `.csv` file with a header row of "Bike", "Riding type", "In stock" and 14 data rows. If the instrument cannot capture a download, the file half is reported UNVERIFIED naming that missing instrument.
+**Then**: The range reads "1–14 of 14"; a "rows per page" select offers 20, 50 and 100; the button reads "Export these 14"; "Previous" is disabled, a page button "1" and "Next" are present; pressing "Export these 14" downloads a CSV file (its name ends in csv) with a header row of "Bike", "Riding type", "In stock" and 14 data rows. If the instrument cannot capture a download, the file half is reported UNVERIFIED naming that missing instrument.
 Traces: SC-62 (ADMIN-009 AC-11, AC-12)
 Check: interact_page
 
