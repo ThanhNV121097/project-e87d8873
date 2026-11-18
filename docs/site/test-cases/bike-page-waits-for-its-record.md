@@ -125,7 +125,7 @@ Check: interact_page
 **Scenario**: TC-10 The tab title is the bike page's title while the page waits
 **Given**: The story is running; the response to `GET /api/v1/products/stance-0` is held for 3000 ms; the state log is registered.
 **When**: `/shop/stance-0` is opened by a full page load and `document.title` is read at 1500 ms (answer held) and again after the bike is drawn.
-**Then**: Both readings contain `A bike from Đèo Bikes` (the product page's title from `content.json`, `pages.product.title`), and they are equal to each other: the title does not change when the bike arrives.
+**Then**: Both readings contain `A bike from Đèo Bikes` (the product page's title in `content.json`, under `pages` › `product` › `title`), and they are equal to each other: the title does not change when the bike arrives.
 Traces: SC-3 (SITE-016 Behaviour 1), story §5 "Tab title: unchanged"
 Check: interact_page
 
