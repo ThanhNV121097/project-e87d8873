@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// The runner that executes `npm test` has NODE_ENV=production, which loads React's
+// production build, and that build has no act(). Hoisted above the imports, so React
+// is loaded as its development build.
+vi.hoisted(() => {
+  vi.stubEnv("NODE_ENV", "test");
+});
 import { collections, schema, setCollection, useCollection, useRecord } from "../data";
 import type { Collection, Field, Filter, Query, Row, Source } from "../data";
 
