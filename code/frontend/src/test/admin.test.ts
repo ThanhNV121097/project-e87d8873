@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   blank, columnsFromFields, fieldsOf, labelOf, missing, titleOf, type FieldSpec,
 } from "../components/admin/fields";
-import { deleteRow, newId, saveRow } from "../components/admin/store";
+import { deleteRow, newId, readRow, saveRow, useAttempt } from "../components/admin/store";
 import { collections, schema, setCollection, type Row } from "../data";
 
 // THE MANAGEMENT SCREENS' ONE PIECE OF LOGIC.
@@ -55,37 +56,151 @@ describe("the fields a management screen derives", () => {
   });
 });
 
-describe("what Save does in a design", () => {
+/** The answers the faked network gives, in order; the calls it was sent, for what they carried. */
+function serve(...replies: (Response | Error)[]) {
+  const calls: { url: string; init: RequestInit }[] = [];
+  vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit = {}) => {
+    calls.push({ url, init });
+    const next = replies.shift();
+    if (!next) throw new Error("no answer was queued");
+    if (next instanceof Error) throw next;
+    return next;
+  }));
+  return calls;
+}
+
+const json = (status: number, body: unknown, headers: Record<string, string> = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
+
+const sentBody = (call: { init: RequestInit }) => JSON.parse(String(call.init.body)) as Record<string, unknown>;
+const headerOf = (call: { init: RequestInit }, name: string) => (call.init.headers as Record<string, string>)[name];
+
+describe("what Save does against the service", () => {
   const rows: Row[] = [
     { id: "a", name: "First" },
     { id: "b", name: "Second" },
     { id: "c", name: "Third" },
   ];
-
-  it("edits in place, keeping the person's place in the list", () => {
-    setCollection("things", rows.map((r) => ({ ...r })));
-    saveRow("things", { id: "b", name: "Second, edited" });
-    const after = collections().things;
-    expect(after.map((r) => r.id)).toEqual(["a", "b", "c"]);
-    expect(after[1].name).toBe("Second, edited");
+  const seed = () => setCollection("things", rows.map((r) => ({ ...r })));
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    localStorage.clear();
   });
 
-  it("gives a new record an id and puts it at the end", () => {
-    setCollection("things", rows.map((r) => ({ ...r })));
-    const saved = saveRow("things", { id: "", name: "Fourth" });
-    expect(saved.id).toBeTruthy();
+  it("adds a record without an id, takes the id the server made, and puts it at the end", async () => {
+    seed();
+    const calls = serve(json(201, { id: "things-k3f9a2", name: "Fourth" }, { ETag: "\"1\"" }));
+    const saved = await saveRow("things", { id: "", name: "Fourth" });
+    expect(saved.id).toBe("things-k3f9a2");
+    expect(calls[0].url).toBe("/api/v1/things");
+    expect(calls[0].init.method).toBe("POST");
+    expect(sentBody(calls[0])).toEqual({ name: "Fourth" });
+    expect(headerOf(calls[0], "If-Match")).toBeUndefined();
     expect(collections().things.map((r) => r.name)).toEqual(["First", "Second", "Third", "Fourth"]);
   });
 
-  it("removes exactly the row asked for", () => {
-    setCollection("things", rows.map((r) => ({ ...r })));
-    deleteRow("things", "b");
+  it("changes a record with the token it was read with, and keeps the place and the next token", async () => {
+    seed();
+    const calls = serve(
+      json(200, { id: "b", name: "Second", _source: "owner", price_listed: "19", wheel: "29" }, { ETag: "\"3\"" }),
+      json(200, { id: "b", name: "Second, edited" }, { ETag: "\"4\"" }),
+      json(200, { id: "b", name: "Second, again" }, { ETag: "\"5\"" }),
+    );
+    const read = await readRow("things", "b");
+    expect(calls[0].url).toBe("/api/v1/things/b");
+    await saveRow("things", { ...read, name: "Second, edited", wheel: 29 } as Row);
+    expect(calls[1].url).toBe("/api/v1/things/b");
+    expect(calls[1].init.method).toBe("PUT");
+    expect(headerOf(calls[1], "If-Match")).toBe("\"3\"");
+    // `_source` is never sent; what the form does not show goes back as read; wheel is text.
+    expect(sentBody(calls[1])).toEqual({ id: "b", name: "Second, edited", price_listed: "19", wheel: "29" });
+    expect(collections().things.map((r) => r.id)).toEqual(["a", "b", "c"]);
+    expect(collections().things[1].name).toBe("Second, edited");
+    await saveRow("things", { id: "b", name: "Second, again" });
+    expect(headerOf(calls[2], "If-Match")).toBe("\"4\"");
+  });
+
+  it("removes exactly the row asked for, sending no token", async () => {
+    seed();
+    const calls = serve(new Response(null, { status: 204 }));
+    await deleteRow("things", "b");
+    expect(calls[0].url).toBe("/api/v1/things/b");
+    expect(calls[0].init.method).toBe("DELETE");
+    expect(headerOf(calls[0], "If-Match")).toBeUndefined();
     expect(collections().things.map((r) => r.id)).toEqual(["a", "c"]);
+  });
+
+  it("rejects with the server's own sentence and tells the screens nothing", async () => {
+    seed();
+    const before = collections().things;
+    const stale = "This record changed while you were editing it — for example an order was placed. Reload and make your change again.";
+    serve(
+      json(409, { error: stale, code: "STALE_RECORD" }),
+      json(409, { error: "Trail is still the riding type of 4 bikes. Give those bikes another riding type first.", code: "IN_USE" }),
+      json(400, { error: "A live bike needs a price.", code: "VALIDATION_FAILED", field: "price" }),
+    );
+    await expect(saveRow("things", { id: "b", name: "Second" })).rejects.toThrow(stale);
+    await expect(deleteRow("things", "b")).rejects.toThrow(/^Trail is still the riding type of 4 bikes\./);
+    await expect(saveRow("things", { id: "", name: "No price" })).rejects.toThrow("A live bike needs a price.");
+    expect(collections().things).toBe(before);
+  });
+
+  it("says the generic sentence when no usable answer came", async () => {
+    seed();
+    serve(
+      new TypeError("Failed to fetch"),
+      new TypeError("Failed to fetch"),
+      new Response("<html>Bad gateway</html>", { status: 502 }),
+      new Response("<html>Bad gateway</html>", { status: 502 }),
+    );
+    await expect(saveRow("things", { id: "b", name: "x" })).rejects.toThrow("The change could not be saved. Please try again.");
+    await expect(deleteRow("things", "b")).rejects.toThrow("The record could not be deleted. Please try again.");
+    await expect(saveRow("things", { id: "b", name: "x" })).rejects.toThrow("The change could not be saved. Please try again.");
+    await expect(readRow("things", "b")).rejects.toThrow("The record could not be opened. Please try again.");
+    expect(collections().things.map((r) => r.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("ends the session when the server says nobody is signed in", async () => {
+    seed();
+    localStorage.setItem("agentteam:session", JSON.stringify({ email: "owner@deo.test" }));
+    serve(json(401, { error: "You are not signed in.", code: "UNAUTHENTICATED" }));
+    await expect(saveRow("things", { id: "b", name: "x" })).rejects.toThrow("Your session has ended. Sign in again.");
+    expect(localStorage.getItem("agentteam:session")).toBeNull();
+  });
+
+  it("reads a record that is gone as a 404 carrying the server's sentence", async () => {
+    serve(json(404, { error: "That record does not exist.", code: "NOT_FOUND" }));
+    await expect(readRow("things", "gone")).rejects.toMatchObject({ message: "That record does not exist.", status: 404 });
   });
 
   it("never gives two records the same id", () => {
     setCollection("things", []);
     expect(newId("things")).not.toBe(newId("things"));
+  });
+});
+
+describe("a button that makes one request at a time", () => {
+  it("ignores a second press while the first is in flight", async () => {
+    const { result } = renderHook(() => useAttempt());
+    let release = () => {};
+    const job = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
+    let first: Promise<boolean> = Promise.resolve(false);
+    act(() => { first = result.current.run(job); });
+    expect(result.current.busy).toBe(true);
+    let second = true;
+    await act(async () => { second = await result.current.run(job); });
+    expect(second).toBe(false);
+    expect(job).toHaveBeenCalledTimes(1);
+    await act(async () => { release(); await first; });
+    expect(result.current.busy).toBe(false);
+  });
+
+  it("keeps the refusal's sentence until the next attempt starts", async () => {
+    const { result } = renderHook(() => useAttempt());
+    await act(async () => { await result.current.run(() => Promise.reject(new Error("A live bike needs a price."))); });
+    expect(result.current.problem).toBe("A live bike needs a price.");
+    await act(async () => { await result.current.run(() => Promise.resolve()); });
+    expect(result.current.problem).toBe("");
   });
 });
 
