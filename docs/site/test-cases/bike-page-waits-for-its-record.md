@@ -164,7 +164,7 @@ Check: interact_page
 **Scenario**: TC-15 "Add to bag" puts the chosen quantity and size in the bag
 **Given**: The story is running at 1280×800; the bag is empty (`localStorage` key `agentteam:cart` removed); `/shop/talon-2` has loaded with `size-M` chosen and quantity 1.
 **When**: The button labelled `One more` is clicked once (quantity 2), then `[data-testid='product-add']` is clicked, then the link `[data-testid='product-to-bag']` is clicked.
-**Then**: After "Add to bag": the button reads `In your bag` and the line `Added to your bag.` is drawn with a link `See your bag` whose `href` is `/bag`. After the link: `location.pathname` is `/bag`; `[data-testid='bag-line-talon-2']` contains `Giant Talon 2`, `Size M` and a quantity of `2`; `[data-testid='bag-total']` reads `37.980.000 ₫`.
+**Then**: After "Add to bag": the button reads `In your bag` and the line `Added to your bag.` is drawn with a link `See your bag` whose `href` is `/bag`. After the link: the URL path is `/bag`; `[data-testid='bag-line-talon-2']` contains `Giant Talon 2`, `Size M` and a quantity of `2`; `[data-testid='bag-total']` reads `37.980.000 ₫`.
 Traces: SC-4 (SITE-016 AC-4, SITE-005 AC-13)
 Check: interact_page
 
