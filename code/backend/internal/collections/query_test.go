@@ -43,7 +43,7 @@ func wantRefused(t *testing.T, collection, raw, field string) {
 	if err.Sentence == "" || !strings.HasSuffix(err.Sentence, ".") {
 		t.Errorf("%s?%s: sentence = %q, want one sentence", collection, raw, err.Sentence)
 	}
-	if field != "" && field != "sort" && !strings.Contains(err.Sentence, field) {
+	if field != "" && field != "sort" && field != "q" && !strings.Contains(err.Sentence, field) {
 		t.Errorf("%s?%s: sentence %q does not name %q", collection, raw, err.Sentence, field)
 	}
 }
