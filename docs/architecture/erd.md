@@ -588,6 +588,7 @@ Three small functions, no extension (an extension needs privileges the project's
 ```sql
 -- Folds text for search and sort: lower case, no accents, "đ" as "d" (DATA-004.1).
 -- translate() runs first because lower() leaves non-ASCII capitals alone in a C-locale database.
+-- chr(768)..chr(879) is the combining-mark block U+0300..U+036F that NFD splits an accent into.
 CREATE FUNCTION fold_text(t text) RETURNS text
 LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT AS $$
   SELECT lower(regexp_replace(normalize(translate(t, 'Đđ', 'Dd'), NFD), '[' || chr(768) || '-' || chr(879) || ']', '', 'g'))
