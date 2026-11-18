@@ -197,9 +197,11 @@ Each is forced by an SRS requirement and is stated once here, not repeated per e
 
 ## 3. Endpoints
 
-Ten endpoints in four groups: health, the record collections (`/v1/{collection}`), the owner's session, and orders. The eight collection names are a closed set: `products`, `categories`, `reviews`, `gallery`, `team`, `services`, `faqs`, `shop`. Any other name in `{collection}` is `404 NOT_FOUND` ("That collection does not exist."), for every method, **before** anything else is checked (so `GET /v1/orders` and `GET /v1/orders/DEO-261116-0001` are `404`: no order is ever served, ORD-001.5, AC-6).
+Ten endpoints in four groups: health, the record collections (`/v1/{collection}`), the owner's session, and orders. The eight collection names are a closed set: `products`, `categories`, `reviews`, `gallery`, `team`, `services`, `faqs`, `shop`. Any other name in `{collection}` is `404 NOT_FOUND` ("That collection does not exist.") for every method the route shape offers, **before** anything else is checked (so `GET /v1/orders` and `GET /v1/orders/DEO-261116-0001` are `404`: no order is ever served, ORD-001.5, AC-6; `GET /v1/sessions/current` is `404` too, a session is never readable).
 
-### 3.1 `GET /v1/healthz` — no: `GET /healthz`
+Route shapes and their methods: `/v1/{collection}` offers `GET` and `POST`; `/v1/{collection}/{id}` offers `GET`, `PUT` and `DELETE`; `/v1/sessions` offers `POST`; `/v1/sessions/current` offers `DELETE`; `/v1/me` offers `GET`; `/v1/orders` offers `POST`; `/healthz` offers `GET`. A literal route wins over `{collection}`. Any other method on a path that exists is `405 METHOD_NOT_ALLOWED` with an `Allow` header listing the methods it does offer (for example `PATCH /v1/products/talon-2` → `Allow: GET, PUT, DELETE`); `HEAD` and `OPTIONS` are not offered. A path that matches no shape is `404 NOT_FOUND` ("That address does not exist."). All of these answers use the envelope of §2.3.
+
+### 3.1 `GET /healthz`
 
 **Purpose** — liveness and readiness for compose and the deploy. **Traces to** — none (infrastructure; exists in the scaffold). **Auth** — none. Unversioned.
 
