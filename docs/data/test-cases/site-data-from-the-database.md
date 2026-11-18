@@ -643,7 +643,7 @@ Check: interact_page
 
 **Scenario**: TC-80 — The brand boxes and the wheel boxes list the bikes they listed before
 **Given**: `/shop` is open.
-**When**: In the filter rail the "Giant" box is ticked and read; then "Giant" is cleared and "Liv" ticked and read; then both ticked; then both cleared and the 29-inch wheel box ticked, then the mixed-wheel box instead; then "Liv" and the mixed box together.
+**When**: In the filter rail, group "Brand", the "Giant" box is ticked and read; then "Giant" is cleared and "Liv" ticked and read; then both ticked; then both cleared and, in the group "Wheel size", the box "29 inch" ticked, then the box "Mixed 29 / 27.5 inch" instead; then "Liv" and the mixed box together.
 **Then**: Giant: count 9, cards (nine at first, in this order) `talon-2`, `talon-29-3`, `talon-29-1`, `anthem-x-advanced-sl-3`, `anthem-advanced-sl-0`, `stance-0`, `stance`, `trance-x-1`, `talon-e-plus-1`. Liv: 5 — `tempt-29-0`, `pique-advanced-sl-se`, `intrigue-x-2`, `tempt-e-plus-1`, `embolden-e-plus-0`. Both: 14. Wheel 29: 12 (all but `intrigue-x-2` and `tempt-e-plus-1`). Mixed: 2 — `intrigue-x-2`, `tempt-e-plus-1`. Liv with mixed: 2, the same two.
 Traces: SC-71 (DATA-008 AC-5)
 Check: interact_page
