@@ -349,7 +349,7 @@ export function useRecord<T extends { id: string } = Row>(
   const key = JSON.stringify([name, id]);
   const [held, setHeld] = useState<{ key: string; item?: Row; error: Error | null } | null>(null);
   useEffect(() => {
-    if (id === undefined) return;
+    if (id === undefined) return undefined;
     let current = true;
     const settle = (item: Row | undefined, error: Error | null) => {
       if (current) setHeld({ key, item, error });
