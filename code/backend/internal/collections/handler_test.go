@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"strings"
 	"syscall"
@@ -259,7 +261,14 @@ func TestAnIdTheDatabaseCannotHoldIsAnswered404WithoutAsking(t *testing.T) {
 	}
 }
 
-func TestOnlyARefusedConnectionOrAGoingAwayServerIs503(t *testing.T) {
+// retryable is an error pgconn says never left the client.
+type retryable struct{}
+
+func (retryable) Error() string       { return "conn busy" }
+func (retryable) SafeToRetry() bool { return true }
+
+func TestOnlyAnUnreachableDatabaseOrAGoingAwayServerIs503(t *testing.T) {
+	noHost := &net.DNSError{Err: "no such host", Name: "db", IsNotFound: true}
 	cases := map[string]struct {
 		err    error
 		status int
@@ -267,14 +276,27 @@ func TestOnlyARefusedConnectionOrAGoingAwayServerIs503(t *testing.T) {
 		"refused":              {syscall.ECONNREFUSED, 503},
 		"refused, wrapped":     {fmt.Errorf("connect: %w", &net.OpError{Op: "dial", Net: "tcp", Err: syscall.ECONNREFUSED}), 503},
 		"a failed dial":        {&net.OpError{Op: "dial", Err: errors.New("no route to host")}, 503},
+		"a host that is gone":  {noHost, 503},
+		"a host that is gone, as pgx words it": {fmt.Errorf("failed to connect to `user=app database=app`: hostname resolving error (%w)", noHost), 503},
+		"a connect error":      {errors.New("failed to connect to `user=app database=app`: dial error (something new)"), 503},
+		"a connection reset":   {&net.OpError{Op: "read", Net: "tcp", Err: syscall.ECONNRESET}, 503},
+		"a broken pipe":        {fmt.Errorf("failed to write: %w", &net.OpError{Op: "write", Net: "tcp", Err: syscall.EPIPE}), 503},
+		"closed under the query": {fmt.Errorf("receive: %w", io.ErrUnexpectedEOF), 503},
+		"closed cleanly":       {io.EOF, 503},
+		"a closed connection":  {net.ErrClosed, 503},
+		"never sent":           {retryable{}, 503},
 		"connection exception": {&pgconn.PgError{Code: "08006"}, 503},
 		"shutting down":        {&pgconn.PgError{Code: "57P01"}, 503},
 		"crash shutdown":       {&pgconn.PgError{Code: "57P02"}, 503},
 		"starting up":          {&pgconn.PgError{Code: "57P03"}, 503},
+		"starting up, at connect": {fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "57P03"}), 503},
+		"a refused password":   {fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "28P01"}), 500},
 		"a missing table":      {&pgconn.PgError{Code: "42P01", Message: `relation "products" does not exist`}, 500},
 		"a constraint":         {&pgconn.PgError{Code: "23505", ConstraintName: "uq_products_seq"}, 500},
 		"a cancelled query":    {&pgconn.PgError{Code: "57014"}, 500},
 		"a deadline":           {context.DeadlineExceeded, 500},
+		"a deadline in the pool": {fmt.Errorf("acquire: %w", context.DeadlineExceeded), 500},
+		"a network timeout":    {&net.OpError{Op: "read", Net: "tcp", Err: os.ErrDeadlineExceeded}, 500},
 		"an abandoned request": {context.Canceled, 500},
 		"a scan error":         {errors.New(`can't scan into dest[0]`), 500},
 		"anything else":        {errors.New("boom"), 500},
@@ -308,5 +330,8 @@ func TestUnavailableLooksAtTheWholeErrorChain(t *testing.T) {
 	}
 	if !unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", syscall.ECONNREFUSED))) {
 		t.Error("a wrapped refused connection was not called unavailable")
+	}
+	if !unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", &net.DNSError{Err: "no such host", Name: "db"}))) {
+		t.Error("a wrapped name lookup failure was not called unavailable")
 	}
 }
