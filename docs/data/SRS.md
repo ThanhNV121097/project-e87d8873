@@ -313,7 +313,7 @@ Behaviour:
 Behaviour:
 
 1. `code/frontend/src/data/` holds only `schema.json` and the data module; the eight JSON files are deleted and the site builds without them.
-2. No other file of the frontend changes: no page, component, hook or library.
+2. No other file of the frontend changes: no page, component, hook or library. New test files under `src/test/` are not product code and are allowed: the module's behaviour (AC-1 to AC-17 of DATA-007) can only be proved by a test.
 3. For every page the same records appear in the same order as before the move. In particular: on the shop the riding-type chips, the brand and wheel boxes and the price sort return the same bikes as before; the frame-size and price-band narrowing stays on the loaded list, and the shop asks for all live bikes in one request of 100; and the search page finds bikes, riding types, workshop jobs, questions and gallery photographs from the API, ignoring accents.
 
 **Acceptance criteria**
@@ -321,7 +321,7 @@ Behaviour:
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-1 | The finished story | `src/data/` is listed | `schema.json` and `index.ts` only |
-| AC-2 | The finished story | The change's file list is read | It contains `src/data/index.ts` and the deleted JSON files and nothing else |
+| AC-2 | The finished story | The change's file list is read | It contains `src/data/index.ts`, the deleted JSON files and, at most, new test files under `src/test/`, and nothing else |
 | AC-3 | /shop with no filters | It opens | The count reads "14 bikes", 9 cards are drawn and the button reads "Show more bikes (5)" |
 | AC-4 | /shop | Each riding-type chip is pressed in turn | The bikes listed, and their order, equal those the same chip listed before the move |
 | AC-5 | /shop | The brand boxes and the wheel boxes are ticked in turn | The bikes equal those listed before the move |
