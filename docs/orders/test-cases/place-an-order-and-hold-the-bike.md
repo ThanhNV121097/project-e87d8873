@@ -62,7 +62,7 @@ Check: fetch_url (the 201) with the database read by SQL in the verification ste
 **Scenario**: Migration 20261118000300 has created the three tables and the service is healthy
 **Given**: The running story, migrated at boot.
 **When**: `GET /healthz` is read and the schema is read by SQL.
-**Then**: `/healthz` is 200 `{"status":"ok"}`. `orders`, `order_lines` and `order_counters` exist; migration `20261118000300` is recorded as applied exactly once; `orders.number` has a unique index; `order_lines` has no foreign key to `products` (its only foreign key is `order_id` → `orders`).
+**Then**: `/healthz` is 200 `{"status":"ok"}`. `orders`, `order_lines` and `order_counters` exist; migration `20261118000300` is recorded as applied exactly once; the `number` column of `orders` has a unique index; `order_lines` has no foreign key to `products` (its only foreign key is `order_id` → `orders`).
 Traces: SC-5 (ORD-001 AC-4; erd §3.9–3.11)
 Check: fetch_url (`/healthz`) with the schema read by SQL
 
