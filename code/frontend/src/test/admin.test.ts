@@ -1,4 +1,6 @@
-import { act, renderHook } from "@testing-library/react";
+import { createElement } from "react";
+import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   blank, columnsFromFields, fieldsOf, labelOf, missing, titleOf, type FieldSpec,
@@ -179,28 +181,49 @@ describe("what Save does against the service", () => {
   });
 });
 
+/**
+ * Runs a hook in a component and hands back its latest value. The updates are
+ * flushed by hand and waited for with a timer: react's act() is not in the
+ * production build the test run may be given.
+ */
+function mount<T>(hook: () => T) {
+  const root = createRoot(document.createElement("div"));
+  const result = { current: undefined as T };
+  const Probe = () => {
+    result.current = hook();
+    return null;
+  };
+  flushSync(() => root.render(createElement(Probe)));
+  return { result, unmount: () => flushSync(() => root.unmount()) };
+}
+const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 describe("a button that makes one request at a time", () => {
   it("ignores a second press while the first is in flight", async () => {
-    const { result } = renderHook(() => useAttempt());
+    const { result, unmount } = mount(() => useAttempt());
     let release = () => {};
     const job = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
-    let first: Promise<boolean> = Promise.resolve(false);
-    act(() => { first = result.current.run(job); });
+    const first = result.current.run(job);
+    await settle();
     expect(result.current.busy).toBe(true);
-    let second = true;
-    await act(async () => { second = await result.current.run(job); });
-    expect(second).toBe(false);
+    expect(await result.current.run(job)).toBe(false);
     expect(job).toHaveBeenCalledTimes(1);
-    await act(async () => { release(); await first; });
+    release();
+    expect(await first).toBe(true);
+    await settle();
     expect(result.current.busy).toBe(false);
+    unmount();
   });
 
   it("keeps the refusal's sentence until the next attempt starts", async () => {
-    const { result } = renderHook(() => useAttempt());
-    await act(async () => { await result.current.run(() => Promise.reject(new Error("A live bike needs a price."))); });
+    const { result, unmount } = mount(() => useAttempt());
+    expect(await result.current.run(() => Promise.reject(new Error("A live bike needs a price.")))).toBe(false);
+    await settle();
     expect(result.current.problem).toBe("A live bike needs a price.");
-    await act(async () => { await result.current.run(() => Promise.resolve()); });
+    expect(await result.current.run(() => Promise.resolve())).toBe(true);
+    await settle();
     expect(result.current.problem).toBe("");
+    unmount();
   });
 });
 
