@@ -738,7 +738,7 @@ Check: interact_page
 **Given**: The owner signed in through the form (the browser holds its hint and its cookie); then the backend stopped (the gateway answers 502).
 **When**: Open `/admin`; then start the backend again.
 **Then**: The browser ends at `/admin/sign-in` showing "Sign in"; no management page content remains on screen.
-Traces: SC-43 (ADMIN-003 AC-12, AC-7 of Behaviour: unreachable = nobody signed in)
+Traces: SC-43 (ADMIN-003 AC-12; ADMIN-003 Behaviour 7)
 Check: interact_page
 
 **Scenario**: SC-43c — A refused `me` check (database down) also lands on sign-in
