@@ -84,7 +84,7 @@ func TestLookupIsExact(t *testing.T) {
 	}
 	for _, name := range []string{"", "nothing", "PRODUCTS", "product", "orders", "me", "sessions", "products "} {
 		if _, ok := Lookup(name); ok {
-			t.Errorf(%q: found, want no such collection", name)
+			t.Errorf("%q: found, want no such collection", name)
 		}
 	}
 }
