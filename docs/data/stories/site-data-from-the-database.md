@@ -73,7 +73,7 @@ CI has no database, so the proof splits three ways. Test writes each case in one
 
 **Records the seed does not have.** Four cases need a record the seed lacks. The case inserts it into a throwaway database or transaction and removes it afterwards; none becomes part of the seed: a record whose text holds "Cửa Lò" and one holding "Đèo" (SC-35); a bike with no `stock` (SC-48); a bike naming a riding type that does not exist (SC-6); a seed file with a broken reference (SC-9).
 
-**"Before the move"** (SC-70 to SC-75): the baseline is the build on `main` before this story's FE PR, whose module still reads the JSON files. Test records the bikes, orders and counts it shows for each case in the test-case file, from that build, before the files are deleted.
+**"Before the move"** (SC-70 to SC-74 and SC-76): the baseline is the build on `main` before this story's FE PR, whose module still reads the JSON files. Test records the bikes, orders and counts it shows for each case in the test-case file, from that build, before the files are deleted.
 
 ## 5. Acceptance criteria
 
