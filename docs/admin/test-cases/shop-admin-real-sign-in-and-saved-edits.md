@@ -1025,7 +1025,7 @@ Check: render_url
 **Scenario**: SC-62a — The "Running low" panel's columns, order and danger badge
 **Given**: `/admin` open at 1440 px on the seeded data.
 **When**: Read the panel "Running low".
-**Then**: The columns are "Bike", "Riding type" and "In stock"; the "In stock" figures read top to bottom never increase in the other direction (they are in order, fewest first: the two bikes at 0 come first, each figure in a badge whose computed `background-color` is a red-dominant danger colour, and different from the colour of the badge of a bike with stock above 0).
+**Then**: The columns are "Bike", "Riding type" and "In stock"; the "In stock" figures never decrease from the top row to the bottom row (fewest first, so the two bikes at 0 come first); each figure sits in a badge, and the badge of a bike at 0 has a red-dominant computed `background-color` that differs from the badge colour of a bike with stock above 0.
 Traces: SC-62 (ADMIN-009 AC-7)
 Check: measure_styles
 
