@@ -120,7 +120,7 @@ Check: fetch_url
 **Scenario**: Two bikes in one order are summed from their own prices
 **Given**: Seed state R. `GET /v1/products/talon-2` and `GET /v1/products/stance-0` read first: prices P1 and P2.
 **When**: One order of 1 × `talon-2` size M and 1 × `stance-0` size M is posted.
-**Then**: 201 with two lines in the order sent (`talon-2` first), `lines[0].price` P1, `lines[1].price` P2, `subtotal` P1 + P2 and `total` P1 + P2.
+**Then**: 201 with two lines in the order sent (`talon-2` first), the first line's `price` P1, the second line's `price` P2, `subtotal` P1 + P2 and `total` P1 + P2.
 Traces: SC-10 (ORD-002 AC-6)
 Check: fetch_url
 
