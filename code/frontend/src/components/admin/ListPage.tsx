@@ -104,7 +104,7 @@ export default function ListPage({
   const [confirming, setConfirming] = useState<Row | null>(null);
   // Why a record could not be opened for editing, said above the table.
   const [opening, setOpening] = useState("");
-  const add_ = () => setEditing({ id: "" } as Row);
+  const openAdd = () => setEditing({ id: "" } as Row);
   async function edit(row: Row) {
     setOpening("");
     try {
@@ -114,7 +114,7 @@ export default function ListPage({
     }
   }
 
-  const addButton = add ? <Button kind="primary" icon="plus" onClick={add_}>Add</Button> : null;
+  const addButton = add ? <Button kind="primary" icon="plus" onClick={openAdd}>Add</Button> : null;
 
   return (
     <DashboardLayout title={title} nav={nav} brand={brand} actions={<>{actions}{addButton}</>}>
