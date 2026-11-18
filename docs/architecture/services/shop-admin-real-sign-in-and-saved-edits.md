@@ -6,7 +6,7 @@ Story: `docs/admin/stories/shop-admin-real-sign-in-and-saved-edits.md` · Requir
 
 **This story adds no endpoint, no request or response field, no error code and no pagination or auth rule that the contract lacks.** It builds the six endpoints `docs/architecture/services.md` already specifies — §3.4 `POST /v1/{collection}`, §3.5 `PUT /v1/{collection}/{id}`, §3.6 `DELETE /v1/{collection}/{id}`, §3.7 `POST /v1/sessions`, §3.8 `GET /v1/me`, §3.9 `DELETE /v1/sessions/current` — with their bodies, answers, error tables and **fixed** sentences, under the account and session rules of §2.2 and the body rules of §3.11. Nothing of those sections, of §2.3 (the envelope), §2.5 (the validation boundary) or §2.6 (idempotency) is restated here. The one read it also relies on, `GET /v1/{collection}/{id}` with its `ETag` (§3.3), is the data story's.
 
-There is no mock module: PR #20 deleted nothing and added none — `src/lib/session.ts` and `src/components/admin/store.ts` are the API clients. §7 reads them against the contract; **they depart from nothing and ask for no frontend change.**
+There is no mock module: PR #20 has none — `src/lib/session.ts` and `src/components/admin/store.ts` are the API clients. §7 reads them against the contract; **they depart from nothing and ask for no frontend change.**
 
 What this file adds, because the contract leaves it to the builder:
 
@@ -250,9 +250,9 @@ PR #20 (`feature/shop-admin-real-sign-in-and-saved-edits-ui`, approved at UI rev
 
 | Client call | Contract | Reading |
 |---|---|---|
-| The first page that reads the session asks `GET /v1/me` once per page load; `200` → the server's email, anything else → nobody | §3.8, §3.9 of this file | matches. A visitor with no cookie sees a `401` in the network log on a management page; that is the answer, not an error |
-| `signIn(email, password)` → `POST /v1/sessions`, `Content-Type: application/json`, body `{"email", "password"}` | §3.7 | matches **only while the body has exactly those two keys**: the server refuses a third (`400`, `field` = the key). The client must never add `remember`, `role` or anything else |
-| `signOut()` → `DELETE /v1/sessions/current`, the session forgotten only after `204` | §3.9 | matches: the server never answers `204` while the session still works |
+| The first page that reads the session asks `GET /v1/me` once per page load; `200` → the server's email, anything else → nobody | §3.8; this file §3.6 | matches. A visitor with no cookie sees a `401` in the network log on a management page; that is the answer, not an error |
+| `signIn(email, password)` → `POST /v1/sessions`, `Content-Type: application/json`, body `{"email", "password"}` | §3.7; this file §3.5 | matches **only while the body has exactly those two keys**: the server refuses a third (`400`, `field` = the key). The client must never add `remember`, `role` or anything else |
+| `signOut()` → `DELETE /v1/sessions/current`, the session forgotten only after `204` | §3.9; this file §3.7 | matches: the server never answers `204` while the session still works |
 | `readRow` → `GET /v1/{collection}/{id}`, keeps the `ETag` text as received (quotes included) | §3.3 | matches; a `404` carries "That record does not exist." and the client treats a finished `404` as "not here" |
 | `saveRow` with no `id` → `POST /v1/{collection}`; body = the record without `_source` and without `id`; `201` + the record + `ETag: "1"` | §3.4, §4.2 | matches; the client keeps the `ETag` for the next save |
 | `saveRow` with an `id` → `PUT /v1/{collection}/{id}`, `If-Match` = the kept `ETag`, body = the record without `_source`, **including** `id` equal to the address | §3.5, §4.3 | matches; every hidden field the form does not show (`price_listed`, `_invented`) goes back as read, which the replace needs. A save with no kept token is `428` and shows that sentence |
