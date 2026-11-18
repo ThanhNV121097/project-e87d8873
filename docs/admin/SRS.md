@@ -579,7 +579,7 @@ The failure notice of ADMIN-013 uses the management kit's existing alert notice 
 |---|---|
 | Security | The password is held only as a salted, slow hash. The session cookie is `HttpOnly`, `SameSite=Lax` and `Secure` over HTTPS, and ends 7 days after sign-in. Five failed sign-ins within 15 minutes lock that client address out for 15 minutes after its last failure. A write needs the cookie and a JSON request body. No secret appears in the repository, in a response or in a log line |
 | Performance | A bike or riding-type write answers within 1 s at the 95th percentile over 50 sequential requests against the seeded database on the same host |
-| Responsive | Every management page works from 390 px wide up with no horizontal page scroll; below 1024 px the sidebar is a drawer |
+| Responsive | Every management page works from 390 px wide up with no horizontal page scroll; below 768 px the sidebar is a drawer |
 | Accessibility | Every management control is keyboard reachable with a visible focus ring; every field is inside a `<label>`; icon-only buttons carry an `aria-label` ("Actions", "Sign out", "Dismiss"); a failed save is announced in a notice |
 | Localisation | Copy is in English; prices are written `18.990.000 ₫`; dates `16/10/2026` |
 | Privacy | The only personal data kept is the owner's email, held as a secret and never returned except to the owner by the `me` check |
