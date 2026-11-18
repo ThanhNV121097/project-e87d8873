@@ -1096,7 +1096,7 @@ Check: measure_styles
 **Given**: The owner opening `/admin/products` by link.
 **When**: Record the table's text from the first frame the instrument can read until the rows appear.
 **Then**: Before the rows arrive the table area reads "Loading…" (and does not read "Nothing here yet"); then the 14 rows replace it. If no frame of the loading state can be captured, report UNVERIFIED naming the missing instrument: a way to hold the API's answer back.
-Traces: SC-66 (ADMIN-010 AC-17; ADMIN-013 AC-6 of Behaviour)
+Traces: SC-66 (ADMIN-010 AC-17; ADMIN-013 Behaviour 6)
 Check: interact_page
 
 **Scenario**: SC-66d — A "Model" link opens the bike's record page
