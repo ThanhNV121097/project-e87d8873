@@ -6,7 +6,7 @@ Story: `docs/data/stories/site-data-from-the-database.md` · Requirements: DATA-
 
 **This story adds no endpoint, no request or response field, no error code and no pagination or auth rule.** It builds the two reads that `docs/architecture/services.md` already specifies — §3.2 `GET /v1/{collection}` and §3.3 `GET /v1/{collection}/{id}` — with every parameter, answer and error of §2.3, §2.4 and §2.7, and the frontend module that speaks them. Nothing of that is restated here.
 
-There is no UI pull request and no mock module for this story: the "mock" is the eight JSON files and the in-memory filter of `src/data/index.ts`. Section 8 reads that module as unreviewed input, says where the API departs from it and what the frontend does about it.
+There is no UI pull request and no mock module for this story: the "mock" is the eight JSON files and the in-memory filter of `src/data/index.ts`. Section 7.6 reads that module as unreviewed input, says where the API departs from it and what the frontend does about it.
 
 What this file adds, because the contract leaves it to the builder:
 
@@ -17,10 +17,9 @@ What this file adds, because the contract leaves it to the builder:
 | 4 | The two statements: how every filter, the search, the sort and the page become SQL with bound values only |
 | 5 | Failures, headers, the request id and the `httpx` changes this story makes for every story after it |
 | 6 | Package layout and what is tested without a database |
-| 7 | (reserved: rollout, see §10) |
-| 8 | How the frontend module speaks the contract: request terms, state, the refresh signal, and its differences from today's module |
-| 9 | Conflicts with merged decisions, resolved |
-| 10 | Rollout, dependencies, open questions |
+| 7 | How the frontend module speaks the contract: request terms, state, the refresh signal, shared in-flight requests, its differences from today's module, its tests |
+| 8 | Conflicts with merged decisions, resolved |
+| 9 | Rollout, dependencies, open questions |
 
 ## 2. Routes
 
@@ -129,7 +128,7 @@ A numeric value goes in as **text** and is cast in SQL, never parsed to a float 
 | numeric or boolean field | `m."price" ASC NULLS LAST, m."seq"` (`DESC NULLS LAST` for `-price`) |
 | text-like field (`id` included) | `natural_key(m."name") COLLATE "C" ASC NULLS LAST, m."seq"` (`DESC` for `-name`) |
 
-`natural_key` is `NULL` for a `NULL` field, so a record with no value sorts last in both directions (SC-48), and equal values keep `seq` ascending **in both directions** (the current module reverses ties on a descending sort; see §8.6).
+`natural_key` is `NULL` for a `NULL` field, so a record with no value sorts last in both directions (SC-48), and equal values keep `seq` ascending **in both directions** (the current module reverses ties on a descending sort; see §7.6).
 
 **Order of the conditions in the text** is deterministic so that unit tests can compare statements: the field conditions in the alphabetical order of their parameter names (§3 step 6), then the search; placeholders are numbered in that order, then `$a`, `$b`.
 
@@ -265,7 +264,7 @@ Today's module filters and sorts the JSON in the browser. The API follows the co
 |---|---|---|
 | Records are there on the first render; `loading` is false one tick later | `items` is `[]` and `loading` true until the first answer | None in a page: they read `items` and `loading` as before. A page that reads only `item` may draw its empty state during the wait; that is SITE-016 and ADMIN-013, not this story (story §8.5) |
 | `collections()` is every record of every collection | The records the module has loaded so far | None in the module. Consumers that look a record up by id (`fields.tsx`) read what a screen has loaded; the admin lists load the riding types themselves (ADMIN-010) |
-| A descending sort reverses the whole list, so equal values come out in reverse file order | Equal values keep `seq` order in both directions (DATA-005 AC-5) | None. Visible only with ties: `-stock` has three (3, 4, 5 each twice); no criterion reads it |
+| A descending sort reverses the whole list, so equal values come out in reverse file order | Equal values keep `seq` order in both directions (DATA-005 AC-5) | None. Visible only with ties: stock 3, 4 and 5 each occur on two bikes, so `-stock` shows them in a different order; no criterion reads it |
 | A record with no value sorts as the empty text: first ascending, last descending | After every record that has one, in both directions (DATA-005 AC-8) | None. The seeded bikes all have a price, stock and name |
 | A range on text compares with `localeCompare`; a `where` key that is not a field matches nothing | Byte order on the stored text (ISO dates compare right); an unknown name is `400` | None. Every call site read for this design passes schema fields only: `Shop`, `Search`, `Home`, `Product`, `RelatedRow`, and `ListPage`'s `filters`. A `sort` on a list column (`sizes`) is a `400` and an empty table; ADMIN-010 owns which columns the admin tables offer |
 | `where: { sizes: "M" }` matched nothing (arrays are never `===` a string) | A list field matches when it contains the value | None; no caller does it. The shop narrows by frame size on the loaded list |
