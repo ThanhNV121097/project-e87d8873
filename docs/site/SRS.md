@@ -561,7 +561,7 @@ Behaviour:
 | AC-7 | The message was accepted | The page is read | The form is replaced by "Thank you — we have your message and will answer soon." |
 | AC-8 | The sender refuses the message with a sentence | The page is read | The sentence is shown under the fields with `role="alert"` and the typed values are still in the fields |
 | AC-9 | The site has no line to the owner | /contact opens | "This form is not connected yet — please try again later." is shown above the button |
-| AC-10 | The hidden field "website" is filled | The message is sent | The owner's inbox does not show it as a message from a person (it is a spam trap) |
+| AC-10 | The hidden field "website" is filled | The message is sent | The request carries the filled value in its `website` field, which is how Agent Team recognises and discards a bot's message |
 | AC-11 | The shop has given no phone, email, address or hours (as shipped) | /contact opens | No details box and no map are drawn |
 | AC-12 | The shop has entered a phone and an email | /contact opens | The box lists them with their icons as `tel:` and `mailto:` links |
 | AC-13 | The shop has entered an address | /contact opens | The address is listed and a map is drawn under the page |
