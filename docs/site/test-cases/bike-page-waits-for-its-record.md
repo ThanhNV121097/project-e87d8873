@@ -109,7 +109,7 @@ Check: interact_page
 **Scenario**: TC-08 Pressing a bike card in a Home section never shows the not-found view before the bike appears
 **Given**: The story is running at 1280×800; `/` is open and the lead card `[data-testid='tint-stance-0']` is drawn; the state log is registered on this page; from now on the response to `GET /api/v1/products/stance-0` is held for 3000 ms.
 **When**: `[data-testid='tint-stance-0']` is clicked, the page is left alone for 3000 ms, then the answer is let through.
-**Then**: After the click `location.pathname` is `/shop/stance-0`. In every entry from the click until the bike appears, the not-found marker is absent and, while the answer is held, `main` has no element (none of Home's sections remains under the new address). After the answer `[data-testid='product-name']` reads `Giant Stance 0`.
+**Then**: After the click the URL path is `/shop/stance-0`. In every entry from the click until the bike appears, the not-found marker is absent and, while the answer is held, `main` has no element (none of Home's sections remains under the new address). After the answer `[data-testid='product-name']` reads `Giant Stance 0`.
 Traces: SC-2 (SITE-016 AC-2)
 Check: interact_page
 
