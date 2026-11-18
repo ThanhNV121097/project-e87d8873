@@ -38,7 +38,7 @@ The page's three outcomes depend on which answer arrives. The error codes below 
 Two consequences, both already true of the merged contract, stated so neither side drifts:
 
 1. **A `404` is the only answer that means "no such bike".** The backend answers `404 NOT_FOUND` for an unknown bike and never for a failure: a failed query is `500 INTERNAL`, a refused connection is `503 UNAVAILABLE` (`services.md` §2.3, §3.3). That is what lets the page treat `error` as "do not claim the bike is gone".
-2. **The sentence of a failure is never shown on this page.** `services.md` §5 says the storefront "shows its existing empty states" when a read fails. For the bike page the empty place of SITE-016 (failure table, "Upstream failure") is that state; the not-found view is not an empty state of a failed read, because the shop has not said the bike is gone. This clarifies §5 for this one page and contradicts nothing in it.
+2. **The sentence of a failure is never shown on this page.** `services.md` §5 (the PostgreSQL row) says the storefront "shows its existing empty states" when a read fails. For the bike page the empty place of SITE-016 (failure table, "Upstream failure") is that state; the not-found view is not an empty state of a failed read, because the shop has not said the bike is gone. This clarifies §5 for this one page and contradicts nothing in it.
 
 ## 4. Where the `404` is decided in the backend
 
