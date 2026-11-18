@@ -313,7 +313,7 @@ Behaviour:
 Behaviour:
 
 1. `code/frontend/src/data/` holds only `schema.json` and the data module; the eight JSON files are deleted and the site builds without them.
-2. No other file of the frontend changes: no page, component, hook or library.
+2. No other file of the frontend changes: no page, component, hook or library. New test files under `src/test/` are not product code and are allowed: the module's behaviour (AC-1 to AC-17 of DATA-007) can only be proved by a test.
 3. For every page the same records appear in the same order as before the move. In particular: on the shop the riding-type chips, the brand and wheel boxes and the price sort return the same bikes as before; the frame-size and price-band narrowing stays on the loaded list, and the shop asks for all live bikes in one request of 100; and the search page finds bikes, riding types, workshop jobs, questions and gallery photographs from the API, ignoring accents.
 
 **Acceptance criteria**
