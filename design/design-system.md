@@ -238,7 +238,7 @@ at that line; `--dock-space` = `88px + env(safe-area-inset-bottom)` kept clear a
 below 1024 px while the dock shows.
 
 Pictures: bikes are landscape — every product tile is `4/3` (the gallery, cards, bag lines); `1/1` for
-the 20 px-square cart thumbnails and the proof rounds; `4/5` exists in `ProductImage` and is not used.
+the 80 px cart thumbnails and the proof rounds; `4/5` exists in `ProductImage` and is not used.
 **Bleed**: a hero photograph, a band or a form panel may run off the screen's edge while its content
 stays on the page's own edge (`Bleed`, and the `-mx-[var(--gutter)]` / `lg:-mr-[calc((100vw-min(100vw,var(--page)))/2+var(--gutter))]`
 pattern).
