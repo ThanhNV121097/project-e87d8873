@@ -34,15 +34,22 @@
  * THE FILTERS AND THE PAGE LIVE IN THE ADDRESS BAR (src/lib/table.ts), so
  * "what is waiting for review" is a link somebody can send, and opening a
  * record and coming back lands on the same page of the same list.
+ *
+ * THE SERVER HAS THE LAST WORD. Edit reads the record by id first and opens
+ * the dialog on what the server holds (the version token travels with those
+ * values, store.ts); Add, Save changes and Delete wait for the answer. A
+ * refusal keeps the dialog open with what was typed and the server's
+ * sentence in an alert notice inside it; the primary button is disabled while
+ * a request is in flight.
  */
 import { useState } from "react";
 import DashboardLayout, { type NavGroup } from "../DashboardLayout";
 import DataTable, { type Column } from "../DataTable";
 import TableFilters, { SearchBox, FilterSelect } from "../TableFilters";
-import { Button, Confirm, Empty, FormDialog, RowMenu } from "./index";
+import { Button, Confirm, Empty, FormDialog, Notice, RowMenu } from "./index";
 import { Form } from "./Form";
 import { blank, columnsFromFields, fieldsOf, missing, titleOf, type FieldSpec } from "./fields";
-import { deleteRow, saveRow } from "./store";
+import { deleteRow, OPEN_FAILED, readRow, saveRow, useAttempt } from "./store";
 import { useCollection, type Filter, type Row } from "../../data";
 import { useTableQuery } from "../../lib/table";
 
@@ -87,16 +94,32 @@ export default function ListPage({
     page: t.page, pageSize: t.size, sort: t.sort, q: t.q, where,
   });
 
+  // Riding types are read here so a bike's "Riding type" column and the
+  // form's choice show names, not ids: fields.tsx reads names from whatever
+  // some screen has loaded, and this is the screen.
+  useCollection("categories", { pageSize: 100 });
+
   // The record in the dialog: a row being edited, or a blank one to add.
   const [editing, setEditing] = useState<Row | null>(null);
   const [confirming, setConfirming] = useState<Row | null>(null);
-  const open = (row: Row | null) => setEditing(row ?? ({ id: "" } as Row));
+  // Why a record could not be opened for editing, said above the table.
+  const [opening, setOpening] = useState("");
+  const add_ = () => setEditing({ id: "" } as Row);
+  async function edit(row: Row) {
+    setOpening("");
+    try {
+      setEditing(await readRow(collection, row.id));
+    } catch (failure) {
+      setOpening(failure instanceof Error ? failure.message : OPEN_FAILED);
+    }
+  }
 
-  const addButton = add ? <Button kind="primary" icon="plus" onClick={() => open(null)}>Add</Button> : null;
+  const addButton = add ? <Button kind="primary" icon="plus" onClick={add_}>Add</Button> : null;
 
   return (
     <DashboardLayout title={title} nav={nav} brand={brand} actions={<>{actions}{addButton}</>}>
       {children}
+      {opening && <Notice tone="alert" onClose={() => setOpening("")}>{opening}</Notice>}
       {(search || filters.length > 0) && (
         <TableFilters onClear={t.filtering ? t.clear : undefined}>
           {search && <SearchBox value={t.q} onChange={t.setQ} placeholder={searchPlaceholder} />}
@@ -130,7 +153,7 @@ export default function ListPage({
         actions={(row) => (
           <RowMenu
             items={[
-              { label: "Edit", onClick: () => open(row) },
+              { label: "Edit", onClick: () => edit(row) },
               ...(remove ? [{ label: "Delete", onClick: () => setConfirming(row), danger: true }] : []),
             ]}
           />
@@ -154,7 +177,7 @@ export default function ListPage({
       <Confirm
         open={confirming !== null}
         onClose={() => setConfirming(null)}
-        onConfirm={() => confirming && deleteRow(collection, confirming.id)}
+        onConfirm={() => (confirming ? deleteRow(collection, confirming.id) : undefined)}
         title={confirming ? `Delete ${titleOf(confirming)}?` : ""}
       />
     </DashboardLayout>
@@ -177,16 +200,18 @@ function RecordDialog({ collection, specs, record, heading, onClose }: {
   const adding = !record?.id;
   const [values, setValues] = useState<Record<string, unknown>>(() => (adding ? blank(specs) : { ...record }));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const attempt = useAttempt();
   const roomy = specs.length > 5;
 
-  function save() {
+  async function save() {
     const bad = missing(specs, values);
     if (Object.keys(bad).length > 0) {
       setErrors(bad);
       return;
     }
-    saveRow(collection, { ...(record ?? {}), ...values } as Row);
-    onClose();
+    setErrors({});
+    // The dialog closes when the server has accepted the change, not before.
+    if (await attempt.run(() => saveRow(collection, { ...(record ?? {}), ...values } as Row))) onClose();
   }
 
   return (
@@ -199,10 +224,11 @@ function RecordDialog({ collection, specs, record, heading, onClose }: {
       footer={
         <>
           <Button onClick={onClose}>Cancel</Button>
-          <Button kind="primary" onClick={save}>{adding ? "Add" : "Save changes"}</Button>
+          <Button kind="primary" onClick={save} disabled={attempt.busy}>{adding ? "Add" : "Save changes"}</Button>
         </>
       }
     >
+      {attempt.problem && <div className="mb-4"><Notice tone="alert">{attempt.problem}</Notice></div>}
       <Form fields={specs} values={values} errors={errors} columns={roomy ? 2 : 1}
         onChange={(key, v) => setValues((cur) => ({ ...cur, [key]: v }))} />
     </FormDialog>
