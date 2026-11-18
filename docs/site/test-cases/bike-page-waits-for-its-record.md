@@ -47,7 +47,7 @@ Screen: Bike `/shop/:id` (`code/frontend/src/pages/Product.tsx`) · Design: `des
 | SC-5 — `/shop/no-such-bike` after the 404: the line and "See all bikes" to `/shop`; neither before | TC-02, TC-18, TC-19, TC-20 |
 | SC-6 — the request fails (unreachable, 500, 503): empty, never the not-found view, no error screen | TC-21, TC-22, TC-23 |
 | SC-7 — a record in hand stays drawn while the shop is asked again | TC-24 (and TC-17 for the part a visitor can reach) |
-| SC-8 — one file changed; hooks in the same order; lint, type-check, build pass | TC-24, TC-25 |
+| SC-8 — one file changed; hooks in the same order; lint, type-check, build pass | TC-25, TC-26 |
 
 ## 4. Cases
 
