@@ -679,7 +679,7 @@ Check: render_url
 **Scenario**: TC-85 — /search?q=bleed lists "Brake bleed" in the Workshop block, whatever the capitals, as a phrase
 **Given**: The running story.
 **When**: `/search?q=bleed`, `/search?q=BLEED` and `/search?q=brake%20bleed` are opened.
-**Then**: Each shows `[data-testid="search-block-services"]` with the heading "Workshop" and the count 1, and its table holds one row `[data-record="services:bleed"]` reading "Brake bleed", "30 min" and "250.000 ₫"; `search-count` reads "1". (The third proves a phrase with a space is searched as one phrase.)
+**Then**: Each shows `[data-testid="search-block-services"]` with the heading "Workshop" and the count 1, and its table holds one row `[data-record="services:bleed"]` reading "Brake bleed", "30 min" and the price 250.000 followed by ₫ (a non-breaking space may separate the figure from the sign); `search-count` reads "1". (The third proves a phrase with a space is searched as one phrase.)
 Traces: SC-75 (DATA-008 AC-9); SC-59 (DATA-007 AC-7, seen from the page)
 Check: render_url
 
