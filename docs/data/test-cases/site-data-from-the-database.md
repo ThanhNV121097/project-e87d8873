@@ -657,7 +657,7 @@ Check: interact_page
 
 **Scenario**: TC-82 — A frame size with a price band narrows the loaded 14, as before
 **Given**: `/shop` is open.
-**When**: The frame-size box "M" and the price-band box for 25–70 million are ticked and read; then both cleared and "XL" with the over-100-million band ticked and read; then "XS" with the under-25-million band.
+**When**: In the group "Frame size" the box "M" and in the group "Price" the box "25–70 million ₫" are ticked and read; then both cleared and "XL" with "Over 100 million ₫" ticked and read; then "XS" with "Under 25 million ₫".
 **Then**: M with 25–70: count 3 — `tempt-29-0`, `stance-0`, `stance` (that order; a price of exactly 25000000 or 70000000 belongs to the band that starts there — none of the 14 sits on an edge). XL with over 100: count 2 — `anthem-x-advanced-sl-3`, `anthem-advanced-sl-0`. XS with under 25: count 1 — `talon-2`. (Each is the intersection of the loaded 14 with the page's own size and band rules.)
 Traces: SC-73 (DATA-008 AC-7)
 Check: interact_page
