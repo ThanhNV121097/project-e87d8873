@@ -269,7 +269,7 @@ Parameter names `page`, `limit`, `q`, `search`, `sort` are the API's own. Any ot
 | Code | HTTP | Trigger |
 |---|---|---|
 | `NOT_FOUND` | 404 | `collection` is not one of the eight |
-| `INVALID_QUERY` | 400 | repeated parameter; `page`/`limit` not a whole number ≥ 1 (`page=0`, `limit=-1`, `limit=abc`, `limit=`); `sort` names a field the collection lacks or a list; `search` names a field the collection lacks or a non-text-like field; `q` longer than 100 characters; a parameter that is not a field, `<field>_from` or `<field>_to` (`colourful=red`); a non-numeric value on a numeric field (`stock=abc`); a bool field with anything but `true`/`false` (`deal=maybe`); a range on a bool or list field (`deal_from=1`). `field` names the parameter. Sentences name it, e.g. "There is no field “colourful” to filter bikes by." |
+| `INVALID_QUERY` | 400 | repeated parameter; `page`/`limit` not a whole number ≥ 1 (`page=0`, `limit=-1`, `limit=abc`, `limit=`); `sort` names a field the collection lacks or a list; `search` names a field the collection lacks or a non-text-like field; `q` longer than 100 characters; a parameter that is not a field, `<field>_from` or `<field>_to` (`colourful=red`); a non-numeric value on a numeric field (`stock=abc`); a bool field with anything but `true`/`false` (`deal=maybe`); a range on a bool or list field (`deal_from=1`). `field` is the field at fault: a condition's own parameter name, `page`, `limit` or `q`, and the field named inside `sort` or `search` (`search=nothing` → `field: "nothing"`); the sentence names the same, e.g. "There is no field “colourful” to filter bikes by." |
 | `INTERNAL` | 500 | the query failed for any reason other than connectivity |
 | `UNAVAILABLE` | 503 | the database refused the connection |
 
@@ -510,7 +510,7 @@ Set-Cookie: deo_session=<43 characters>; Path=/; Max-Age=604800; Expires=<now + 
 **Checks, in this order**
 1. Body within 32 KiB (`413`); `Content-Type: application/json` and a JSON object (`400 MALFORMED_REQUEST`, ORD-003 AC-16).
 2. **Bot:** a `website` that is a string of at least one character → `202 {}`; nothing is validated, stored, held or sent (ORD-003.7, AC-15). A `website` that is not a string is `400`.
-3. Undefined keys and wrong JSON types, `400 MALFORMED_REQUEST`.
+3. Undefined keys and wrong JSON types, `400 MALFORMED_REQUEST`. An **absent** required key is not a type error: it is caught in step 4 (`VALIDATION_FAILED`), so a body with no `name` answers "Your name is needed." and a body with `qty: "2"` answers `MALFORMED_REQUEST`.
 4. Value rules, `400 VALIDATION_FAILED`, in this order: `name`, `phone`, `delivery`, `payment`, cash on delivery, `address`, `note`, `lines` (empty, then more than 20), then each line in the order sent: `id`, `variant`, `qty`. The first failure answers.
 5. The transaction, `409 BIKE_UNAVAILABLE` or success (next paragraph).
 
