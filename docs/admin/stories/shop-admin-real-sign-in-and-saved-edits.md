@@ -203,7 +203,7 @@ No provider account, webhook or redirect address is involved, so there is no `re
 - `src/pages/AdminOverview.tsx`
 - `src/test/admin.test.ts`
 
-**Backend** (new files beside the data story's; the read handlers are not rewritten): the auth package (sign-in, `me`, sign-out, throttle, `requireOwner`), the write handlers and validators for `products` and `categories`, one added line per route in `internal/server` `Router`, migration `20261118000400_sessions.up.sql` / `.down.sql`, `code/backend/.env.example` (the two names, no values), and Go tests that run without a database.
+**Backend** (new files beside the data story's; the read handlers are not rewritten, except for adding the `ETag` header of §3 if it is missing): the auth package (sign-in, `me`, sign-out, throttle, `requireOwner`), the write handlers and validators for `products` and `categories`, one added line per route in `internal/server` `Router`, migration `20261118000400_sessions.up.sql` / `.down.sql`, `code/backend/.env.example` (the two names, no values), and Go tests that run without a database.
 
 ## 10. Traceability
 
