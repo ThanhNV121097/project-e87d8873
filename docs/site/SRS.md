@@ -575,7 +575,7 @@ Behaviour:
 | Invalid input | Name or phone/email empty | The browser's required-field check stops the submit (AC-3) |
 | Upstream failure | The line to Agent Team fails | The sender's sentence in a `role="alert"` line, the typed values kept (AC-8) |
 | Not connected | The site has no line to the owner | The line of Behaviour 4 (AC-9) |
-| Spam | The hidden field is filled | Not shown as a person's message (AC-10) |
+| Spam | The hidden field is filled | The value travels in the message's `website` field so the inbox can discard it (AC-10) |
 
 **Data touched** — the visitor's name, phone or email, message, bike, height and the page; the shop's reply hours and contact details.
 
