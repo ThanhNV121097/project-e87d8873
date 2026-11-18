@@ -44,7 +44,7 @@ Screen: Bike `/shop/:id` (`code/frontend/src/pages/Product.tsx`) · Design: `des
 | SC-2 — arriving by pressing a card (grid, "More", Home); previous bike not shown | TC-06, TC-07, TC-08 |
 | SC-3 — while awaited the page draws nothing; header and footer stay | TC-05, TC-09, TC-10 |
 | SC-4 — a bike that exists is drawn as SITE-005 (breadcrumb, price, sizes, add to bag, ask band, "More") | TC-11, TC-12, TC-13, TC-14, TC-15, TC-16, TC-17 |
-| SC-5 — `/shop/no-such-bike` after the 404: the line and "See all bikes" to `/shop`; neither before | TC-02, TC-17, TC-18, TC-19 |
+| SC-5 — `/shop/no-such-bike` after the 404: the line and "See all bikes" to `/shop`; neither before | TC-02, TC-18, TC-19, TC-20 |
 | SC-6 — the request fails (unreachable, 500, 503): empty, never the not-found view, no error screen | TC-20, TC-21, TC-22 |
 | SC-7 — a record in hand stays drawn while the shop is asked again | TC-23 (and TC-16 for the part a visitor can reach) |
 | SC-8 — one file changed; hooks in the same order; lint, type-check, build pass | TC-24, TC-25 |
