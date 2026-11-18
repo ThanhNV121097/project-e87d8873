@@ -222,8 +222,8 @@ func token(s string) (n int, comment bool) {
 		}
 		return len(s), true
 	case s[0] == '\'' || s[0] == '"':
-		// A doubled quote ('it”s') reads as two adjacent strings, which is
-		// the same text.
+		// A doubled quote inside a string reads as two adjacent strings,
+		// which cut the same way.
 		if j := strings.IndexByte(s[1:], s[0]); j >= 0 {
 			return j + 2, false
 		}
