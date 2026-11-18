@@ -194,7 +194,7 @@ Check: interact_page
 **Scenario**: TC-19 The button "See all bikes" opens the shop
 **Given**: The story is running at 1280×800; `/shop/no-such-bike` has loaded and shows the not-found view (nothing held).
 **When**: The link `See all bikes` in `main` is clicked.
-**Then**: `location.pathname` is `/shop`; the shop grid is drawn with `[data-testid='card-stance-0']` present; `main` no longer contains `That bike is no longer in the shop.`.
+**Then**: The URL path is `/shop`; the shop grid is drawn with `[data-testid='card-stance-0']` present; `main` no longer contains `That bike is no longer in the shop.`.
 Traces: SC-5 (SITE-016 AC-3, SITE-005 AC-26)
 Check: interact_page
 
