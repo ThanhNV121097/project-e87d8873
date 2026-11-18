@@ -60,7 +60,13 @@ Derived sets used below: riding type `hardtail` = #1–4; `cross-country` = #5�
 
 Reviews by date (all text, ISO): `r-minh` 2026-10-28 (bike `stance-0`), `r-lan` 2026-10-12, `r-huy` 2026-09-30, `r-thao` 2026-09-14 (bike `talon-e-plus-1`), `r-quan` 2026-08-22, `r-ha` 2026-08-03, `r-tuan` 2026-07-19, `r-phuc` 2026-06-27, `r-trang` 2026-06-08, `r-khanh` 2026-05-21, `r-dung` 2026-04-30, `r-vy` 2026-04-11 (bike `stance-0`).
 
-**A3. Values that are easy to lose in a move** (used by the exactness cases): `services.build.price` is `0` (a real price, not "empty"); `products.pique-advanced-sl-se.stock` is `0` and `.rating` is `5` (a number, not `"5"`); `products.talon-29-3.deal` is `false` (present, not omitted); `products.talon-2.size_fit[0]` is `155–166 cm` (an en dash, U+2013); `products.talon-2.fact` is `29 in · 100 mm fork · 1×9` (middle dot U+00B7, multiplication sign U+00D7); `reviews.r-thao.name` is `Thảo`; `team.bao.name` is `Bảo`; `team.van.name` is `Vân`; `shop.shop.payment` is the three strings `Bank transfer (VietQR)`, `Cash on delivery (in town)`, `Card or cash at the shop` in that order; `shop.shop.delivery_fee` is `350000`; `shop.shop.rating` is `4.9`.
+**A3. Values that are easy to lose in a move** (used by the exactness cases). Each is written as record → field → value:
+- workshop job `build` → field `price` → the number `0` (a real price, not "empty");
+- bike `pique-advanced-sl-se` → field `stock` → the number `0`, and field `rating` → the number `5` (a number, not the text `"5"`);
+- bike `talon-29-3` → field `deal` → the boolean `false` (present, not omitted);
+- bike `talon-2` → first entry of the list `size_fit` → `155–166 cm` (an en dash, U+2013); field `fact` → `29 in · 100 mm fork · 1×9` (middle dot U+00B7, multiplication sign U+00D7);
+- review `r-thao` → field `name` → `Thảo`; team members `bao` and `van` → field `name` → `Bảo` and `Vân` (precomposed letters);
+- the shop record → field `payment` → the list of three strings `Bank transfer (VietQR)`, `Cash on delivery (in town)`, `Card or cash at the shop` in that order; field `delivery_fee` → `350000`; field `rating` → `4.9`.
 
 ## A. The records are stored, exactly (DATA-001)
 
