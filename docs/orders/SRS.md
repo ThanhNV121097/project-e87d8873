@@ -148,7 +148,7 @@ Behaviour:
 | AC-1 | A valid order | The name is missing, and separately is "   " | Each is 400 naming the name; no order is stored |
 | AC-2 | A valid order | The phone is missing | 400 naming the phone |
 | AC-3 | A valid order | `lines` is empty or missing | 400 |
-| AC-4 | A valid order with 20 lines of distinct bikes | It is placed | 201 (20 lines is accepted) |
+| AC-4 | A valid order with 20 lines (a bike may repeat in different sizes) and stock for all of them | It is placed | 201 (20 lines is accepted) |
 | AC-5 | A valid order with 21 lines | It is placed | 400 |
 | AC-6 | A valid order | A quantity of 1 and, separately, 10 | Each is accepted (when stock allows) |
 | AC-7 | A valid order | A quantity of 0, 11, 1.5, -1 and "2" | Each is 400 |
