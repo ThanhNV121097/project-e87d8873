@@ -74,7 +74,7 @@ func TestTheWorkedExampleOfTheContract(t *testing.T) {
 		"p.rn > $5::bigint AND p.rn <= $6::bigint",
 		`ORDER BY m."price" DESC NULLS LAST, m."seq"`,
 	)
-	if i, j := strings.Index(sql, `t."category"`), strings.Index(sql, `t."price"`); i > j {
+	if i, j := strings.Index(sql, `t."category" = ANY`), strings.Index(sql, `t."price" <=`); i < 0 || j < 0 || i > j {
 		t.Error("the conditions are not in the alphabetical order of their parameter names")
 	}
 	want := []any{[]string{"Trail", "e-mtb"}, "70000000", []string{"live"}, "Stance", int64(5), int64(10)}
