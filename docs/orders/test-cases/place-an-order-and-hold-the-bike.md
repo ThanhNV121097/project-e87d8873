@@ -599,7 +599,14 @@ Check: interact_page
 Traces: SC-48 (ORD-008 AC-2; ORD-008.1)
 Check: interact_page
 
-**Scenario**: The owner's message is built from the server's answer
+**Scenario**: The owner's message shows the customer, the order number, the lines, delivery, payment, total and note
+**Given**: Seed state R. The customer is "Minh", phone "0901234567". Bag `B(2, "M")`; on `/checkout` the address "12 Hùng Vương", delivery `courier`, payment `transfer`, `#order-note` "Call after 5pm"; the courier charge is 350000. Recorder installed.
+**When**: `[data-testid="place-order"]` is pressed.
+**Then**: The recorded POST to `<api>/<key>/messages` has a JSON body with `name` "Minh" and `reply_to` "0901234567"; its `message` contains the line "2 × Giant Talon 2 (size M) — 37.980.000 ₫" and, after a blank line, "Call after 5pm"; its `details` has `order` equal to the `number` of the 201 body, `delivery` "courier", `address` "12 Hùng Vương", `payment` "transfer" and `total` "38.330.000 ₫"; the body has no `website` key.
+Traces: SC-49 (ORD-008 AC-3; story decision 6)
+Check: interact_page
+
+**Scenario**: The owner's message is built from the server's answer, not from the bag
 **Given**: Seed state R. The customer is "Minh", phone "0901234567", address "12 Hùng Vương". Bag `B(2, "M")` filled at 18990000; then `talon-2`'s price changed to 17990000 (put back at the end). On `/checkout`: delivery `courier`, payment `transfer`, `#order-note` "Call after 5pm". Courier charge 350000. Recorder installed.
 **When**: `[data-testid="place-order"]` is pressed.
 **Then**: The recorded call to `<api>/<key>/messages` is a POST whose JSON body has `name` "Minh" and `reply_to` "0901234567"; `message` contains the line "2 × Giant Talon 2 (size M) — 35.980.000 ₫" (the server's price, not the bag's 37.980.000 ₫) and, after a blank line, "Call after 5pm"; `details` has the server's order number (equal to the 201 body's `number`, not one made by the browser), `delivery` "courier", `address` "12 Hùng Vương", `payment` "transfer" and `total` "36.330.000 ₫" (35.980.000 + 350.000); the body has no `website` key; `page` is "/checkout".
