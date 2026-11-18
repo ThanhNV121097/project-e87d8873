@@ -133,7 +133,7 @@ Check: fetch_url with the database read by SQL in the verification step
 
 ## 3. What is refused as invalid (ORD-003)
 
-Every 400 below is in the error envelope (`error`, `code`, `field` where one field is at fault). A refusal stores nothing; the bookkeeping check of "Refused orders leave no trace" (section 3, last case but one) proves it for the whole family.
+Every 400 below is in the error envelope (`error`, `code`, `field` where one field is at fault). A refusal stores nothing; the last case of this section, "Refused orders leave no trace", proves it for the whole family (and section 4 repeats it for the 409s).
 
 **Scenario**: A missing name and a name of only spaces are refused, naming the name
 **Given**: Seed state R.
