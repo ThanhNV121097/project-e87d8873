@@ -293,6 +293,7 @@ Behaviour:
 | AC-14 | `useRecord("products", "no-such-bike")` | The API answers 404 | `item` is empty, `loading` false, `error` null |
 | AC-15 | The module | Every name of Behaviour 1 is imported | Each exists, and the project type-checks with no page or component changed |
 | AC-16 | A list of bikes on screen | Another module saves a bike | The list asks again and shows the new record without a reload |
+| AC-17 | The riding types have been loaded by some screen | `collections().categories` is read | It holds the loaded riding types, each with its `id` and `name` |
 
 **Failure, boundary and permission behaviour**
 
