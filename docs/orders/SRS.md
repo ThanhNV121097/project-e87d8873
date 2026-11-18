@@ -184,7 +184,7 @@ Behaviour:
 1. An order is refused with a 409 and one sentence naming the bike when, for any line, at the moment the order would be stored:
    - the bike does not exist: "A bike in your bag is no longer in the shop."
    - the bike is not live: "<Brand> <Model> is no longer in the shop."
-   - the bikes' stock, counting every line of that bike together, is below the quantity asked: "<Brand> <Model> is out of stock." when its stock is 0, and "<Brand> <Model>: only <N> in stock." when it is above 0
+   - the bike's stock, counting every line of that bike together, is below the quantity asked: "<Brand> <Model> is out of stock." when its stock is 0, and "<Brand> <Model>: only <N> in stock." when it is above 0
    - the bike has frame sizes and the line's size is not one of them, is one the owner marked out, or is missing: "<Brand> <Model> is not available in size <size>." (for a missing size: "<Brand> <Model> needs a frame size.")
 2. When several lines fail, the sentence is about the first failing line in the order the lines were sent.
 3. A refused order is refused whole: no order or line is stored and no stock of any bike changes, however many of its other lines were fine.
