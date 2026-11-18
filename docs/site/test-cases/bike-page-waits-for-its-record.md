@@ -270,4 +270,4 @@ Check: interact_page
 | SC-7 | TC-24 (manual — no instrument can force "record in hand while asking again"); TC-17 for the reachable part | manual, interact_page |
 | SC-8 | TC-25 (manual — repository diff and CI), TC-26 (hook order at runtime) | manual, interact_page |
 
-26 cases: 22 `interact_page`/`render_url`/`measure_styles`/`fetch_url` cases that observe the running story, 2 `manual` (TC-24, TC-25) for the reasons stated in their `Check:` lines — 8% of the file, well under the one-third that parks a story.
+26 cases: 24 observe the running story (`fetch_url`, `render_url`, `measure_styles`, `interact_page`) and 2 are `manual` (TC-24, TC-25), each with its reason written under it — 8% of the file, well under the one-third that parks a story.
