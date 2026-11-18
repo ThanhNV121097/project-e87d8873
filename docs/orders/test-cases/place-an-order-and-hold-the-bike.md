@@ -495,7 +495,7 @@ Check: interact_page
 **Scenario**: A 201 empties the bag, saves the server's order unchanged and shows the confirmation page
 **Given**: Seed state R (so the server's first number is `…-0001`, which the browser's old random four-digit number could not give). Bag `B(2, "M")`; `F` filled; recorder installed.
 **When**: `[data-testid="place-order"]` is pressed and the page settles.
-**Then**: The address is `/checkout/done`; `[data-testid="order-confirmed"]` is present; the bag holds no line (`localStorage` key `agentteam:cart` absent, and `/bag` shows its empty state "…" from `pages.bag.empty`). `sessionStorage` key `deo:last-order` parses to an object deep-equal to the 201 body the recorder captured: same `number` (matching `^DEO-\d{6}-0001$`), same `placed`, same `lines` (name "Giant Talon 2", not the bag's own name), same `subtotal`, `delivery_fee`, `total` — no field taken from the bag or the form.
+**Then**: The address is `/checkout/done`; `[data-testid="order-confirmed"]` is present; the bag holds no line (`localStorage` key `agentteam:cart` absent, and `/bag` shows its empty state "Your bag is empty."). `sessionStorage` key `deo:last-order` parses to an object deep-equal to the 201 body the recorder captured: same `number` (matching `^DEO-\d{6}-0001$`), same `placed`, same `lines` (name "Giant Talon 2", not the bag's own name), same `subtotal`, `delivery_fee`, `total` — no field taken from the bag or the form.
 Traces: SC-39 (ORD-007 AC-3; ORD-007.3)
 Check: interact_page
 
