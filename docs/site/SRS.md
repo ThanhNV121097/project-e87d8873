@@ -644,7 +644,7 @@ Behaviour:
 | AC-6 | The address asks for kind "gallery" and the words have no gallery result | The page opens | Every kind with results is shown and "Everything" is chosen |
 | AC-7 | The bikes' records hold a live bike "Stance 0" | /search?q=STANCE and /search?q=stance | The same bikes are found; a draft bike is never found |
 | AC-8 | A record whose text holds "Cửa Lò" | /search?q=cua lo | That record is found |
-| AC-9 | /search?q=size | The page is read | The question "How do I know which frame size to choose?" is found under "Questions" and the Bikes block lists up to six bike cards with a link "Narrow by size, wheel and price" to /shop?q=size |
+| AC-9 | /search?q=size | The page is read | The question "How do I know which frame size to choose?" is found under "Questions"; and where the Bikes block is drawn it lists at most six bike cards and carries the link "Narrow by size, wheel and price" to /shop?q=size |
 | AC-10 | The Workshop block | The table is read | Its columns are "Job", "Time", "Price", a job priced 0 reads "Included" |
 | AC-11 | A search with no result in any kind | The page is read | The pink panel "Nothing in the shop matches “<words>”", its line, a primary "Ask the shop" to /contact and an outlined "See all bikes" to /shop |
 | AC-12 | Words typed in the field | Enter is pressed | The address holds the words and the results show |
