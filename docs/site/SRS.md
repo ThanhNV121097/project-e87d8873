@@ -465,7 +465,7 @@ Behaviour:
 Behaviour:
 
 1. The `h1` "Where / these bikes / go" with the lead "Climbs to the pass, rock on the way down, roots under the trees — the riding our customers buy their bikes for.", the number of photographs followed by "photographs", and one outlined chip per riding type linking to the shop narrowed to it.
-2. The first photograph is drawn wide beside the heading and runs off the right edge; the rest follow two to a row at 768 px and up (one per row on a phone), every frame the same landscape shape; a last odd photograph runs the full width. Photographs are large: each is at least half the page's width at 768 px and up, and full width on a phone.
+2. The first photograph is drawn wide beside the heading and runs off the right edge; the rest follow two to a row at 768 px and up (one per row on a phone), every frame the same landscape shape; a last odd photograph runs the full width. Photographs are large: each is at least 40% of the page's width at 768 px and up, and full width on a phone.
 3. Every photograph has a caption under a hairline: its title in semibold, its caption line, and — when it has a riding type — an outlined link with that type's name to the shop narrowed to it.
 4. A closing band: "Seen / your kind / of riding?" with a primary button "See the bikes for it" to the shop.
 5. An address ending in `#shot-<id>` scrolls to that photograph.
