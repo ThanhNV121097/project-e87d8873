@@ -224,9 +224,9 @@ Traces: SC-6 (SITE-016 failure table, "Upstream failure")
 Check: interact_page
 
 **Scenario**: TC-22 When the shop answers 500 the bike's place stays empty and never says the bike is gone
-**Given**: The story is running at 1280×800; the store fails the bike query — the arrangement tool makes the products query fail (for example by renaming the `products` table) — so `GET /api/v1/products/stance-0` answers `500` with `code` `INTERNAL` (confirmed with `fetch_url`); the state log is registered.
+**Given**: The story is running at 1280×800 and the real backend is up; a fetch_url of `GET /api/v1/products/stance-0` answers `200` (the bike exists). The page driver answers every request for `GET /api/v1/products/stance-0` itself with status `500`, `Content-Type: application/json` and the body `{"error":"Something went wrong. Please try again.","code":"INTERNAL"}` — the contract's `INTERNAL` envelope — by request interception (§2 "Failing a request"). Every other request passes through unchanged. The state log is registered before the page's scripts, and the driver records page errors.
 **When**: `/shop/stance-0` is opened by a full page load and read at 500 ms and at 5000 ms.
-**Then**: In every log entry the not-found marker is absent. At 5000 ms: `main` has no element, no text and no `h1`; no error message is drawn; the `header` and `footer` are still drawn. After the table is put back and the page reloaded, the bike is drawn (`Giant Stance 0`).
+**Then**: The driver's request log shows the request for `/api/v1/products/stance-0` answered `500` at least once. In every log entry the not-found marker is absent (`main` never contains `That bike is no longer in the shop.` and never has a link or button named `See all bikes`). At 5000 ms: `main` has no element (`mainChildren` is 0), no text and no `h1`; the sentence `Something went wrong. Please try again.` is not on the page, and no `[role='alert']`, retry button or spinner is drawn (the design draws no error screen); `[data-testid='product-name']` is absent; the `header` and `footer` are still drawn with text. No uncaught page error is recorded. With the interception removed, a reload of `/shop/stance-0` draws `[data-testid='product-name']` reading `Giant Stance 0`.
 Traces: SC-6 (SITE-016 failure table, "Upstream failure"; story §3 table, row "answered 5xx")
 Check: interact_page
 
