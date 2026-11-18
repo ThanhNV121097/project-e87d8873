@@ -568,7 +568,7 @@ weight, colour), what size to take, and the longer things — scanned, not read.
 
 **Anatomy (size guide)** — a table: head `text-xs uppercase tracking-wider text-ink-soft`, rows `py-3` with a hairline; size in 600, rider height right-aligned and tabular, "In stock" / "Out of stock" in `--ink-soft`; a note under it in `text-xs`.
 
-**Anatomy (ProductTabs)** — a tab list (About, Riding, Delivery & payment, Reviews) with a 1 px rule under it, then the panel (`max-w-[68ch]`, `pt-6`). A tab with nothing in it is left out; one tab alone is drawn as its content with no bar.
+**Anatomy (ProductTabs)** — a tab list ("What it is for", "Owning it", "Delivery and payment", "Reviews") with a 1 px rule under it, then the panel (`max-w-[68ch]`, `pt-6`). A tab with nothing in it is left out; one tab alone is drawn as its content with no bar.
 
 **States (a tab)**
 
