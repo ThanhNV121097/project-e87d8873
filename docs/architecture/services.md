@@ -904,7 +904,7 @@ Both reads run under `context.WithTimeout(r.Context(), 5*time.Second)` (`service
 
 | The error is | Answer |
 |---|---|
-| a refused connection: `syscall.ECONNREFUSED` anywhere in the chain, or a dial `*net.OpError`; or a `*pgconn.PgError` whose SQLSTATE is in class `08` or is `57P01`, `57P02`, `57P03` (the server is going away or not yet accepting) | `503 UNAVAILABLE`, `code` `UNAVAILABLE`, "The service is not ready." |
+| the database cannot be reached: a refused connection (`syscall.ECONNREFUSED` anywhere in the chain), a database host that no longer resolves (`*net.DNSError`), any other `*net.OpError` that is not a timeout (dial, read or write: reset, broken pipe), a connection closed under the query (`io.EOF`, `io.ErrUnexpectedEOF`, `net.ErrClosed`), a request pgx says never left the client (`pgconn.SafeToRetry`), or pgx's own "failed to connect to" error; or a `*pgconn.PgError` whose SQLSTATE is in class `08` or is `57P01`, `57P02`, `57P03` (the server is going away or not yet accepting). A `*pgconn.PgError` is decided by its SQLSTATE alone | `503 UNAVAILABLE`, `code` `UNAVAILABLE`, "The service is not ready." |
 | anything else: a failed statement, a deadline, a cancelled request, a scan error | `500 INTERNAL`, `code` `INTERNAL`, "Something went wrong. Please try again." |
 
 The body is the envelope and nothing else: no `items`, no record, no SQL, host, path or constraint name (SC-19). The real error goes to the log at `Error` level with `collection`, the operation (`list` or `record`) and `request_id` — **never the query string and never `q`**, because a visitor's search words are private (`services.md` §3.2). A request the visitor abandoned (`context.Canceled`) is logged at `Info`, not `Error`.
