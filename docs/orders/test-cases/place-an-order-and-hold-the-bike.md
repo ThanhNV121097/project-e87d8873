@@ -396,7 +396,7 @@ Check: fetch_url (parallel requests)
 **Scenario**: Five orders of two for a stock of nine: four accepted, one refused, stock 1
 **Given**: Seed state R; `talon-2` stock 9.
 **When**: Five orders for 2 × `talon-2` size M are posted at the same moment.
-**Then**: Four answers are 201 and one is 409 `BIKE_UNAVAILABLE` ("Giant Talon 2: only 1 in stock." or "… only 1 in stock" for the stock the loser saw); `GET /v1/products/talon-2` reads `stock` 1; the database holds four orders.
+**Then**: Four answers are 201 and one is 409 `BIKE_UNAVAILABLE` "Giant Talon 2: only 1 in stock." (the loser queues on the bike's row lock and sees the stock the four winners left); `GET /v1/products/talon-2` reads `stock` 1; the database holds four orders.
 Traces: SC-30 (ORD-005 AC-6)
 Check: fetch_url (parallel requests)
 
