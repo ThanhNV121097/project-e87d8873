@@ -32,11 +32,11 @@ type Field struct {
 	Kind Kind
 }
 
-// Collection is one table. Fields lists the schema's fields in schema order,
+// Spec is one collection. Fields lists the schema's fields in schema order,
 // without the id; Noun is the plural the 400 sentences use. The table has the
 // collection's name. Versioned collections carry the compare-and-swap token
 // the record answer sends as its ETag.
-type Collection struct {
+type Spec struct {
 	Name      string
 	Noun      string
 	Versioned bool
@@ -51,7 +51,7 @@ func list(k string) Field { return Field{k, KindList} }
 
 // All is the closed set of collections, and the only place a column name
 // comes from: no request ever supplies one.
-var All = []Collection{
+var All = []Spec{
 	{Name: "products", Noun: "bikes", Versioned: true, Fields: []Field{
 		txt("image"), txt("name"), txt("brand"), ref("category"), num("year"), num("price"), num("was"),
 		txt("price_listed"), txt("fact"), txt("status"), num("stock"), list("sizes"), list("sizes_out"),
@@ -86,18 +86,18 @@ var All = []Collection{
 }
 
 // Lookup finds a collection by its exact name.
-func Lookup(name string) (Collection, bool) {
+func Lookup(name string) (Spec, bool) {
 	for _, c := range All {
 		if c.Name == name {
 			return c, true
 		}
 	}
-	return Collection{}, false
+	return Spec{}, false
 }
 
 // Field finds a field by key; "id" is the record's own id. Names that are not
 // schema keys (_source, seq, version, created_at, updated_at) are not found.
-func (c Collection) Field(key string) (Field, bool) {
+func (c Spec) Field(key string) (Field, bool) {
 	if key == "id" {
 		return Field{"id", KindID}, true
 	}
@@ -112,7 +112,7 @@ func (c Collection) Field(key string) (Field, bool) {
 // AnswerColumns are the columns a record is built from, in this order: the
 // id, every schema field, then the record's origin. A column a table gains
 // later is not in the answer until it is added here.
-func (c Collection) AnswerColumns() []string {
+func (c Spec) AnswerColumns() []string {
 	cols := make([]string, 0, len(c.Fields)+2)
 	cols = append(cols, "id")
 	for _, f := range c.Fields {
@@ -123,7 +123,7 @@ func (c Collection) AnswerColumns() []string {
 
 // DefaultSearch is what q searches when no search= names fields: the id and
 // every text-like schema field, in schema order.
-func (c Collection) DefaultSearch() []Field {
+func (c Spec) DefaultSearch() []Field {
 	out := []Field{{"id", KindID}}
 	for _, f := range c.Fields {
 		if f.Kind.TextLike() {
