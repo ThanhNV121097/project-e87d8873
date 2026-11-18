@@ -277,4 +277,4 @@ Check: interact_page
 | SC-7 | TC-24 (manual — no instrument can force "record in hand while asking again"); TC-17 for the reachable part | manual, interact_page |
 | SC-8 | TC-25 (manual — repository diff and CI), TC-26 (hook order at runtime) | manual, interact_page |
 
-26 cases: 24 observe the running story (`fetch_url`, `render_url`, `measure_styles`, `interact_page`) and 2 are `manual` (TC-24, TC-25), each with its reason written under it — 8% of the file, well under the one-third that parks a story.
+26 cases: 24 observe the running story (`fetch_url`, `render_url`, `measure_styles`, `interact_page`) and 2 are `manual` (TC-24, TC-25), each with its reason written under it — 8% of the file, well under the one-third that parks a story. TC-21 and TC-22 are `interact_page`, not `manual`: their failure is arranged by request interception (§2 "Failing a request"), the same instrument that holds a request in TC-03 and the others, and if the driver cannot abort or fulfil a request they are reported UNVERIFIED with that instrument named (§2 "Fallback"), never passed.
