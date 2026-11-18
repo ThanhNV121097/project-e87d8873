@@ -81,7 +81,7 @@ func fail(field, format string, a ...any) *QueryError {
 
 // ParseQuery reads the whole query string of a list request. The checks run
 // in the order the service contract lists them and the first failure answers.
-func ParseQuery(c Collection, v url.Values) (Query, *QueryError) {
+func ParseQuery(c Spec, v url.Values) (Query, *QueryError) {
 	names := make([]string, 0, len(v))
 	for name := range v {
 		names = append(names, name)
@@ -159,7 +159,7 @@ func parseWhole(s string) (int64, bool) {
 	return n, err == nil
 }
 
-func parseSort(c Collection, raw string, q *Query) *QueryError {
+func parseSort(c Spec, raw string, q *Query) *QueryError {
 	if raw == "" {
 		return nil
 	}
@@ -178,7 +178,7 @@ func parseSort(c Collection, raw string, q *Query) *QueryError {
 	return nil
 }
 
-func parseSearch(c Collection, raw string, q *Query) *QueryError {
+func parseSearch(c Spec, raw string, q *Query) *QueryError {
 	for _, part := range strings.Split(raw, ",") {
 		name := strings.TrimSpace(part)
 		if name == "" {
@@ -199,7 +199,7 @@ func parseSearch(c Collection, raw string, q *Query) *QueryError {
 // parseCondition classifies a parameter by its name, whatever its value, even
 // an empty one: an unknown name is refused, and an empty value only means "no
 // condition" for a name that is a field. ok is false for no condition.
-func parseCondition(c Collection, name, raw string) (cond Condition, ok bool, err *QueryError) {
+func parseCondition(c Spec, name, raw string) (cond Condition, ok bool, err *QueryError) {
 	if f, found := c.Field(name); found {
 		return parseEquality(f, name, raw)
 	}
