@@ -1,22 +1,22 @@
 /**
- * The site's records — products, categories, a menu, branches, the team —
- * one JSON file per kind in this folder, described in schema.json. Words
- * that are not records stay in content.json.
+ * The site's records — bikes, riding types, reviews, the team, gallery photographs,
+ * workshop jobs, questions and the shop's own numbers — read from the shop's API.
+ * schema.json describes every collection's fields; the records live in the database.
  *
- * Components read records ONLY through these hooks, never by importing a
- * JSON file: in the design they read the files here; once the site has a
- * backend, this one module is rewritten to call its API — base
- * import.meta.env.VITE_API_URL ?? "/api";
- * GET <base>/v1/<name>?page=&limit=&sort=&q=&<field>=<value> → { items, total, page, limit }
- *   — <field>=a,b is "any of"; <field>_from / <field>_to is a range; sort is
- *   "price" or "-created_at". A CMS list is a page of a table, so the backend
- *   answers a page, not a window: `total` is every match;
- * GET <base>/v1/<name>/<id> → the record — and the JSON files are deleted. The
- * components, their paging and their loading states stay exactly as they are,
- * and so does useCollection's return: `items` (the pages loaded) and `total`
- * (every match, for "24 products").
+ * Components read records ONLY through these hooks. Every request runs in the
+ * browser, against `import.meta.env.VITE_API_URL ?? "/api"` (read when a request is
+ * made), and speaks the service contract:
+ *   GET <base>/v1/<name>?page=&limit=&<field>=<value>&q=&search=&sort= → { items, total, page, limit }
+ *     — <field>=a,b is "any of"; <field>_from / <field>_to is an inclusive range; sort
+ *     is "price" or "-price". `total` is every match, never the size of the page;
+ *   GET <base>/v1/<name>/<id> → the record, or 404.
+ * A page size above 100 is never asked: the API would answer 100 anyway.
+ *
+ * The page paints before its records arrive: `items` is empty and `loading` is true
+ * until the first answer. There is no cache: every answer is `no-store`, and a request
+ * that is already in flight for the same address is shared, nothing more.
  */
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import schemaFile from "./schema.json";
 
 /** Where a record came from: the owner's own data, a page on the web, or an assumption. */
@@ -59,43 +59,14 @@ export interface Collection {
 
 export const schema = schemaFile as { collections: Record<string, Collection> };
 
-const files = import.meta.glob<{ default: Row[] }>(["./*.json", "!./schema.json"], { eager: true });
-
-let store: Record<string, Row[]> = {};
-for (const [path, mod] of Object.entries(files)) {
-  store[path.slice(2, -5)] = mod.default;
-}
-const listeners = new Set<() => void>();
-
-/** The Studio's unsaved edits, shown live in its frame. */
-export function setCollection(name: string, rows: Row[]) {
-  store = { ...store, [name]: rows };
-  listeners.forEach((l) => l());
-}
-
-export function collections(): Record<string, Row[]> {
-  return store;
-}
-
-function subscribe(l: () => void) {
-  listeners.add(l);
-  return () => {
-    listeners.delete(l);
-  };
-}
-
-function useRows(name: string): Row[] {
-  return useSyncExternalStore(subscribe, () => store[name] ?? EMPTY);
-}
-const EMPTY: Row[] = [];
-
 /**
  * One condition on a field. A plain value is an exact match; a list is "any
  * of" (a status filter with three boxes ticked); a range is from/to
  * inclusive, for dates and prices.
  *
  * An empty value — "", an empty list, a range with neither end — filters
- * nothing. A filter the person has not set yet must not empty the table.
+ * nothing, and is not sent. A filter the person has not set yet must not
+ * empty the table.
  */
 export type Filter =
   | string
@@ -105,13 +76,13 @@ export type Filter =
   | { from?: string | number; to?: string | number };
 
 export interface Query {
-  /** Records whose field matches, e.g. { category: "iphone", status: ["pending", "rejected"] }. */
+  /** Records whose field matches, e.g. { category: "trail", status: ["draft", "live"] }. */
   where?: Record<string, Filter | undefined>;
   /** Free text, matched against `search` fields — accents and case ignored. */
   q?: string;
   /** Which fields `q` searches. Every text field when not given. */
   search?: readonly string[];
-  /** "price" ascending, "-created_at" descending. */
+  /** "price" ascending, "-price" descending. */
   sort?: string;
   /**
    * The page to return, 1-based. Given, `items` is THAT page alone — the
@@ -119,77 +90,153 @@ export interface Query {
    * what a catalogue's "Show more" needs.
    */
   page?: number;
-  /** How many a page holds. */
+  /** How many a page holds: 12 when not given, at most 100. */
   pageSize?: number;
 }
 
-/** Lowercased and stripped of accents, so "Cửa Lò" is found by "cua lo". */
-function fold(v: unknown): string {
-  return String(v ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+// What the module has seen, per collection, merged by id in first-seen order; and
+// one counter per collection that hooks subscribe to, so that a collection reported
+// changed is asked for again.
+let loaded: Record<string, Row[]> = {};
+const epochs: Record<string, number> = {};
+const listeners = new Set<() => void>();
+const inflight = new Map<string, Map<string, Promise<Answer>>>();
+
+interface Answer {
+  status: number;
+  body: unknown;
 }
 
-function empty(v: Filter | undefined): boolean {
-  if (v === undefined || v === null || v === "") return true;
-  if (Array.isArray(v)) return v.length === 0;
-  if (typeof v === "object") {
-    const r = v as { from?: string | number; to?: string | number };
-    return !set(r.from) && !set(r.to);
-  }
-  return false;
+/** The records the module has loaded so far, for code that looks one up by its id. */
+export function collections(): Record<string, Row[]> {
+  return loaded;
 }
 
 /**
- * value against one end of a range: negative below, positive above. Two
- * numbers compare as numbers; anything else as text, which is why a date is
- * kept as ISO — "2026-01-09" < "2026-02-01" is true read either way.
+ * Another module saved or deleted records of `name`: remember `rows` at once, and
+ * make every list and record of that collection on screen ask the API again.
  */
-function compare(value: unknown, edge: string | number): number {
-  const x = Number(value);
-  const y = Number(edge);
-  if (!Number.isNaN(x) && !Number.isNaN(y) && edge !== "") return x - y;
-  return String(value ?? "").localeCompare(String(edge));
+export function setCollection(name: string, rows: Row[]) {
+  loaded = { ...loaded, [name]: rows };
+  epochs[name] = (epochs[name] ?? 0) + 1;
+  inflight.delete(name);
+  listeners.forEach((l) => l());
 }
 
-function set(edge: string | number | undefined): boolean {
-  return edge !== undefined && edge !== "";
+function remember(name: string, rows: Row[]) {
+  const next = [...(loaded[name] ?? [])];
+  for (const row of rows) {
+    const at = next.findIndex((r) => r.id === row.id);
+    if (at < 0) next.push(row);
+    else next[at] = row;
+  }
+  loaded = { ...loaded, [name]: next };
 }
 
-function inRange(value: unknown, r: { from?: string | number; to?: string | number }): boolean {
-  if (set(r.from) && compare(value, r.from as string | number) < 0) return false;
-  if (set(r.to) && compare(value, r.to as string | number) > 0) return false;
-  return true;
+function subscribe(l: () => void) {
+  listeners.add(l);
+  return () => {
+    listeners.delete(l);
+  };
 }
 
-function matches(row: Row, query: Query): boolean {
-  const where = query.where ?? {};
-  const ok = Object.entries(where).every(([k, v]) => {
-    if (empty(v)) return true;
-    const value = row[k];
-    if (Array.isArray(v)) return v.some((one) => one === value || fold(one) === fold(value));
-    if (typeof v === "object") return inRange(value, v as { from?: string | number; to?: string | number });
-    return value === v || fold(v) === fold(value);
-  });
-  if (!ok) return false;
-  const q = fold(query.q).trim();
-  if (!q) return true;
-  const fields = query.search ?? Object.keys(row).filter((k) => !k.startsWith("_") && typeof row[k] === "string");
-  return fields.some((f) => fold(row[f]).includes(q));
+function useEpoch(name: string): number {
+  return useSyncExternalStore(subscribe, () => epochs[name] ?? 0);
 }
 
-/** Rows in `sort` order: "price" ascending, "-price" descending. */
-function sorted<T extends { id: string }>(rows: T[], sort?: string): T[] {
-  const key = (sort ?? "").trim();
-  if (!key) return rows;
-  const desc = key.startsWith("-");
-  const field = desc ? key.slice(1) : key;
-  const out = [...rows].sort((a, b) => {
-    const x = (a as unknown as Row)[field];
-    const y = (b as unknown as Row)[field];
-    if (typeof x === "number" && typeof y === "number") return x - y;
-    return String(x ?? "").localeCompare(String(y ?? ""), undefined, { numeric: true });
-  });
-  return desc ? out.reverse() : out;
+const base = () => String(import.meta.env.VITE_API_URL ?? "/api").replace(/\/+$/, "");
+const enc = (v: string | number | boolean) => encodeURIComponent(String(v));
+const asError = (e: unknown) => (e instanceof Error ? e : new Error(String(e)));
+const given = (e: string | number | undefined): e is string | number => e !== undefined && e !== "";
+const isRow = (b: unknown): b is Row => typeof b === "object" && b !== null && typeof (b as Row).id === "string";
+
+/** GET <base>/v1/<name><path>. A request already in flight for the address is joined, never cached. */
+function get(name: string, path: string): Promise<Answer> {
+  const url = `${base()}/v1/${enc(name)}${path}`;
+  let shared = inflight.get(name);
+  if (!shared) {
+    shared = new Map();
+    inflight.set(name, shared);
+  }
+  const joined = shared.get(url);
+  if (joined) return joined;
+  const request: Promise<Answer> = fetch(url)
+    .then(async (res) => ({ status: res.status, body: (await res.json().catch(() => null)) as unknown }))
+    .finally(() => {
+      if (inflight.get(name)?.get(url) === request) inflight.get(name)?.delete(url);
+    });
+  shared.set(url, request);
+  return request;
 }
+
+/** The envelope's own sentence when the API gave one. */
+function problem(a: Answer): Error {
+  const sentence = (a.body as { error?: unknown } | null)?.error;
+  return new Error(typeof sentence === "string" ? sentence : `The shop's records could not be read (${a.status}).`);
+}
+
+/** `field=value` terms, in the object's key order; what is empty is not sent, a false or a 0 is. */
+function whereTerms(where: Query["where"]): string[] {
+  const out: string[] = [];
+  for (const [key, value] of Object.entries(where ?? {})) {
+    if (value === undefined || value === null || value === "") continue;
+    if (Array.isArray(value)) {
+      if (value.length > 0) out.push(`${enc(key)}=${value.map((v) => enc(v)).join(",")}`);
+    } else if (typeof value === "object") {
+      const r = value as { from?: string | number; to?: string | number };
+      if (given(r.from)) out.push(`${enc(`${key}_from`)}=${enc(r.from)}`);
+      if (given(r.to)) out.push(`${enc(`${key}_to`)}=${enc(r.to)}`);
+    } else {
+      out.push(`${enc(key)}=${enc(value as string | number | boolean)}`);
+    }
+  }
+  return out;
+}
+
+/** Everything of a query but the page and the size, as `&`-led terms in the API's own words. */
+function terms(query: Query): string {
+  const out = whereTerms(query.where);
+  const q = (query.q ?? "").trim();
+  if (q) out.push(`q=${enc(q)}`);
+  const search = (query.search ?? []).filter((f) => f !== "");
+  if (search.length > 0) out.push(`search=${search.map((f) => enc(f)).join(",")}`);
+  const sort = (query.sort ?? "").trim();
+  if (sort) out.push(`sort=${enc(sort)}`);
+  return out.map((t) => `&${t}`).join("");
+}
+
+const pageLimit = (size: number | undefined) => {
+  const n = Math.floor(size ?? 12);
+  return Number.isFinite(n) ? Math.min(100, Math.max(1, n)) : 12;
+};
+const lastPage = (total: number, limit: number) => Math.max(1, Math.ceil(total / limit));
+
+async function fetchPage(name: string, page: number, limit: number, rest: string) {
+  const answer = await get(name, `?page=${page}&limit=${limit}${rest}`);
+  if (answer.status < 200 || answer.status > 299) throw problem(answer);
+  const body = answer.body as { items?: unknown; total?: unknown } | null;
+  if (!body || !Array.isArray(body.items) || typeof body.total !== "number") {
+    throw new Error("The shop's records came back in a form this page cannot read.");
+  }
+  remember(name, body.items as Row[]);
+  return { items: body.items as Row[], total: body.total };
+}
+
+/**
+ * What a list holds: `pages` are the records of the query `answered`; `settled` is the
+ * latest query whose request finished, answered or failed; `pending` is a request for
+ * the next page in flight.
+ */
+interface Held {
+  name: string;
+  answered: string;
+  settled: string;
+  pages: Row[][];
+  total: number;
+  error: Error | null;
+  pending: boolean;
+}
+const fresh = (name: string): Held => ({ name, answered: "", settled: "", pages: [], total: 0, error: null, pending: false });
 
 /**
  * A page at a time: `items` grows by `pageSize` with each `loadMore()` — wire
@@ -199,11 +246,16 @@ function sorted<T extends { id: string }>(rows: T[], sort?: string): T[] {
  * - `items` — the page asked for, or the records loaded so far;
  * - `total` — how many records match in all, loaded or not. A count the
  *   visitor reads ("24 products", "1–20 of 137") is `total`, never
- *   `items.length`, which is only the page. Once the site has a backend,
- *   `total` is the API's `total`;
+ *   `items.length`, which is only the page;
  * - `pages` — how many pages of `pageSize` those matches make;
  * - `page` — the page `items` holds, clamped into range: a filter narrowed
- *   while standing on page 7 shows the last page, not an empty table.
+ *   while standing on page 7 shows the last page, not an empty table;
+ * - `loading` — true from the moment a request goes out until it is answered;
+ * - `error` — an Error when a request failed, null again after one succeeds.
+ *
+ * When the query changes, `items` start again from its first page: until that answer
+ * arrives the previous records of the same collection stay and `loading` is true, and
+ * the answer of an earlier query that arrives late is discarded.
  *
  * Pass `page` for a dashboard list — a table's footer is "1–20 of 137" with
  * numbers to click — and leave it out for a catalogue, where `loadMore()`
@@ -213,38 +265,111 @@ function sorted<T extends { id: string }>(rows: T[], sort?: string): T[] {
 // an interface included: `T extends Row` asked for Row's index signature,
 // which no interface has, and a design turn spent 24 builds on the error.
 export function useCollection<T extends { id: string } = Row>(name: string, query: Query = {}) {
-  const rows = useRows(name);
-  const pageSize = query.pageSize ?? 12;
-  const key = JSON.stringify([query.where ?? {}, query.q ?? "", query.search ?? null, query.sort ?? ""]);
-  const [pages, setPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const epoch = useEpoch(name);
+  const limit = pageLimit(query.pageSize);
+  const rest = terms(query);
+  const asked = query.page === undefined ? undefined : Math.max(1, Math.floor(query.page) || 1);
+  const identity = JSON.stringify([name, rest, limit, asked ?? null, epoch]);
+  const [held, setHeld] = useState<Held>(() => fresh(name));
+  const generation = useRef(0);
+  const busy = useRef(false);
+  const live = useRef({ name, rest, limit, asked, identity, held });
   useEffect(() => {
-    setPages(1);
-  }, [name, key]);
+    live.current = { name, rest, limit, asked, identity, held };
+  });
+
+  // An answer counts only while the query it answers is still the one on screen.
+  const settle = useCallback((mine: number, next: (prev: Held) => Held) => {
+    if (mine !== generation.current) return;
+    busy.current = false;
+    setHeld(next);
+  }, []);
+
   useEffect(() => {
-    // Async on purpose, as the API will be: components handle loading now.
-    setLoading(true);
-    const t = window.setTimeout(() => setLoading(false), 0);
+    const mine = ++generation.current;
+    busy.current = true;
+    (async () => {
+      try {
+        let page = asked ?? 1;
+        let answer = await fetchPage(name, page, limit, rest);
+        // A page past the last: ask for the last one, as many times as the total moves.
+        while (mine === generation.current && answer.items.length === 0 && answer.total > 0 && page > lastPage(answer.total, limit)) {
+          page = lastPage(answer.total, limit);
+          answer = await fetchPage(name, page, limit, rest);
+        }
+        settle(mine, () => ({ name, answered: identity, settled: identity, pages: [answer.items], total: answer.total, error: null, pending: false }));
+      } catch (e) {
+        settle(mine, (prev) => ({ ...(prev.name === name ? prev : fresh(name)), name, settled: identity, error: asError(e), pending: false }));
+      }
+    })();
     return () => {
-      window.clearTimeout(t);
+      generation.current += 1;
     };
-  }, [name, key, pages, query.page]);
-  const all = sorted(rows.filter((r) => matches(r, query)) as unknown as T[], query.sort);
-  const count = all.length;
-  const last = Math.max(1, Math.ceil(count / pageSize));
-  // A page past the end — the person was on page 7 and narrowed the filter —
-  // shows the last page rather than an empty table with no way back.
-  const page = query.page === undefined ? 1 : Math.min(Math.max(1, Math.floor(query.page)), last);
-  const items = query.page === undefined
-    ? all.slice(0, pages * pageSize)
-    : all.slice((page - 1) * pageSize, page * pageSize);
-  const loadMore = useCallback(() => setPages((p) => p + 1), []);
-  return { items, total: count, pages: last, page, hasMore: query.page === undefined && items.length < count, loading, error: null as Error | null, loadMore };
+  }, [name, rest, limit, asked, identity, settle]);
+
+  const loadMore = useCallback(() => {
+    const cur = live.current;
+    const have = cur.held.pages.reduce((n, p) => n + p.length, 0);
+    if (busy.current || cur.asked !== undefined || cur.held.answered !== cur.identity || have >= cur.held.total) return;
+    const mine = generation.current;
+    busy.current = true;
+    setHeld((prev) => ({ ...prev, pending: true }));
+    fetchPage(cur.name, cur.held.pages.length + 1, cur.limit, cur.rest).then(
+      (more) => settle(mine, (prev) => ({ ...prev, pages: [...prev.pages, more.items], total: more.total, error: null, pending: false })),
+      (e) => settle(mine, (prev) => ({ ...prev, error: asError(e), pending: false })),
+    );
+  }, [settle]);
+
+  const same = held.name === name;
+  const items = (same ? held.pages.flat() : []) as unknown as T[];
+  const total = same ? held.total : 0;
+  const pages = lastPage(total, limit);
+  return {
+    items,
+    total,
+    pages,
+    page: asked === undefined ? 1 : Math.min(asked, pages),
+    hasMore: asked === undefined && items.length < total,
+    loading: held.settled !== identity || held.pending,
+    error: same ? held.error : null,
+    loadMore,
+  };
 }
 
-/** One record by id. */
-export function useRecord<T extends { id: string } = Row>(name: string, id: string | undefined) {
-  const rows = useRows(name);
-  const item = rows.find((r) => r.id === id) as unknown as T | undefined;
-  return { item, loading: false, error: null as Error | null };
+/**
+ * One record by id. `item` is empty until it is answered, and stays empty when the
+ * answer is 404 (`error` is then null); `loading` is true from the first render for
+ * an id until the answer; any other failure is an Error.
+ */
+export function useRecord<T extends { id: string } = Row>(
+  name: string,
+  id: string | undefined,
+): { item: T | undefined; loading: boolean; error: Error | null } {
+  const epoch = useEpoch(name);
+  const key = JSON.stringify([name, id]);
+  const [held, setHeld] = useState<{ key: string; item?: Row; error: Error | null } | null>(null);
+  useEffect(() => {
+    if (id === undefined) return;
+    let current = true;
+    const settle = (item: Row | undefined, error: Error | null) => {
+      if (current) setHeld({ key, item, error });
+    };
+    get(name, `/${enc(id)}`).then(
+      (a) => {
+        if (a.status === 200 && isRow(a.body)) {
+          remember(name, [a.body]);
+          settle(a.body, null);
+        } else {
+          settle(undefined, a.status === 404 ? null : problem(a));
+        }
+      },
+      (e) => settle(undefined, asError(e)),
+    );
+    return () => {
+      current = false;
+    };
+  }, [name, id, key, epoch]);
+  if (id === undefined) return { item: undefined, loading: false, error: null };
+  if (!held || held.key !== key) return { item: undefined, loading: true, error: null };
+  return { item: held.item as T | undefined, loading: false, error: held.error };
 }
