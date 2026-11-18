@@ -321,7 +321,7 @@ Behaviour:
 | # | Given | When | Then |
 |---|---|---|---|
 | AC-1 | The finished story | `src/data/` is listed | `schema.json` and `index.ts` only |
-| AC-2 | The finished story | The change's file list is read | It contains `src/data/index.ts` and the deleted JSON files and nothing else |
+| AC-2 | The finished story | The change's file list is read | It contains `src/data/index.ts`, the deleted JSON files and, at most, new test files under `src/test/`, and nothing else |
 | AC-3 | /shop with no filters | It opens | The count reads "14 bikes", 9 cards are drawn and the button reads "Show more bikes (5)" |
 | AC-4 | /shop | Each riding-type chip is pressed in turn | The bikes listed, and their order, equal those the same chip listed before the move |
 | AC-5 | /shop | The brand boxes and the wheel boxes are ticked in turn | The bikes equal those listed before the move |
