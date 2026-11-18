@@ -385,9 +385,9 @@ Traces: SC-37 (DATA-004 AC-6)
 Check: fetch_url
 
 **Scenario**: TC-45 — Percent, underscore and backslash in the words mean themselves
-**Given**: The seeded stack; no bike's text holds a percent sign, underscore or backslash; the question `delivery` and the record `shop` both hold "90% built".
-**When**: `GET /api/v1/products?q=100%25`, `GET /api/v1/products?q=_`, `GET /api/v1/products?q=%5C`, `GET /api/v1/faqs?q=90%25`, `GET /api/v1/shop?q=90%25` and `GET /api/v1/faqs?q=_` are read.
-**Then**: Each is 200 (no 4xx, no 5xx). The three bike requests have `total` 0 and `items` `[]` — in particular `q=100%` does not return every bike and `q=_` is not "any one character". `faqs?q=90%` has `total` 1: `delivery`. `shop?q=90%` has `total` 1: `shop`. `faqs?q=_` has `total` 0.
+**Given**: The seeded stack; no bike holds the text "100%"; no question holds an underscore; the question `delivery` and the record `shop` both hold "90% built". (Whether some bike's text holds a lone underscore or backslash is not assumed: those two requests are judged by what each returned item holds, below.)
+**When**: `GET /api/v1/products?q=100%25`, `GET /api/v1/products?q=_&limit=100`, `GET /api/v1/products?q=%5C&limit=100`, `GET /api/v1/faqs?q=90%25`, `GET /api/v1/shop?q=90%25` and `GET /api/v1/faqs?q=_` are read.
+**Then**: Each is 200 (no 4xx, no 5xx). `products?q=100%` has `total` 0 and `items` `[]` — it does not return every bike. `products?q=_` and `products?q=%5C` return only bikes that hold a literal underscore (respectively backslash) in a searched text field, and `total` is not 14 (so `_` is not "any one character", and `\` is not an escape). `faqs?q=90%` has `total` 1: `delivery`. `shop?q=90%` has `total` 1: `shop`. `faqs?q=_` has `total` 0.
 Traces: SC-38 (DATA-004 AC-7; SRS §6 Security)
 Check: fetch_url
 
