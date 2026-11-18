@@ -365,7 +365,7 @@ Check: fetch_url
 
 **Scenario**: TC-42 — "cua lo" finds "Cửa Lò" and "deo" finds "Đèo"
 **Given**: The seeded stack, which holds neither phrase. `set_db_state` inserts two test-only questions: `INSERT INTO faqs (id, q, a) VALUES ('tc-cualo', 'Do you ride to Cửa Lò?', 'Yes.'), ('tc-deo', 'Which bike for the Đèo pass?', 'A trail bike.')`.
-**When**: `GET /api/v1/faqs?q=cua%20lo`, `?q=C%E1%BB%AC A L%C3%92` is replaced by the accented, capitalised `?q=CỬA LÒ` (percent-encoded), `?q=deo`, `?q=%C4%90%C3%A8o` (the word "Đèo") and `?q=%C4%91%C3%A8o` ("đèo") are read. Afterwards both test rows are deleted with `DELETE FROM faqs WHERE id IN ('tc-cualo','tc-deo')`.
+**When**: `GET /api/v1/faqs?q=cua%20lo`, `?q=C%E1%BB%ACA%20L%C3%92` (the capitalised, accented words "CỬA LÒ"), `?q=deo`, `?q=%C4%90%C3%A8o` (the word "Đèo") and `?q=%C4%91%C3%A8o` ("đèo") are read. Afterwards both test rows are deleted with `DELETE FROM faqs WHERE id IN ('tc-cualo','tc-deo')`.
 **Then**: Both `cua lo` requests (plain and accented) have `tc-cualo` among their items and `tc-deo` not; each `deo`/`Đèo`/`đèo` request has `tc-deo` among its items (it may also return `delivery`, whose text holds "video call", which contains "deo"). After the deletion `GET /api/v1/faqs` answers `total` 8 again.
 Traces: SC-35 (DATA-004 AC-2, AC-3)
 Check: fetch_url
