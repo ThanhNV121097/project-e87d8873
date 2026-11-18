@@ -60,7 +60,8 @@ Check: fetch_url
 **When**: Search the whole repository (code, docs, tests, `code/backend/.env.example`) for the password's value; read how the password is held in the auth package; read the service's log after a right and a wrong sign-in; read the `sessions` table.
 **Then**: The value appears nowhere in the repository, and `.env.example` lists `ADMIN_EMAIL` and `ADMIN_PASSWORD` as names with no value; the code holds only an `argon2id` hash made at start (the plain string is dropped); the log holds neither the password nor the typed email; `sessions` holds only 32-byte `token_hash` values and no token and no password.
 Traces: SC-2 (ADMIN-001 AC-2, AC-5)
-Check: manual — no instrument reads a source tree, a server log or a table's contents over HTTP; Test greps the repository and reads the PR diff, and uses the database tool for `sessions` if it returns rows.
+Check: manual
+Manual because: no instrument reads a source tree, a server log or a table's contents over HTTP; Test greps the repository and reads the PR diff, and uses the database tool for `sessions` if it returns rows.
 
 **Scenario**: SC-3a — Without the secrets nobody can sign in, and the shop still works
 **Given**: The backend is started with `ADMIN_PASSWORD` unset (run it a second time with `ADMIN_EMAIL` unset instead), the database seeded.
@@ -74,7 +75,8 @@ Check: fetch_url
 **When**: Three sign-ins are made.
 **Then**: The log holds exactly three lines containing `admin account is not configured` (one per attempt), each with the request id and with no email and no password.
 Traces: SC-3 (ADMIN-001 AC-4)
-Check: manual — no instrument reads the service's log; Test reads the container log if it can and otherwise reads the unit test of the not-configured path in the PR.
+Check: manual
+Manual because: no instrument reads the service's log; Test reads the container log if it can and otherwise reads the unit test of the not-configured path in the PR.
 
 **Scenario**: SC-4 — The cookie is HttpOnly, SameSite=Lax, Path=/ and lasts 7 days
 **Given**: Throttle clean; plain HTTP (no `X-Forwarded-Proto`).
@@ -130,7 +132,8 @@ Check: fetch_url
 **When**: `POST /v1/sessions` with the right credentials.
 **Then**: 200 with the owner's email and a cookie.
 Traces: SC-8 (ADMIN-002 AC-5)
-Check: manual — no instrument advances a server's clock by 15 minutes or waits that long; the evidence is the Go unit test of the throttle with the injected clock (Test runs the backend tests with `run_tests` and reads that test's name and result).
+Check: manual
+Manual because: no instrument advances a server's clock by 15 minutes or waits that long; the evidence is the Go unit test of the throttle with the injected clock (Test runs the backend tests with `run_tests` and reads that test's name and result).
 
 **Scenario**: SC-9 — A right sign-in resets the failure count
 **Given**: A backend restarted so the throttle is clean.
@@ -179,7 +182,8 @@ Check: fetch_url
 **When**: `GET /v1/me` with the old cookie.
 **Then**: 401 `UNAUTHENTICATED` in both runs (the stored token hash was keyed by the old secrets).
 Traces: SC-11 (ADMIN §3; ADMIN-003 AC-3)
-Check: manual — no instrument changes the container's secrets; the evidence is the Go unit test of the credential fingerprint and the session lookup in the PR (read with `run_tests`).
+Check: manual
+Manual because: no instrument changes the container's secrets; the evidence is the Go unit test of the credential fingerprint and the session lookup in the PR (read with `run_tests`).
 
 **Scenario**: SC-12a — Sign-out answers 204, clears the cookie and kills the old value
 **Given**: A signed-in `SESSION`.
@@ -505,7 +509,8 @@ Check: fetch_url
 **When**: The bike is deleted; `order_lines` is read again.
 **Then**: The rows are identical to the ones read before (the line holds a copy of the bike's id, name and price, not a key).
 Traces: SC-29 (ADMIN-006 AC-7)
-Check: manual — the API never serves an order (ORD-001.5), so no HTTP instrument can read order lines; the evidence is a read of `order_lines` through the database tool if it returns rows, and the `order_lines` definition in the migration (no foreign key to `products`).
+Check: manual
+Manual because: the API never serves an order (ORD-001.5), so no HTTP instrument can read order lines; the evidence is a read of `order_lines` through the database tool if it returns rows, and the `order_lines` definition in the migration (no foreign key to `products`).
 
 **Scenario**: SC-30a — A saved stock of 0 shows on the shop, the bike's page and Home
 **Given**: A valid `SESSION`; `talon-2` at stock 9; Home read first and showing "12" before "bikes in stock"; the shop card and the bike page showing no "Out of stock".
@@ -589,7 +594,8 @@ Check: fetch_url
 **When**: `PUT` stock 5 and `ORDER(T, 1)` are sent at the same instant; then `T` is read.
 **Then**: Every run ends as save 200 + order 201 with `stock` 4, or save 409 + order 201 with `stock` 8; never `stock` 5 with the order accepted.
 Traces: SC-34 (ADMIN-008 AC-5)
-Check: manual — no instrument sends two requests in the same instant; the sequential halves are SC-34a and SC-33a, and the invariant rests on both writers taking the bike's row lock (the conditional `UPDATE … WHERE version = $2` and the order's `stock >= qty`), which the backend review reads in the PR.
+Check: manual
+Manual because: no instrument sends two requests in the same instant; the sequential halves are SC-34a and SC-33a, and the invariant rests on both writers taking the bike's row lock (the conditional `UPDATE … WHERE version = $2` and the order's `stock >= qty`), which the backend review reads in the PR.
 
 **Scenario**: SC-35 — Deleting is not refused for a change since the screen loaded the bike
 **Given**: A valid `SESSION`; `T` read with `ETag` `E1`; then `T` saved by another client (`ETag` now `E2`).
@@ -775,14 +781,16 @@ Check: interact_page
 **When**: The owner signs in; the foot is read.
 **Then**: "L", "Lan Tran", "lan.tran@deo.test" and a "Sign out" button.
 Traces: SC-45 (ADMIN-003 AC-10)
-Check: manual — the run's account is `owner@deo.test` and no instrument changes it; the evidence is `src/test/session.test.ts` (Test runs `run_tests` for the frontend and reads that test), and SC-45a proves the same derivation on the live account.
+Check: manual
+Manual because: the run's account is `owner@deo.test` and no instrument changes it; the evidence is `src/test/session.test.ts` (Test runs `run_tests` for the frontend and reads that test), and SC-45a proves the same derivation on the live account.
 
 **Scenario**: SC-45c — The session module keeps its four names and the gate and layout are unchanged
 **Given**: The PR's diff.
 **When**: Read `src/lib/session.ts`, `src/App.tsx` and `src/components/admin/DashboardLayout.tsx` in the diff; run the frontend tests.
 **Then**: `useSession`, `signIn`, `signOut` and `useRole` are all still exported by `session.ts`; `useRole()` returns the empty text for a signed-in owner (a test asserts it); `App.tsx` and `DashboardLayout.tsx` are absent from the diff.
 Traces: SC-45 (ADMIN-003 AC-11; ADMIN-003 Behaviour 5)
-Check: manual — no instrument reads source exports or a diff; the evidence is the PR's file list and `run_tests` for the frontend.
+Check: manual
+Manual because: no instrument reads source exports or a diff; the evidence is the PR's file list and `run_tests` for the frontend.
 
 ---
 
@@ -795,7 +803,8 @@ In this section the owner is signed in through the form, the bikes list is `/adm
 **When**: Import the three names; call `newId()` twice; call `saveRow` and `deleteRow` against a faked success and against a faked refusal carrying a sentence and against a faked network failure.
 **Then**: All three names import from `components/admin/store.ts`; the two `newId` texts differ; on success each promise resolves; on a refusal it rejects carrying the server's sentence; on a network failure it rejects carrying "The change could not be saved. Please try again." (save) and "The record could not be deleted. Please try again." (delete); the field-derivation tests in the file still pass.
 Traces: SC-46 (ADMIN-013 AC-1)
-Check: manual — a module's exports and a promise's rejection are not visible over HTTP or in the DOM; the evidence is the unit test run by `run_tests` for the frontend (the screens' behaviour is proved by SC-47 to SC-59).
+Check: manual
+Manual because: a module's exports and a promise's rejection are not visible over HTTP or in the DOM; the evidence is the unit test run by `run_tests` for the frontend (the screens' behaviour is proved by SC-47 to SC-59).
 
 **Scenario**: SC-47a — A successful edit closes the dialog and the list shows the change without a reload
 **Given**: `T` live at price 25000000; `/admin/products` open (the row of "Test Bike" reads `25.000.000 ₫`).
@@ -1323,14 +1332,16 @@ Check: interact_page
 **When**: Run the backend tests (no database, as in CI).
 **Then**: They pass, and the suite contains tests named for the validators (each rule of §3.11 at its limit), the throttle with an injected clock (5 failures, 15 minutes, reset on success), the password hash check, the cookie attributes (`HttpOnly`, `SameSite=Lax`, `Max-Age=604800`, `Secure` only over HTTPS), and the 405-before-401 ordering.
 Traces: story §3 (Backend: Go unit tests); SC-4, SC-5, SC-8, SC-9, SC-14, SC-18 to SC-24
-Check: manual — no HTTP or DOM instrument runs a test suite; the evidence is `run_tests` for the backend, read for pass/fail and for the names above.
+Check: manual
+Manual because: no HTTP or DOM instrument runs a test suite; the evidence is `run_tests` for the backend, read for pass/fail and for the names above.
 
 **Scenario**: SC-F2 — The frontend's tests, lint and build pass, and nothing outside the story's files changed
 **Given**: The PR's branch.
 **When**: Run the frontend tests; read the PR's file list against the story's §9.
 **Then**: `npm test`, lint and the type-check build pass; `src/test/admin.test.ts` keeps its field-derivation tests and tests the store against a faked network; `src/test/session.test.ts` exists; the changed files are only those of §9 (`session.ts`, `SignInPage.tsx`, `store.ts`, `ListPage.tsx`, `RecordPage.tsx`, the `Confirm` component in `components/admin/index.tsx`, `AdminOverview.tsx`, the two tests); `App.tsx`, `DashboardLayout.tsx`, `AdminProducts.tsx`, `AdminProduct.tsx`, `AdminKinds.tsx`, `AdminSignIn.tsx`, `src/data/index.ts`, `theme.css` and `index.css` are not in the diff.
 Traces: story §3 (Frontend), §4, §9
-Check: manual — a file list and a test run are not observable over HTTP; the evidence is `run_tests` for the frontend and the PR's diff.
+Check: manual
+Manual because: a file list and a test run are not observable over HTTP; the evidence is `run_tests` for the frontend and the PR's diff.
 
 ---
 
