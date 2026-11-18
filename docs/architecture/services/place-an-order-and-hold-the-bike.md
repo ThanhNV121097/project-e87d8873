@@ -80,12 +80,14 @@ An **absent** key is never a shape error: it is caught in step 5, so a body with
 | 4 | `payment` absent or not `transfer`, `cod`, `shop` | "The payment method must be transfer, cod or shop." | `payment` |
 | 5 | `payment` is `cod` and `delivery` is not `local` | "Cash on delivery is only available for delivery in town." | `payment` |
 | 6 | `delivery` is not `pickup` and `address` is absent or blank | "A delivery address is needed." | `address` |
-| 7 | `lines` absent or empty | "Your bag is empty." | `lines` |
-| 8 | `lines` has more than 20 entries | "An order holds at most 20 lines." | `lines` |
-| 9 | each line in the order sent: `id` absent, blank or over 200 characters | "Line N needs a bike." | `lines[i].id` |
-| 10 | … then `qty` absent, or not a whole number from 1 to 10 | "The quantity of line N must be a whole number from 1 to 10." | `lines[i].qty` |
+| 7 | `note` (optional): only its NUL and length checks apply | see below | `note` |
+| 8 | `lines` absent or empty | "Your bag is empty." | `lines` |
+| 9 | `lines` has more than 20 entries | "An order holds at most 20 lines." | `lines` |
+| 10 | each line in the order sent: `id` absent, blank or over 200 characters | "Line N needs a bike." | `lines[i].id` |
+| 11 | … then `variant` (optional): only its NUL and length checks apply | see below | `lines[i].variant` |
+| 12 | … then `qty` absent, or not a whole number from 1 to 10 | "The quantity of line N must be a whole number from 1 to 10." | `lines[i].qty` |
 
-Too long, wherever it comes up in a field's turn (`name` over 100, `phone` over 30, `address` over 300, `note` over 1,000, a `variant` over 20): "A text is too long: name 100, phone 30, address 300, note 1000, size 20 characters." with `field` naming that field. A text with a NUL character (U+0000) in any of `name`, `phone`, `address`, `note`, `variant`, `id`: "The text in “<field>” contains a character that cannot be stored." — Postgres cannot store it and would otherwise answer a 500. `address` and `note` are optional: absent means `""`; `variant` absent or blank means `""`; an `id` is **not** trimmed (it is compared exactly, so an id with a space is simply a bike that does not exist, a 409). The contract's step order puts `address` after the cash-on-delivery rule and `note` and `lines` after it; the table above is that order with the line checks expanded, so the `note` length check comes between rows 6 and 7.
+Too long, wherever it comes up in a field's turn (`name` over 100, `phone` over 30, `address` over 300, `note` over 1,000, a `variant` over 20): "A text is too long: name 100, phone 30, address 300, note 1000, size 20 characters." with `field` naming that field. A text with a NUL character (U+0000) in any of `name`, `phone`, `address`, `note`, `variant`, `id`: "The text in “<field>” contains a character that cannot be stored." — Postgres cannot store it and would otherwise answer a 500. `address` and `note` are optional: absent means `""`; `variant` absent or blank means `""`; an `id` is **not** trimmed (it is compared exactly, so an id with a space is simply a bike that does not exist, a 409). The table is the contract's order (`name`, `phone`, `delivery`, `payment`, cash on delivery, `address`, `note`, `lines`, then each line's `id`, `variant`, `qty`) with every turn written out; the NUL and length checks of `name`, `phone` and `address` run inside their own turns (rows 1, 2 and 6).
 
 **`qty` grammar.** The raw number token must match `^-?(0|[1-9][0-9]*)$` and its value must be 1 to 10; anything else that is a JSON number is `VALIDATION_FAILED` — `0`, `11`, `-1`, `1.5`, `2.0`, `1e0`, `00`, and an integer too large for 64 bits (never an overflow, never a 500; SC-14).
 
@@ -136,10 +138,10 @@ The two classes use the **one** predicate of the data story (`unavailable(err)`,
 
 - **Deadline.** `context.WithTimeout(r.Context(), 10*time.Second)` covers the whole of §4: the wait for a pool connection, every statement and the commit (`services.md` §5, PostgreSQL row). A deadline is a `500`, as for the reads.
 - **Rollback.** Any error or refusal after `BEGIN` ends in `ROLLBACK`, issued on a fresh context (`context.WithoutCancel` plus 2 s), so that a request the visitor abandoned releases its row locks at once instead of when the connection is reaped. A request cancelled before `COMMIT` stores nothing.
-- **A commit whose outcome is unknown** (the error comes from `COMMIT` itself) answers `500`, although the order may exist. This is the lost-answer case the SRS already accepts (orders SRS §7, question 2); the log line carries the order number so the owner's helper can find it.
+- **A commit whose outcome is unknown** (the error comes from `COMMIT` itself) answers `500`, although the order may exist. This is the lost-answer case the SRS already accepts (orders SRS §7, question 2); the log line carries the order number so the operator can find it.
 - **A panic** is turned into the generic `500` by the existing `Recover`, and the transaction is rolled back by the deferred `ROLLBACK` before it propagates.
 - **Headers.** Every answer, the `202` and every error included, carries `Cache-Control: no-store` and `X-Request-Id` from the middleware chain, and `Content-Type: application/json; charset=utf-8`. A `405` carries `Allow`. There is no `Location` and no `CORS` header (`services.md` §2.8).
-- **Logging.** One `Info` line per accepted order from the handler: `msg: "order placed"`, `request_id`, `order_number`, `lines` (a count). One `Info` line per refusal: `msg: "order refused"`, `request_id`, `code`. Failures are logged at `Error` with the real cause and `request_id`. **Never logged**: the body, the name, phone, address and note, the query, and the sentence of a 409 is not logged either (it names a bike, not a person, but the code already says why). A request abandoned by the visitor (`context.Canceled`) is logged at `Info`.
+- **Logging.** One `Info` line per accepted order from the handler: `msg: "order placed"`, `request_id`, `order_number`, `lines` (a count). One `Info` line per refusal: `msg: "order refused"`, `request_id`, `code`. Failures are logged at `Error` with the real cause and `request_id`. **Never logged**: the body, the name, phone, address and note, the query, and a refusal's sentence is not logged, because the code already says why. A request abandoned by the visitor (`context.Canceled`) is logged at `Info`.
 - **No retry, no idempotency key, no rate limit** (`services.md` §2.6, §9 question 2).
 
 ## 6. Layout and what is tested without a database
