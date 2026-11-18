@@ -102,7 +102,7 @@ Check: interact_page
 **Scenario**: TC-07 Pressing a card in the "More" row of another bike's page shows neither the not-found view nor the previous bike while the new bike is awaited
 **Given**: The story is running at 1280×800; `/shop/stance-0` has loaded and shows `Giant Stance 0`; its "More Trail" row (`section[data-block='related']`) holds three cards; the state log is registered on this page; from now on every `GET /api/v1/products/<id>` is held for 3000 ms. Let `<new-id>` be the id in the `data-testid` (`card-<new-id>`) of the first card of that row, and `<new-name>` the card's bike name.
 **When**: That card is clicked, the page is left alone for 3000 ms, then the answer is let through.
-**Then**: After the click `location.pathname` is `/shop/<new-id>`. In every entry from the click until the new bike appears: the not-found marker is absent, and **no entry whose `path` is the new address shows the previous bike** — `main` does not contain `Giant Stance 0` and `[data-testid='product-name']` is absent; while the answer is held `main` has no element. After the answer `[data-testid='product-name']` reads `Giant <new-name>` and `main` no longer contains the text `Stance 0` as a heading.
+**Then**: After the click the URL path is `/shop/<new-id>`. In every entry from the click until the new bike appears: the not-found marker is absent, and **no entry whose `path` is the new address shows the previous bike** — `main` does not contain `Giant Stance 0` and `[data-testid='product-name']` is absent; while the answer is held `main` has no element. After the answer `[data-testid='product-name']` reads `Giant <new-name>` and `main` no longer contains the text `Stance 0` as a heading.
 Traces: SC-2 (SITE-016 AC-2)
 Check: interact_page
 
