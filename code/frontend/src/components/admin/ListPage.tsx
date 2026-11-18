@@ -158,15 +158,7 @@ export default function ListPage({
             ]}
           />
         )}
-        empty={
-          <Empty
-            title={t.filtering ? "Nothing matches those filters" : "Nothing here yet"}
-            note={t.filtering ? "Clear a filter to see more." : undefined}
-            action={t.filtering
-              ? <Button onClick={t.clear}>Clear filters</Button>
-              : addButton}
-          />
-        }
+        empty={<ListEmpty filtering={t.filtering} onClear={t.clear} addButton={addButton} />}
       />
 
       {/* Keyed on the record, so opening another one starts from ITS values
@@ -181,6 +173,19 @@ export default function ListPage({
         title={confirming ? `Delete ${titleOf(confirming)}?` : ""}
       />
     </DashboardLayout>
+  );
+}
+
+/** What an empty table says: nothing yet (with Add), or nothing under the filters (with Clear). */
+function ListEmpty({ filtering, onClear, addButton }: {
+  filtering: boolean; onClear: () => void; addButton: React.ReactNode;
+}) {
+  return (
+    <Empty
+      title={filtering ? "Nothing matches those filters" : "Nothing here yet"}
+      note={filtering ? "Clear a filter to see more." : undefined}
+      action={filtering ? <Button onClick={onClear}>Clear filters</Button> : addButton}
+    />
   );
 }
 
