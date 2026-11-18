@@ -92,7 +92,7 @@ Check: fetch_url
 **Scenario**: The browser's own money, number and names are ignored
 **Given**: Seed state R; `talon-2` priced 18990000.
 **When**: `V` with 1 × `talon-2` size M is posted with the extra keys `"total":1`, `"subtotal":1`, `"delivery_fee":1`, `"number":"X"`, `"placed":"x"` and, on the line, `"price":1`, `"name":"Cheap"`, `"image":"x"`. A second request carries `"total":"not a number"` and `"price":null` on the line.
-**Then**: Both are 201 (the advisory keys are accepted and never read, not type-checked). `lines[0].price` is 18990000, `lines[0].name` is "Giant Talon 2", `lines[0].image` is "/images/ref/talon-2.jpg", `subtotal` and `total` are 18990000, `delivery_fee` is 0, `number` matches `^DEO-\d{6}-\d{4}$` and is not "X", `placed` is a real time with `+07:00`. The database holds `unit_price` 18990000 for both lines.
+**Then**: Both are 201 (the advisory keys are accepted and never read, not type-checked). the first line's `price` is 18990000, its `name` is "Giant Talon 2", its `image` is "/images/ref/talon-2.jpg", `subtotal` and `total` are 18990000, `delivery_fee` is 0, `number` matches `^DEO-\d{6}-\d{4}$` and is not "X", `placed` is a real time with `+07:00`. The database holds `unit_price` 18990000 for both lines.
 Traces: SC-7 (ORD-002 AC-1; contract §3.10 advisory keys; also the "price changed after the bag was filled" row of ORD-002)
 Check: fetch_url
 
