@@ -97,8 +97,8 @@ export async function placeOrder(request: OrderRequest): Promise<{ ok: true; ord
 
 /** What the Studio, the walk and the owner's preview see on the confirmation page. */
 export const EXAMPLE_ORDER: Order = {
-  number: "DEO-261116-0001",
-  placed: "2026-11-16T09:40:00+07:00",
+  number: "DEO-261116-4821",
+  placed: "2026-11-16T09:40:00",
   name: "Minh",
   phone: "09•• ••• •••",
   delivery: "local",
