@@ -296,7 +296,15 @@ func TestOnlyAnUnreachableDatabaseOrAGoingAwayServerIs503(t *testing.T) {
 		{"crash shutdown", &pgconn.PgError{Code: "57P02"}, 503},
 		{"starting up", &pgconn.PgError{Code: "57P03"}, 503},
 		{"starting up, at connect", fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "57P03"}), 503},
-		{"a refused password", fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "28P01"}), 500},
+		{"refused at connect: not accepting connections", fmt.Errorf("failed to connect to `user=app database=app`: server error (%w)", &pgconn.PgError{Code: "55000"}), 503},
+		{"refused at connect: no privilege to connect", fmt.Errorf("failed to connect to `user=app database=app`: server error (%w)", &pgconn.PgError{Code: "42501"}), 503},
+		{"refused at connect: role cannot log in", fmt.Errorf("failed to connect to `user=app database=app`: server error (%w)", &pgconn.PgError{Code: "28000"}), 503},
+		{"refused at connect: a refused password", fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "28P01"}), 503},
+		{"refused at connect, wrapped again", fmt.Errorf("acquire: %w", fmt.Errorf("failed to connect to `user=app`: server error (%w)", &pgconn.PgError{Code: "55000"})), 503},
+		{"a deadline while connecting", fmt.Errorf("failed to connect to `user=app`: dial error (%w)", context.DeadlineExceeded), 503},
+		{"the same refusals once connected are bugs", &pgconn.PgError{Code: "55000"}, 500},
+		{"a refused password, not at connect", &pgconn.PgError{Code: "28P01"}, 500},
+		{"no privilege on a table", &pgconn.PgError{Code: "42501", Message: "permission denied for table products"}, 500},
 		{"a missing table", &pgconn.PgError{Code: "42P01", Message: `relation "products" does not exist`}, 500},
 		{"a constraint", &pgconn.PgError{Code: "23505", ConstraintName: "uq_products_seq"}, 500},
 		{"a cancelled query", &pgconn.PgError{Code: "57014"}, 500},
@@ -339,5 +347,23 @@ func TestUnavailableLooksAtTheWholeErrorChain(t *testing.T) {
 	}
 	if !unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", &net.DNSError{Err: "no such host", Name: "db"}))) {
 		t.Error("a wrapped name lookup failure was not called unavailable")
+	}
+}
+
+// TC-24: a database that is made to refuse connections answers the connection
+// itself with a PgError (55000, 42501, 28000), which pgx wraps as a connect
+// error. Its SQLSTATE is not in class 08, and it must still be 503.
+func TestARefusalAtConnectTimeIsUnavailableWhateverItsSQLSTATE(t *testing.T) {
+	for _, code := range []string{"55000", "42501", "28000", "28P01", "3D000", "53300", "57P03"} {
+		err := fmt.Errorf("failed to connect to `user=app database=app`: server error (%w)", &pgconn.PgError{Code: code})
+		if !unavailable(err) {
+			t.Errorf("a connection refused with SQLSTATE %s was not called unavailable", code)
+		}
+		if unavailable(&pgconn.PgError{Code: code}) != (code == "57P03") {
+			t.Errorf("SQLSTATE %s outside the connect phase was decided wrongly", code)
+		}
+	}
+	if unavailable(fmt.Errorf("failed to connect to `user=app`: %w", context.Canceled)) {
+		t.Error("a request the visitor abandoned while connecting was called unavailable")
 	}
 }
