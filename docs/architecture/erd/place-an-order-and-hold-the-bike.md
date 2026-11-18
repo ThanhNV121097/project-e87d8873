@@ -100,7 +100,7 @@ None of these changes a table, a column, a constraint or an index. Each pins a c
 7. **Defaults:** `"id" uuid DEFAULT gen_random_uuid()` (built in since Postgres 13, no extension), `"placed_at" timestamptz NOT NULL DEFAULT now()`, `"address"` and `"note"` `NOT NULL DEFAULT ''`, `"size"` `NOT NULL DEFAULT ''`. `"quantity"` is `integer`, `"position"` is `smallint`, money is `bigint`.
 8. **No `CONCURRENTLY` anywhere in the file, in any case** (the runner would move the whole file out of its transaction on seeing the word, `docs/architecture/erd/site-data-from-the-database.md` §5 item 5), and no data statement: this file only creates tables.
 9. **The down file** is exactly three statements, in this order: `DROP TABLE "order_lines";`, `DROP TABLE "orders";`, `DROP TABLE "order_counters";`. It mentions no other table and creates or drops no function or trigger (this story creates none).
-10. **`migrations_test.go`** gains a test that reads the pair: the up file creates exactly `orders`, `order_lines` and `order_counters`; the down file drops exactly those; neither mentions `products` as a table it touches, and neither contains `concurrently`. The test checks text, not Postgres: CI has no database.
+10. **`migrations_test.go`** gains a test that reads the pair: the up file creates exactly `orders`, `order_lines` and `order_counters`; the down file drops exactly those; neither has a `REFERENCES` to `products` or a statement on it, and neither contains `concurrently`. The test checks text, not Postgres: CI has no database.
 
 ## 5. The model checked against the real data
 
