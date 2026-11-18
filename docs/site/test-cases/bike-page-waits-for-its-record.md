@@ -95,7 +95,7 @@ Check: interact_page
 **Scenario**: TC-06 Pressing a bike card on the shop grid never shows the not-found view before the bike appears
 **Given**: The story is running at 1280×800; `/shop` is open and `[data-testid='card-stance-0']` is drawn; the state log is registered on this page; from now on the response to `GET /api/v1/products/stance-0` is held for 3000 ms.
 **When**: `[data-testid='card-stance-0']` is clicked, the page is left alone for 3000 ms, then the answer is let through.
-**Then**: After the click `location.pathname` is `/shop/stance-0`. In every entry from the click until `[data-testid='product-name']` appears, `main` does not contain `That bike is no longer in the shop.` and has no link or button named `See all bikes`; while the answer is held `main` has no element and no `h1`. After the answer `[data-testid='product-name']` reads `Giant Stance 0`.
+**Then**: After the click the URL path is `/shop/stance-0`. In every entry from the click until `[data-testid='product-name']` appears, `main` does not contain `That bike is no longer in the shop.` and has no link or button named `See all bikes`; while the answer is held `main` has no element and no `h1`. After the answer `[data-testid='product-name']` reads `Giant Stance 0`.
 Traces: SC-2 (SITE-016 AC-2)
 Check: interact_page
 
