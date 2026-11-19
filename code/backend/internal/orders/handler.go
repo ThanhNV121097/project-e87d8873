@@ -48,13 +48,13 @@ func Place(store Store, now func() time.Time) http.HandlerFunc {
 				return
 			}
 			slog.Info("order request could not be read", "request_id", id, "error", err)
-			refuse(w, id, &Problem{Status: http.StatusBadRequest, Code: httpx.CodeMalformedRequest, Sentence: sentenceUnread})
+			answer(w, id, &Problem{Status: http.StatusBadRequest, Code: httpx.CodeMalformedRequest, Sentence: sentenceUnread})
 			return
 		}
 
 		req, bot, problem := Parse(r.Header.Get("Content-Type"), body)
 		if problem != nil {
-			refuse(w, id, problem)
+			answer(w, id, problem)
 			return
 		}
 		if bot {
@@ -69,7 +69,7 @@ func Place(store Store, now func() time.Time) http.HandlerFunc {
 		if err != nil {
 			var refusal *Refusal
 			if errors.As(err, &refusal) {
-				refuse(w, id, &Problem{Status: http.StatusConflict, Code: httpx.CodeBikeUnavailable, Sentence: refusal.Sentence})
+				answer(w, id, &Problem{Status: http.StatusConflict, Code: httpx.CodeBikeUnavailable, Sentence: refusal.Sentence})
 				return
 			}
 			failed(w, id, err)
@@ -82,12 +82,12 @@ func Place(store Store, now func() time.Time) http.HandlerFunc {
 }
 
 func refusedSize(w http.ResponseWriter, id string) {
-	refuse(w, id, &Problem{Status: http.StatusRequestEntityTooLarge, Code: httpx.CodePayloadTooLarge, Sentence: sentenceTooLarge})
+	answer(w, id, &Problem{Status: http.StatusRequestEntityTooLarge, Code: httpx.CodePayloadTooLarge, Sentence: sentenceTooLarge})
 }
 
-// refuse answers a refusal in the error envelope. The log says why by its
+// answer writes a refusal in the error envelope. The log says why by its
 // code; the sentence names the customer's own fields and is not logged.
-func refuse(w http.ResponseWriter, id string, p *Problem) {
+func answer(w http.ResponseWriter, id string, p *Problem) {
 	slog.Info("order refused", "request_id", id, "code", p.Code)
 	httpx.WriteCoded(w, p.Status, p.Code, p.Sentence, p.Field)
 }
