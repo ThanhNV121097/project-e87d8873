@@ -44,12 +44,9 @@ func TestABikeIsDecodedIntoTheValuesTheStatementBinds(t *testing.T) {
 	want := map[string]any{
 		"name": "Talon 2", "brand": "Giant", "category": "trail", "year": "2027.0", "price": int64(25000000), "was": nil,
 		"status": "draft", "stock": int64(3), "sizes": []string{"M", "L"}, "sizes_out": []string{}, "deal": true, "month": nil,
-		"wheel": "29", "rating": "4.5", "description": "Fast.", "fact": nil, "sizes_unknown": nil,
+		"wheel": "29", "rating": "4.5", "description": "Fast.", "fact": nil,
 	}
 	for key, w := range want {
-		if key == "sizes_unknown" {
-			continue
-		}
 		if got := valueOf(t, s, rec, key); !reflect.DeepEqual(got, w) {
 			t.Errorf("%s = %#v, want %#v", key, got, w)
 		}
@@ -108,6 +105,7 @@ func TestRefusedBodies(t *testing.T) {
 		{"no name", "products", `{"brand":"Giant"}`, 400, "VALIDATION_FAILED", "name", "needed"},
 		{"a blank name", "products", `{"name":"   "}`, 400, "VALIDATION_FAILED", "name", "needed"},
 		{"a name of a no-break space", "products", `{"name":" "}`, 400, "VALIDATION_FAILED", "name", "needed"},
+		{"a name of one more kind of space", "products", `{"name":" "}`, 400, "VALIDATION_FAILED", "name", "needed"},
 		{"an empty name", "products", `{"name":""}`, 400, "VALIDATION_FAILED", "name", "needed"},
 		{"a null name", "products", `{"name":null}`, 400, "VALIDATION_FAILED", "name", "needed"},
 		{"a name that is a number", "products", `{"name":5}`, 400, "MALFORMED_REQUEST", "name", "must be text"},
