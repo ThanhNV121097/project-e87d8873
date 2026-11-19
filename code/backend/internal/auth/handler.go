@@ -159,9 +159,7 @@ func (s *Service) SignIn(w http.ResponseWriter, r *http.Request) {
 	id := httpx.RequestIDFrom(r.Context())
 	addr := clientAddr(r)
 	if wait, locked := s.throttle.Check(addr); locked {
-		slog.Info("sign-in", "request_id", id, "outcome", outcomeLocked)
-		w.Header().Set("Retry-After", strconv.Itoa(retryAfterSeconds(wait)))
-		httpx.WriteCoded(w, http.StatusTooManyRequests, httpx.CodeRateLimited, sentenceTooMany, "")
+		tooManyAttempts(w, id, wait)
 		return
 	}
 	email, password, ref := readSignIn(w, r)
@@ -172,13 +170,16 @@ func (s *Service) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	ctx, cancel := context.WithTimeout(r.Context(), signInTimeout)
 	defer cancel()
-	ok, err := s.account.Verify(ctx, email, password)
+	ok, wait, locked, err := s.attempt(ctx, addr, email, password)
 	if err != nil {
 		storeFailed(w, r, "password check", err)
 		return
 	}
+	if locked {
+		tooManyAttempts(w, id, wait)
+		return
+	}
 	if !ok {
-		s.throttle.Fail(addr)
 		if s.account.configured {
 			slog.Info("sign-in", "request_id", id, "outcome", outcomeBadCredentials)
 		} else {
@@ -199,6 +200,38 @@ func (s *Service) SignIn(w http.ResponseWriter, r *http.Request) {
 	slog.Info("sign-in", "request_id", id, "outcome", outcomeOK)
 	http.SetCookie(w, sessionCookie(token, now, isHTTPS(r)))
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"email": s.account.email})
+}
+
+// tooManyAttempts answers the 429 of a locked address, with Retry-After and
+// no cookie.
+func tooManyAttempts(w http.ResponseWriter, requestID string, wait time.Duration) {
+	slog.Info("sign-in", "request_id", requestID, "outcome", outcomeLocked)
+	w.Header().Set("Retry-After", strconv.Itoa(retryAfterSeconds(wait)))
+	httpx.WriteCoded(w, http.StatusTooManyRequests, httpx.CodeRateLimited, sentenceTooMany, "")
+}
+
+// attempt is the password check behind the throttle. A caller that opens many
+// connections at once gets every request past the first look at the lock,
+// before any of them has failed, so the lock is looked at again here, with a
+// hashing slot held and before any hashing: a locked address is answered 429
+// without a hash, and the slot is not given back until a wrong pair has been
+// counted. At most maxHashes-1 attempts that began before the lock engaged
+// still answer 401. ok is the pair matching; locked is the lock being on, with
+// wait left; err is only a slot that did not come before ctx ended.
+func (s *Service) attempt(ctx context.Context, addr, email, password string) (ok bool, wait time.Duration, locked bool, err error) {
+	release, err := s.account.acquire(ctx)
+	if err != nil {
+		return false, 0, false, err
+	}
+	defer release()
+	if wait, locked := s.throttle.Check(addr); locked {
+		return false, wait, true, nil
+	}
+	if s.account.matches(email, password) {
+		return true, 0, false, nil
+	}
+	s.throttle.Fail(addr)
+	return false, 0, false, nil
 }
 
 // authenticate reports whether the request carries a live session of the
