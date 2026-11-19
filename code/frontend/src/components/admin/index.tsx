@@ -34,6 +34,7 @@ import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import Icon, { type IconName } from "../Icon";
 import { cn } from "../../lib/cn";
+import { useAttempt } from "./store";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -325,24 +326,49 @@ export function Breadcrumb({ trail }: { trail: readonly { label: string; to?: st
  * Edit. So it asks, and the question names the record — "Delete Trà sen Tây
  * Hồ?" — because "Are you sure?" is a question about nothing and a person
  * who has clicked it twice stops reading it.
+ *
+ * IT CLOSES WHEN THE DELETE HAS SUCCEEDED, NOT WHEN THE BUTTON IS PRESSED.
+ * `onConfirm` may return a promise: while it is pending "Delete" is
+ * disabled, and when it rejects the question stays open with the sentence in
+ * an alert notice inside it and "Delete" enabled again. Its state lives in
+ * the dialog's content, so every opening starts clean.
  */
 export function Confirm({ open, onClose, onConfirm, title, note, verb }: {
-  open: boolean; onClose: () => void; onConfirm: () => void;
+  open: boolean; onClose: () => void; onConfirm: () => void | Promise<unknown>;
   title: string; note?: string; verb?: string;
 }) {
   return (
     <AlertDialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
       <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="font-body">{title}</AlertDialogTitle>
-          <AlertDialogDescription>{note ?? "This cannot be undone."}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>{verb ?? "Delete"}</AlertDialogAction>
-        </AlertDialogFooter>
+        <ConfirmBody title={title} note={note} verb={verb} onClose={onClose} onConfirm={onConfirm} />
       </AlertDialogContent>
     </AlertDialog>
+  );
+}
+
+function ConfirmBody({ onClose, onConfirm, title, note, verb }: {
+  onClose: () => void; onConfirm: () => void | Promise<unknown>;
+  title: string; note?: string; verb?: string;
+}) {
+  const attempt = useAttempt();
+  // The dialog's own button would close it the moment it is pressed:
+  // preventDefault keeps it open until the answer is in.
+  async function confirm(e: React.MouseEvent) {
+    e.preventDefault();
+    if (await attempt.run(async () => { await onConfirm(); })) onClose();
+  }
+  return (
+    <>
+      <AlertDialogHeader>
+        <AlertDialogTitle className="font-body">{title}</AlertDialogTitle>
+        <AlertDialogDescription>{note ?? "This cannot be undone."}</AlertDialogDescription>
+      </AlertDialogHeader>
+      {attempt.problem && <Notice tone="alert">{attempt.problem}</Notice>}
+      <AlertDialogFooter>
+        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogAction variant="destructive" disabled={attempt.busy} onClick={confirm}>{verb ?? "Delete"}</AlertDialogAction>
+      </AlertDialogFooter>
+    </>
   );
 }
 
