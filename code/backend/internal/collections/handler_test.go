@@ -339,13 +339,13 @@ func TestOnlyAnUnreachableDatabaseOrAGoingAwayServerIs503(t *testing.T) {
 }
 
 func TestUnavailableLooksAtTheWholeErrorChain(t *testing.T) {
-	if unavailable(nil) || unavailable(errors.New("x")) || unavailable(context.DeadlineExceeded) {
+	if httpx.Unavailable(nil) || httpx.Unavailable(errors.New("x")) || httpx.Unavailable(context.DeadlineExceeded) {
 		t.Error("an error that is not a lost connection was called unavailable")
 	}
-	if !unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", syscall.ECONNREFUSED))) {
+	if !httpx.Unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", syscall.ECONNREFUSED))) {
 		t.Error("a wrapped refused connection was not called unavailable")
 	}
-	if !unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", &net.DNSError{Err: "no such host", Name: "db"}))) {
+	if !httpx.Unavailable(fmt.Errorf("a: %w", fmt.Errorf("b: %w", &net.DNSError{Err: "no such host", Name: "db"}))) {
 		t.Error("a wrapped name lookup failure was not called unavailable")
 	}
 }
@@ -356,14 +356,14 @@ func TestUnavailableLooksAtTheWholeErrorChain(t *testing.T) {
 func TestARefusalAtConnectTimeIsUnavailableWhateverItsSQLSTATE(t *testing.T) {
 	for _, code := range []string{"55000", "42501", "28000", "28P01", "3D000", "53300", "57P03"} {
 		err := fmt.Errorf("failed to connect to `user=app database=app`: server error (%w)", &pgconn.PgError{Code: code})
-		if !unavailable(err) {
+		if !httpx.Unavailable(err) {
 			t.Errorf("a connection refused with SQLSTATE %s was not called unavailable", code)
 		}
-		if unavailable(&pgconn.PgError{Code: code}) != (code == "57P03") {
+		if httpx.Unavailable(&pgconn.PgError{Code: code}) != (code == "57P03") {
 			t.Errorf("SQLSTATE %s outside the connect phase was decided wrongly", code)
 		}
 	}
-	if unavailable(fmt.Errorf("failed to connect to `user=app`: %w", context.Canceled)) {
+	if httpx.Unavailable(fmt.Errorf("failed to connect to `user=app`: %w", context.Canceled)) {
 		t.Error("a request the visitor abandoned while connecting was called unavailable")
 	}
 }
