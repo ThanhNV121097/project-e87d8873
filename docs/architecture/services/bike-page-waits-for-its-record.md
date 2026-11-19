@@ -81,6 +81,19 @@ Nothing in the code this story reads has moved since PR #22 merged (`76a0160`): 
 
 Result: the design above stands unchanged. No endpoint, field, code, schema or migration is added by this re-check either.
 
+### 7.2 Third re-check (`main` at `074dc3b`, 2026-11-19)
+
+The step-6 task was dispatched again. `main` has moved only by documentation since §7.1 (PR #27 and the index rebuild after it); no file under `code/` changed, so §7 and §7.1 still describe the code on `main`. This time the one claim §7.1 left open was read instead of repeated: whether the open admin backend (PR #26, head `d4b1e23`) leaves this page's call as it is.
+
+| What was read | Finding |
+|---|---|
+| PR #26 diff of `code/backend/internal/collections/handler.go`, function `record` (formerly `Record`) | Only the non-`GET` branch changed: `PUT` and `DELETE` on the two writable collections go to the owner's guard, any other method is `405`. The `GET` path of a record is the same code, so `GET /v1/products/stance-0` is still `200` with no session and an id with no row is still `404` `NOT_FOUND` via `pgx.ErrNoRows`. The guard wraps the write handlers only; it is never applied to a read |
+| PR #26 move of the connection-failure predicate | `unavailable(err)` became a one-line call to `httpx.Unavailable(err)` with the body moved unchanged, so the `503`/`500` split of §3 is the same. The read tests pin that name and still call it |
+| PR #26 route table | A literal route (`/v1/sessions`, `/v1/me`, `DELETE /v1/sessions/current`) wins over `{collection}`; none of them shadows `/v1/products/{id}`. A `GET` on `/v1/sessions/current` is a `404` as an unknown collection, which is correct and unrelated to a bike |
+| PR #25 (orders, head `c8a7a6a`) | Not re-read line by line here. Its description and the TL review recorded in the team's notes say it adds the one literal route `/v1/orders`, moves the same predicate into `httpx`, and changes no read answer. A literal `/v1/orders` cannot match `/v1/products/{id}` |
+
+Nothing in this pass changes the contract, the ERD extension or the delivery table of §9. After whichever of PR #25 and PR #26 merges first, TC-02 and TC-23 remain the regression check for this page's call, as §7.1 says. Neither PR is a prerequisite of this story: PR #13 touches `Product.tsx` only and merges over `main` as it is.
+
 ## 8. Migration and rollout
 
 No schema step and no deploy step of its own: see `docs/architecture/erd/bike-page-waits-for-its-record.md` §4. Rolling the page change out before *Site data from the database* is harmless (it is invisible on the file-backed mock). Rolling it back is reverting one line of `Product.tsx`; the API is untouched either way.
