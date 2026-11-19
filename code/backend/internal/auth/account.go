@@ -89,22 +89,29 @@ func randomBytes(n int) []byte {
 	return b
 }
 
-// Verify checks a typed pair. It always does the same work, so the time does
-// not say which half was wrong: the password is hashed whatever the email is,
-// and both comparisons run in constant time (the email by its digest, so the
-// length of the real one is not leaked). At most maxHashes run at once; a
-// request waits for a slot until its own deadline and then gets the error.
-func (a *Account) Verify(ctx context.Context, email, password string) (bool, error) {
+// acquire waits for one of the maxHashes hashing slots until ctx ends, and
+// returns the function that gives it back. At most maxHashes computations run
+// at once; a request waits for a slot until its own deadline and then gets the
+// error. A caller that holds a slot decides, still holding it, whether it may
+// hash at all and records what the hash said (see Service.attempt), so no
+// more than maxHashes sign-ins are ever past the throttle's last look.
+func (a *Account) acquire(ctx context.Context) (release func(), err error) {
 	select {
 	case a.slots <- struct{}{}:
+		return func() { <-a.slots }, nil
 	case <-ctx.Done():
-		return false, ctx.Err()
+		return nil, ctx.Err()
 	}
-	defer func() { <-a.slots }()
+}
 
+// matches checks a typed pair; the caller holds a slot. It always does the
+// same work, so the time does not say which half was wrong: the password is
+// hashed whatever the email is, and both comparisons run in constant time (the
+// email by its digest, so the length of the real one is not leaked).
+func (a *Account) matches(email, password string) bool {
 	got := derive([]byte(password), a.salt)
 	passwordOK := subtle.ConstantTimeCompare(got, a.hash)
 	typed := sha256.Sum256([]byte(Normalize(email)))
 	emailOK := subtle.ConstantTimeCompare(typed[:], a.emailSum[:])
-	return a.configured && passwordOK&emailOK == 1, nil
+	return a.configured && passwordOK&emailOK == 1
 }
