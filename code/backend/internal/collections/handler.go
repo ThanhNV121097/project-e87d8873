@@ -4,18 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"log/slog"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
 )
@@ -150,7 +145,7 @@ func storeFailed(w http.ResponseWriter, r *http.Request, collection, op string, 
 	} else {
 		slog.Error("read failed", attrs...)
 	}
-	if unavailable(err) {
+	if httpx.Unavailable(err) {
 		httpx.WriteCoded(w, http.StatusServiceUnavailable, httpx.CodeUnavailable, sentenceNotReady, "")
 		return
 	}
