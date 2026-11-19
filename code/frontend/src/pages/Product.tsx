@@ -37,10 +37,13 @@ type Size = ReturnType<typeof sizesOf>[number];
  */
 export default function Product() {
   const { id } = useParams();
-  const { item } = useRecord<Bike>("products", id);
+  const { item, loading, error } = useRecord<Bike>("products", id);
   const types = useCollection<Department>("categories", { pageSize: 24 }).items;
   usePageMeta("pages.product.title", "pages.product.description");
-  if (!item) return <Missing />;
+  // A record in hand is always drawn. With none, the bike's place stays empty
+  // while the shop is asked and after it could not be reached; only an answer
+  // of "no such bike" (finished, no error) shows the not-found view.
+  if (!item) return loading || error ? null : <Missing />;
   const typeIndex = Math.max(0, types.findIndex((d) => d.id === item.category));
   const type = types[typeIndex];
   const sizes = sizesOf(item);
