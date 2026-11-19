@@ -23,6 +23,16 @@ const (
 	CodeInvalidQuery     = "INVALID_QUERY"
 	CodeInternal         = "INTERNAL"
 	CodeUnavailable      = "UNAVAILABLE"
+
+	CodeUnauthenticated      = "UNAUTHENTICATED"
+	CodeRateLimited          = "RATE_LIMITED"
+	CodeIDTaken              = "ID_TAKEN"
+	CodeStaleRecord          = "STALE_RECORD"
+	CodeInUse                = "IN_USE"
+	CodePreconditionRequired = "PRECONDITION_REQUIRED"
+	CodeMalformedRequest     = "MALFORMED_REQUEST"
+	CodeValidationFailed     = "VALIDATION_FAILED"
+	CodePayloadTooLarge      = "PAYLOAD_TOO_LARGE"
 )
 
 // RequestIDHeader carries the id of a request, on the way in and on every answer.

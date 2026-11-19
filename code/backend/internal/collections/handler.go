@@ -4,18 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"log/slog"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
 )
@@ -48,8 +43,14 @@ type listAnswer struct {
 }
 
 // Collection answers GET /v1/{collection}: one page of the collection,
-// narrowed, searched and ordered. The collection is checked before the method.
-func Collection(db DB) http.HandlerFunc {
+// narrowed, searched and ordered, and POST /v1/{collection}: the owner adds a
+// record (guard lets only the signed-in owner through). The collection is
+// checked before the method, and the method before the session.
+func Collection(db DB, guard Guard) http.HandlerFunc {
+	return collection(db, pgWriter{db}, guard)
+}
+
+func collection(db DB, wr Writer, guard Guard) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s, ok := Lookup(r.PathValue("collection"))
 		if !ok {
@@ -57,7 +58,11 @@ func Collection(db DB) http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
-			methodNotAllowed(w)
+			if r.Method == http.MethodPost && s.Writable() {
+				guard(addHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			methodNotAllowed(w, s, false)
 			return
 		}
 		values, err := url.ParseQuery(r.URL.RawQuery)
@@ -88,8 +93,13 @@ func Collection(db DB) http.HandlerFunc {
 
 // Record answers GET /v1/{collection}/{id}: the record, and for a versioned
 // collection its version as the ETag. The id matches exactly, capitals
-// included.
-func Record(db DB) http.HandlerFunc {
+// included. PUT and DELETE are the owner's change and delete of a bike or a
+// riding type, behind guard.
+func Record(db DB, guard Guard) http.HandlerFunc {
+	return record(db, pgWriter{db}, guard)
+}
+
+func record(db DB, wr Writer, guard Guard) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s, ok := Lookup(r.PathValue("collection"))
 		if !ok {
@@ -97,7 +107,15 @@ func Record(db DB) http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
-			methodNotAllowed(w)
+			if s.Writable() && r.Method == http.MethodPut {
+				guard(changeHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			if s.Writable() && r.Method == http.MethodDelete {
+				guard(removeHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			methodNotAllowed(w, s, true)
 			return
 		}
 		id := r.PathValue("id")
@@ -133,8 +151,18 @@ func Record(db DB) http.HandlerFunc {
 	}
 }
 
-func methodNotAllowed(w http.ResponseWriter) {
-	w.Header().Set("Allow", http.MethodGet)
+// methodNotAllowed answers a method the route does not offer, with the
+// methods it does: every collection offers GET, a writable one also POST on
+// its list and PUT and DELETE on a record.
+func methodNotAllowed(w http.ResponseWriter, s Spec, record bool) {
+	allow := http.MethodGet
+	switch {
+	case s.Writable() && record:
+		allow = "GET, PUT, DELETE"
+	case s.Writable():
+		allow = "GET, POST"
+	}
+	w.Header().Set("Allow", allow)
 	httpx.WriteCoded(w, http.StatusMethodNotAllowed, httpx.CodeMethodNotAllowed, sentenceMethod, "")
 }
 
@@ -157,57 +185,8 @@ func storeFailed(w http.ResponseWriter, r *http.Request, collection, op string, 
 	httpx.WriteCoded(w, http.StatusInternalServerError, httpx.CodeInternal, sentenceInternal, "")
 }
 
-// connectPhase is the text every pgx error of a connection that could not be
-// opened begins with, whatever the cause under it: pgx does not export the
-// type in this version.
-const connectPhase = "failed to connect to"
-
-// unavailable reports whether err means the database cannot be reached right
-// now, however the stack under it says so: a connection that could not be
-// opened (refused at the socket, a host name that no longer resolves, or the
-// server answering the connection itself with an error such as 55000 "not
-// accepting connections", 42501 or 28000), a connection that was reset or
-// closed under the query, a request that never left (pgconn's SafeToRetry), or
-// a server that is shutting down or not yet accepting (SQLSTATE class 08,
-// 57P01 to 57P03). Anything else is a bug or a slow query and retrying does
-// not fix it: a failed statement, a deadline (the 5 s read bound, or a wait for
-// a free pool connection) and an abandoned request are all INTERNAL.
-func unavailable(err error) bool {
-	if err == nil || errors.Is(err, context.Canceled) {
-		return false
-	}
-	// The connect phase is decided before anything under it. A database that
-	// refuses to open a connection is a database the service cannot reach: the
-	// refusal is a PgError at connect time (pgx wraps it), and reading its
-	// SQLSTATE alone would call every such refusal a bug. Even a deadline that
-	// expired while connecting is an unreachable database, not a slow statement.
-	if strings.Contains(err.Error(), connectPhase) {
-		return true
-	}
-	if errors.Is(err, context.DeadlineExceeded) {
-		return false
-	}
-	// A server's own answer to a statement decides on its SQLSTATE alone: a
-	// missing table or a constraint is a PgError too, and is not a lost
-	// connection.
-	var pg *pgconn.PgError
-	if errors.As(err, &pg) {
-		return strings.HasPrefix(pg.Code, "08") || pg.Code == "57P01" || pg.Code == "57P02" || pg.Code == "57P03"
-	}
-	// A network timeout is a deadline in another form.
-	var timeout net.Error
-	if errors.As(err, &timeout) && timeout.Timeout() {
-		return false
-	}
-	var (
-		op  *net.OpError
-		dns *net.DNSError
-	)
-	switch {
-	case errors.As(err, &op), errors.As(err, &dns):
-		return true
-	case errors.Is(err, syscall.ECONNREFUSED), errors.Is(err, io.EOF), errors.Is(err, io.ErrUnexpectedEOF), errors.Is(err, net.ErrClosed):
-		return true
-	}
-	return pgconn.SafeToRetry(err)
-}
+// unavailable is the one predicate every handler uses to tell a database that
+// cannot be reached (503) from a bug or a slow query (500). It lives in httpx,
+// beside the sign-in and the owner's writes, which need it too; this name is
+// what the read tests pin.
+func unavailable(err error) bool { return httpx.Unavailable(err) }

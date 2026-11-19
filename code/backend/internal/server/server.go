@@ -13,6 +13,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/ThanhNV121097/project-e87d8873/backend/internal/auth"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/collections"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
 )
@@ -25,13 +26,23 @@ type DB interface {
 
 // Router returns the whole application as one handler. A story adds its
 // routes here with one line each, and takes the DB it needs from db.
-func Router(db DB) http.Handler {
+func Router(db DB, account *auth.Account) http.Handler {
+	owner := auth.New(account, db, time.Now)
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", health(db))
+	// The owner's account. /v1/sessions and /v1/me carry no method: the handler
+	// answers 405 with Allow to the rest. Sign-out carries its method, so any
+	// other method on /v1/sessions/current falls through to the collection
+	// route below and is 404 "That collection does not exist.": a session is
+	// never readable.
+	mux.HandleFunc("/v1/sessions", owner.SignIn)
+	mux.HandleFunc("DELETE /v1/sessions/current", owner.SignOut)
+	mux.HandleFunc("/v1/me", owner.Me)
 	// No method in these patterns: the handler, not the mux, decides what a
-	// method other than GET gets (405 with Allow).
-	mux.HandleFunc("/v1/{collection}", collections.Collection(db))
-	mux.HandleFunc("/v1/{collection}/{id}", collections.Record(db))
+	// method gets (the read, the owner's write behind the guard, or 405 with
+	// Allow).
+	mux.HandleFunc("/v1/{collection}", collections.Collection(db, owner.RequireOwner))
+	mux.HandleFunc("/v1/{collection}/{id}", collections.Record(db, owner.RequireOwner))
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		httpx.WriteCoded(w, http.StatusNotFound, httpx.CodeNotFound, "That address does not exist.", "")
 	})
