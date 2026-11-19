@@ -105,6 +105,22 @@ The step-6 task was dispatched once more. Since §7.2 (`main` at `074dc3b`) `mai
 
 Result: the design stands unchanged. No endpoint, field, error code, schema or migration is added by this pass, no mock module exists to judge (§6), and the delivery table of §9 is as written: **no backend branch and no backend pull request for this story; PR #13 is the only pull request to verify and merge.**
 
+### 7.4 Fifth re-check (`main` at `c86940a`, 2026-11-19)
+
+The step-6 task was dispatched again, and this time `main` has moved in code: PR #17 (orders UI) and PR #25 (orders backend) merged after §7.3. §7.2 left PR #25 unread ("not re-read line by line"); it is now on `main`, so it was read there instead of by description. PR #26 (admin backend) and PR #13 are still open.
+
+| What was read | Finding |
+|---|---|
+| `code/backend/internal/server/server.go`, `Router` | The orders story added one literal route, `mux.HandleFunc("/v1/orders", orders.Place(...))`, before the two collection routes, and `server.DB` gained `Begin`. `/v1/{collection}/{id}` still routes to `collections.Record(db)`. A literal `/v1/orders` cannot match `/v1/products/{id}`, and the chain is still `RequestID(Recover(Log(NoStore(mux))))`, so every answer of this page's call still carries `Cache-Control: no-store` |
+| `collections.Record` (`handler.go` lines 87–129) | Unchanged in what this page reads: unknown collection `404`, non-`GET` `405`, an id the database cannot store `404` with no query, `pgx.ErrNoRows` `404` `NOT_FOUND` "That record does not exist.", any other error through `storeFailed`, and a hit is `200` with the record and the `ETag`. No read needs a session |
+| `storeFailed` and `httpx.Unavailable` | The predicate now lives in `internal/httpx` (`httpx.go:161`) and `storeFailed` calls it (`handler.go:148`): `503` `UNAVAILABLE` when it holds, else `500` `INTERNAL`. The orders handler calls the same function (`orders/handler.go:103`). The split of §3 is as written; no failure path is a `404` |
+| `code/frontend/src/data/index.ts`, `useRecord` (lines 344–375) | Unchanged. First render for an id is `{ item: undefined, loading: true, error: null }`; a `404` settles `error: null`; any other status or a rejected request settles an `Error` |
+| `code/frontend/src/pages/Product.tsx` on `main` | Still `const { item } = useRecord<Bike>("products", id)` (line 40) and `if (!item) return <Missing />` (line 43). The plan item's defect is still open on `main`; PR #13 alone closes it |
+
+One edge of the data module, recorded so Test does not mistake it for a page defect: when a held record's key is asked again and that second request **fails**, `settle(undefined, error)` replaces the held answer, so the page then has no record and an `error` and draws nothing (the failure row of §3). SC-7 covers the re-ask *in flight*, not a re-ask that fails; whether a failed refresh should keep the older record is a DATA-007 question and does not widen this story or `Product.tsx`.
+
+Result: the design stands unchanged. No endpoint, field, error code, schema or migration is added by this pass; the delivery table of §9 is as written (no backend branch and no backend pull request; PR #13 is the story's only pull request). TC-02 and TC-23 of `docs/site/test-cases/bike-page-waits-for-its-record.md` remain the regression check for this page's call after PR #26 merges.
+
 ## 8. Migration and rollout
 
 No schema step and no deploy step of its own: see `docs/architecture/erd/bike-page-waits-for-its-record.md` §4. Rolling the page change out before *Site data from the database* is harmless (it is invisible on the file-backed mock). Rolling it back is reverting one line of `Product.tsx`; the API is untouched either way.
