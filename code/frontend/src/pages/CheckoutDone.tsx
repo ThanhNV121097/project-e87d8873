@@ -5,7 +5,7 @@ import { usePageMeta } from "../seo";
 import { useCollection } from "../data";
 import { useDemo } from "../lib/demo";
 import { formatDateTime, formatPrice } from "../lib/format";
-import { EXAMPLE_ORDER, lastOrder } from "../lib/mock/orders";
+import { EXAMPLE_ORDER, lastOrder } from "../lib/orders";
 import type { ShopInfo } from "../lib/shop";
 import Bleed from "../components/Bleed";
 import Icon, { type IconName } from "../components/Icon";
