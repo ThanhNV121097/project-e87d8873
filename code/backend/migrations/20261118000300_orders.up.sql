@@ -1,7 +1,7 @@
 -- Orders: what a customer placed, what was in it as it was when ordered, and the
 -- daily counter the order number is issued from (erd.md sections 3.9 to 3.11).
 -- Every object is new: no existing table is read or changed, and order_lines
--- keeps a copy of the bike's id, never a foreign key to products, so a bike the
+-- keeps a copy of the bike's id, never a foreign key to the bike, so a bike the
 -- owner deletes leaves its sold lines as they were.
 
 CREATE TABLE "orders" (
