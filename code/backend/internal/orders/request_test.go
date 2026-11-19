@@ -35,7 +35,7 @@ func withQty(token string) string {
 	return `{"name":"Minh","phone":"0901234567","delivery":"local","address":"12 Hùng Vương","payment":"transfer","lines":[{"id":"talon-2","variant":"M","qty":` + token + `}]}`
 }
 
-func set(key string, value any) func(map[string]any) {
+func with(key string, value any) func(map[string]any) {
 	return func(m map[string]any) { m[key] = value }
 }
 
@@ -105,27 +105,27 @@ func TestTheValueRulesRefuseWithTheFieldAndASentenceNamingIt(t *testing.T) {
 		words  string
 	}{
 		{"no name", drop("name"), "name", "name"},
-		{"blank name", set("name", "   "), "name", "name"},
+		{"blank name", with("name", "   "), "name", "name"},
 		{"no phone", drop("phone"), "phone", "phone"},
-		{"blank phone", set("phone", " "), "phone", "phone"},
+		{"blank phone", with("phone", " "), "phone", "phone"},
 		{"no delivery", drop("delivery"), "delivery", "delivery"},
-		{"a drone", set("delivery", "drone"), "delivery", "delivery"},
+		{"a drone", with("delivery", "drone"), "delivery", "delivery"},
 		{"no payment", drop("payment"), "payment", "payment"},
-		{"a card", set("payment", "card"), "payment", "payment"},
+		{"a card", with("payment", "card"), "payment", "payment"},
 		{"cash on delivery by courier", cod("courier"), "payment", "cash on delivery"},
 		{"cash on delivery to collect", cod("pickup"), "payment", "cash on delivery"},
 		{"no address for local", drop("address"), "address", "address"},
 		{"blank address for courier", func(m map[string]any) { m["delivery"], m["address"] = "courier", "  " }, "address", "address"},
 		{"no lines", drop("lines"), "lines", "bag"},
-		{"empty lines", set("lines", []any{}), "lines", "bag"},
-		{"21 lines", set("lines", manyLines(21)), "lines", "20 lines"},
-		{"no bike id", set("lines", []any{map[string]any{"qty": 1}}), "lines[0].id", "line 1"},
-		{"blank bike id", set("lines", []any{map[string]any{"id": "  ", "qty": 1}}), "lines[0].id", "line 1"},
-		{"a bike id of 201 characters", set("lines", []any{map[string]any{"id": strings.Repeat("a", 201), "qty": 1}}), "lines[0].id", "line 1"},
-		{"no quantity on line 2", set("lines", []any{map[string]any{"id": "a", "qty": 1}, map[string]any{"id": "b"}}), "lines[1].qty", "quantity of line 2"},
-		{"a NUL in the name", set("name", "a\x00b"), "name", "cannot be stored"},
-		{"a NUL in the note", set("note", "a\x00b"), "note", "cannot be stored"},
-		{"a NUL in a size", set("lines", []any{map[string]any{"id": "a", "variant": "M\x00", "qty": 1}}), "lines[0].variant", "cannot be stored"},
+		{"empty lines", with("lines", []any{}), "lines", "bag"},
+		{"21 lines", with("lines", manyLines(21)), "lines", "20 lines"},
+		{"no bike id", with("lines", []any{map[string]any{"qty": 1}}), "lines[0].id", "line 1"},
+		{"blank bike id", with("lines", []any{map[string]any{"id": "  ", "qty": 1}}), "lines[0].id", "line 1"},
+		{"a bike id of 201 characters", with("lines", []any{map[string]any{"id": strings.Repeat("a", 201), "qty": 1}}), "lines[0].id", "line 1"},
+		{"no quantity on line 2", with("lines", []any{map[string]any{"id": "a", "qty": 1}, map[string]any{"id": "b"}}), "lines[1].qty", "quantity of line 2"},
+		{"a NUL in the name", with("name", "a\x00b"), "name", "cannot be stored"},
+		{"a NUL in the note", with("note", "a\x00b"), "note", "cannot be stored"},
+		{"a NUL in a size", with("lines", []any{map[string]any{"id": "a", "variant": "M\x00", "qty": 1}}), "lines[0].variant", "cannot be stored"},
 	}
 	for _, c := range cases {
 		_, bot, p := parseWith(t, c.change)
@@ -164,10 +164,10 @@ func TestTextLimitsHoldAtTheLimitAndRefuseOnePast(t *testing.T) {
 		make  func(text string) func(map[string]any)
 		field string
 	}{
-		{"name", 100, func(s string) func(map[string]any) { return set("name", s) }, "name"},
-		{"phone", 30, func(s string) func(map[string]any) { return set("phone", s) }, "phone"},
-		{"address", 300, func(s string) func(map[string]any) { return set("address", s) }, "address"},
-		{"note", 1000, func(s string) func(map[string]any) { return set("note", s) }, "note"},
+		{"name", 100, func(s string) func(map[string]any) { return with("name", s) }, "name"},
+		{"phone", 30, func(s string) func(map[string]any) { return with("phone", s) }, "phone"},
+		{"address", 300, func(s string) func(map[string]any) { return with("address", s) }, "address"},
+		{"note", 1000, func(s string) func(map[string]any) { return with("note", s) }, "note"},
 		{"size", 20, line, "lines[0].variant"},
 	}
 	for _, c := range cases {
@@ -178,18 +178,18 @@ func TestTextLimitsHoldAtTheLimitAndRefuseOnePast(t *testing.T) {
 		wantProblem(t, c.name+" one past", p, "VALIDATION_FAILED", c.field, "too long")
 	}
 	// Characters are counted, not bytes: 100 letters of two bytes each fit.
-	if _, _, p := parseWith(t, set("name", strings.Repeat("Đ", 100))); p != nil {
+	if _, _, p := parseWith(t, with("name", strings.Repeat("Đ", 100))); p != nil {
 		t.Errorf("a name of 100 Đ refused: %v", p)
 	}
 	// The limit counts the text after its spaces are trimmed.
-	if _, _, p := parseWith(t, set("name", "  "+strings.Repeat("a", 100)+"  ")); p != nil {
+	if _, _, p := parseWith(t, with("name", "  "+strings.Repeat("a", 100)+"  ")); p != nil {
 		t.Errorf("a name of 100 characters inside spaces refused: %v", p)
 	}
 }
 
 func TestAnOrderHoldsOneToTwentyLines(t *testing.T) {
 	for _, n := range []int{1, 20} {
-		if req, _, p := parseWith(t, set("lines", manyLines(n))); p != nil || len(req.Lines) != n {
+		if req, _, p := parseWith(t, with("lines", manyLines(n))); p != nil || len(req.Lines) != n {
 			t.Errorf("%d lines: problem %v, got %d", n, p, len(req.Lines))
 		}
 	}
@@ -214,13 +214,13 @@ func TestAPickupNeedsNoAddressAndKeepsOneItIsGiven(t *testing.T) {
 }
 
 func TestAKeyTheContractDoesNotDefineIsRefusedAtEveryLevel(t *testing.T) {
-	_, _, p := parseWith(t, set("colour", "red"))
+	_, _, p := parseWith(t, with("colour", "red"))
 	wantProblem(t, "top level", p, "MALFORMED_REQUEST", "colour", "colour")
 
 	_, _, p = parseWith(t, func(m map[string]any) { m["zeta"], m["alpha"] = 1, 2 })
 	wantProblem(t, "two undefined keys", p, "MALFORMED_REQUEST", "alpha", "alpha")
 
-	_, _, p = parseWith(t, set("lines", []any{map[string]any{"id": "a", "qty": 1, "colour": "red"}}))
+	_, _, p = parseWith(t, with("lines", []any{map[string]any{"id": "a", "qty": 1, "colour": "red"}}))
 	wantProblem(t, "a line", p, "MALFORMED_REQUEST", "lines[0].colour", "colour")
 }
 
@@ -243,15 +243,15 @@ func TestAWrongJSONTypeIsMalformedAndAnAbsentKeyIsNot(t *testing.T) {
 		change func(map[string]any)
 		field  string
 	}{
-		{"a number for a name", set("name", 5), "name"},
-		{"null for a phone", set("phone", nil), "phone"},
-		{"a number for a note", set("note", 5), "note"},
-		{"a number for the hidden field", set("website", 5), "website"},
-		{"a string for the lines", set("lines", "x"), "lines"},
-		{"null for the lines", set("lines", nil), "lines"},
-		{"a line that is not an object", set("lines", []any{"talon-2"}), "lines[0]"},
-		{"a number for a bike id", set("lines", []any{map[string]any{"id": 5, "qty": 1}}), "lines[0].id"},
-		{"a number for a size", set("lines", []any{map[string]any{"id": "a", "variant": 5, "qty": 1}}), "lines[0].variant"},
+		{"a number for a name", with("name", 5), "name"},
+		{"null for a phone", with("phone", nil), "phone"},
+		{"a number for a note", with("note", 5), "note"},
+		{"a number for the hidden field", with("website", 5), "website"},
+		{"a string for the lines", with("lines", "x"), "lines"},
+		{"null for the lines", with("lines", nil), "lines"},
+		{"a line that is not an object", with("lines", []any{"talon-2"}), "lines[0]"},
+		{"a number for a bike id", with("lines", []any{map[string]any{"id": 5, "qty": 1}}), "lines[0].id"},
+		{"a number for a size", with("lines", []any{map[string]any{"id": "a", "variant": 5, "qty": 1}}), "lines[0].variant"},
 	}
 	for _, c := range cases {
 		_, _, p := parseWith(t, c.change)
@@ -275,7 +275,7 @@ func TestAFilledHiddenFieldIsABotWhateverElseIsWrong(t *testing.T) {
 			t.Errorf("%s: bot %v, problem %v, want a bot", body, bot, p)
 		}
 	}
-	for _, change := range []func(map[string]any){set("website", ""), nil} {
+	for _, change := range []func(map[string]any){with("website", ""), nil} {
 		if _, bot, p := parseWith(t, change); bot || p != nil {
 			t.Errorf("an empty or absent hidden field: bot %v, problem %v", bot, p)
 		}
