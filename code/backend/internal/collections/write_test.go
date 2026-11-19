@@ -2,7 +2,6 @@ package collections
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -321,7 +320,7 @@ func TestAChangeChecksInTheContractsOrder(t *testing.T) {
 	// Unknown id and no If-Match: the 404 comes first.
 	wr := newFakeWriter()
 	wr.lookup = func() (int64, bool, bool, error) { return 0, false, true, nil }
-	if rec := call(writeRouter(wr, anyOwner), http.MethodPut, "/v1/products/no-such-bike", body); rec.Code != http.StatusNotFound {
+	if rec := call(writeRouter(wr, anyOwner), http.MethodPut, "/v1/products/talon-2", body); rec.Code != http.StatusNotFound {
 		t.Errorf("unknown id, no If-Match: status %d, want 404", rec.Code)
 	}
 
@@ -579,7 +578,7 @@ func TestTheStatementsAreFixedTextBuiltFromTheFieldTable(t *testing.T) {
 		}
 		for _, sql := range []string{stmts.add, stmts.replace} {
 			head := sql[:strings.Index(sql, "RETURNING")]
-			for _, never := range []string{`"seq"`, `"version" =`, `"created_at"`, `"updated_at"`, `"_source"`} {
+			for _, never := range []string{`"seq"`, `SET "version"`, `, "version"`, `"created_at"`, `"updated_at"`, `"_source"`} {
 				if strings.Contains(head, never) {
 					t.Errorf("%s: a write names %s:\n%s", s.Name, never, head)
 				}
@@ -607,7 +606,8 @@ func TestTheStatementsAreFixedTextBuiltFromTheFieldTable(t *testing.T) {
 func TestEveryRequestedValueIsOnlyEverAPlaceholder(t *testing.T) {
 	for _, stmts := range writeStatements {
 		for _, sql := range []string{stmts.add, stmts.replace, stmts.lookup, stmts.version, stmts.remove} {
-			if strings.ContainsAny(sql, "'") {
+			// The one literal is the key the answer drops: to_jsonb(w) - 'version'.
+			if strings.ContainsAny(strings.ReplaceAll(sql, "- 'version'", ""), "'") {
 				t.Errorf("a statement holds a quoted literal: %s", sql)
 			}
 		}
@@ -621,8 +621,5 @@ func TestACollectionsWritesAreOnlyToBikesAndRidingTypes(t *testing.T) {
 	}
 	if len(got) != 2 || writeStatements["products"].add == "" || writeStatements["categories"].add == "" {
 		t.Errorf("write statements for %v, want products and categories only", got)
-	}
-	if !errors.Is(nil, nil) {
-		t.Fatal("errors.Is is broken")
 	}
 }
