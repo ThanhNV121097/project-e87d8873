@@ -51,12 +51,12 @@ type Refusal struct {
 	Field    string
 }
 
-// Record is a body that passed every rule. Values holds one entry per field of
+// Decoded is a body that passed every rule. Values holds one entry per field of
 // the collection in field-table order, ready to bind: nil for "no value", a
 // string, an int64 for a whole number, the text of any other number (cast in
 // SQL, so it is kept exactly as written), a bool, or a []string (non-nil, even
 // when empty).
-type Record struct {
+type Decoded struct {
 	ID       string // "" when the body carries none: the server makes one
 	Values   []any
 	Category *string // the riding type the body names, when it names one
@@ -85,9 +85,9 @@ const (
 	jsonObject
 )
 
-// kindOf names the JSON type of one raw value by its first byte; the raw
+// jsonKindOf names the JSON type of one raw value by its first byte; the raw
 // values come from json.Unmarshal, so they are well formed.
-func kindOf(raw json.RawMessage) jsonKind {
+func jsonKindOf(raw json.RawMessage) jsonKind {
 	if len(raw) == 0 {
 		return jsonNull
 	}
@@ -114,13 +114,13 @@ func kindOf(raw json.RawMessage) jsonKind {
 // in field-table order with its JSON type before its value (the first failure
 // answers), then the one rule that spans two fields: a live bike needs a
 // price. The size limit is the handler's, before anything is parsed.
-func Decode(s Spec, contentType string, body []byte, addressID string, change bool) (Record, *Refusal) {
+func Decode(s Spec, contentType string, body []byte, addressID string, change bool) (Decoded, *Refusal) {
 	if mt, _, err := mime.ParseMediaType(contentType); err != nil || mt != "application/json" {
-		return Record{}, &Refusal{400, httpx.CodeMalformedRequest, "The request must be sent as JSON.", ""}
+		return Decoded{}, &Refusal{400, httpx.CodeMalformedRequest, "The request must be sent as JSON.", ""}
 	}
 	var fields map[string]json.RawMessage
 	if t := bytes.TrimSpace(body); len(t) == 0 || t[0] != '{' || json.Unmarshal(body, &fields) != nil {
-		return Record{}, &Refusal{400, httpx.CodeMalformedRequest, "The request must be a JSON object.", ""}
+		return Decoded{}, &Refusal{400, httpx.CodeMalformedRequest, "The request must be a JSON object.", ""}
 	}
 
 	keys := make([]string, 0, len(fields))
@@ -130,22 +130,22 @@ func Decode(s Spec, contentType string, body []byte, addressID string, change bo
 	sort.Strings(keys)
 	for _, k := range keys {
 		if _, ok := s.Field(k); !ok {
-			return Record{}, &Refusal{400, httpx.CodeMalformedRequest, "The field “" + k + "” is not part of a " + singular[s.Name] + ".", k}
+			return Decoded{}, &Refusal{400, httpx.CodeMalformedRequest, "The field “" + k + "” is not part of a " + singular[s.Name] + ".", k}
 		}
 	}
 
-	var rec Record
-	if raw := fields["id"]; len(raw) > 0 && kindOf(raw) != jsonNull {
-		if kindOf(raw) != jsonString {
-			return Record{}, malformed("id", "must be text.")
+	var rec Decoded
+	if raw := fields["id"]; len(raw) > 0 && jsonKindOf(raw) != jsonNull {
+		if jsonKindOf(raw) != jsonString {
+			return Decoded{}, malformed("id", "must be text.")
 		}
 		var id string
 		_ = json.Unmarshal(raw, &id)
 		if !idShape.MatchString(id) {
-			return Record{}, invalid("id", "must be 1 to 64 lowercase letters, digits or hyphens, and not start with a hyphen.")
+			return Decoded{}, invalid("id", "must be 1 to 64 lowercase letters, digits or hyphens, and not start with a hyphen.")
 		}
 		if change && id != addressID {
-			return Record{}, invalid("id", "must equal the address's id.")
+			return Decoded{}, invalid("id", "must equal the address's id.")
 		}
 		rec.ID = id
 	}
@@ -155,7 +155,7 @@ func Decode(s Spec, contentType string, body []byte, addressID string, change bo
 	for i, f := range s.Fields {
 		v, ref := decodeField(f, fields[f.Key])
 		if ref != nil {
-			return Record{}, ref
+			return Decoded{}, ref
 		}
 		rec.Values[i], byKey[f.Key] = v, v
 		if cat, ok := v.(string); ok && f.Key == "category" {
@@ -165,7 +165,7 @@ func Decode(s Spec, contentType string, body []byte, addressID string, change bo
 
 	if status, _ := byKey["status"].(string); status == "live" {
 		if price, _ := byKey["price"].(int64); price <= 0 {
-			return Record{}, invalid("price", "")
+			return Decoded{}, &Refusal{400, httpx.CodeValidationFailed, liveNeedsPrice, "price"}
 		}
 	}
 	return rec, nil
@@ -177,7 +177,7 @@ const liveNeedsPrice = "A live bike needs a price."
 // decodeField checks one field. raw is empty when the key is absent.
 func decodeField(f Field, raw json.RawMessage) (any, *Refusal) {
 	required := f.Key == "name"
-	if kindOf(raw) == jsonNull { // absent and null alike
+	if jsonKindOf(raw) == jsonNull { // absent and null alike
 		if required {
 			return nil, invalid(f.Key, "is needed.")
 		}
@@ -187,7 +187,7 @@ func decodeField(f Field, raw json.RawMessage) (any, *Refusal) {
 	case KindNumber:
 		return decodeNumber(f.Key, raw)
 	case KindBool:
-		if kindOf(raw) != jsonBool {
+		if jsonKindOf(raw) != jsonBool {
 			return nil, malformed(f.Key, "must be true or false.")
 		}
 		return string(raw) == "true", nil
@@ -198,7 +198,7 @@ func decodeField(f Field, raw json.RawMessage) (any, *Refusal) {
 }
 
 func decodeText(key string, raw json.RawMessage, required bool) (any, *Refusal) {
-	if kindOf(raw) != jsonString {
+	if jsonKindOf(raw) != jsonString {
 		return nil, malformed(key, "must be text.")
 	}
 	var text string
@@ -237,7 +237,7 @@ func checkText(key, text, tooLong string) *Refusal {
 }
 
 func decodeNumber(key string, raw json.RawMessage) (any, *Refusal) {
-	switch kindOf(raw) {
+	switch jsonKindOf(raw) {
 	case jsonString:
 		if string(raw) == `""` {
 			return nil, nil // an empty text is no value
@@ -270,7 +270,7 @@ func decodeNumber(key string, raw json.RawMessage) (any, *Refusal) {
 
 func decodeList(key string, raw json.RawMessage) (any, *Refusal) {
 	const notList = "must be a list of text."
-	if kindOf(raw) != jsonArray {
+	if jsonKindOf(raw) != jsonArray {
 		return nil, malformed(key, notList)
 	}
 	var entries []json.RawMessage
@@ -280,7 +280,7 @@ func decodeList(key string, raw json.RawMessage) (any, *Refusal) {
 	items := make([]string, 0, len(entries))
 	for _, e := range entries {
 		var item string
-		if kindOf(e) != jsonString || json.Unmarshal(e, &item) != nil {
+		if jsonKindOf(e) != jsonString || json.Unmarshal(e, &item) != nil {
 			return nil, malformed(key, notList)
 		}
 		items = append(items, item)
