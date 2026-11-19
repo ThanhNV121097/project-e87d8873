@@ -13,6 +13,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"github.com/ThanhNV121097/project-e87d8873/backend/internal/collections"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
 )
 
@@ -27,10 +28,14 @@ type DB interface {
 func Router(db DB) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", health(db))
+	// No method in these patterns: the handler, not the mux, decides what a
+	// method other than GET gets (405 with Allow).
+	mux.HandleFunc("/v1/{collection}", collections.Collection(db))
+	mux.HandleFunc("/v1/{collection}/{id}", collections.Record(db))
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
-		httpx.WriteError(w, http.StatusNotFound, "That address does not exist.")
+		httpx.WriteCoded(w, http.StatusNotFound, httpx.CodeNotFound, "That address does not exist.", "")
 	})
-	return httpx.Recover(httpx.Log(httpx.NoStore(mux)))
+	return httpx.RequestID(httpx.Recover(httpx.Log(httpx.NoStore(mux))))
 }
 
 // health answers 200 only while a query reaches the database. The server
@@ -43,8 +48,8 @@ func health(db DB) http.HandlerFunc {
 		defer cancel()
 		var one int
 		if err := db.QueryRow(ctx, "SELECT 1").Scan(&one); err != nil || one != 1 {
-			slog.Error("health check: the database did not answer", "error", err)
-			httpx.WriteError(w, http.StatusServiceUnavailable, "The service is not ready.")
+			slog.Error("health check: the database did not answer", "request_id", httpx.RequestIDFrom(r.Context()), "error", err)
+			httpx.WriteCoded(w, http.StatusServiceUnavailable, httpx.CodeUnavailable, "The service is not ready.", "")
 			return
 		}
 		httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
