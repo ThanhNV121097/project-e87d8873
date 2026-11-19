@@ -105,15 +105,6 @@ func written(w http.ResponseWriter, r *http.Request, s Spec, status int, rec []b
 	httpx.WriteJSON(w, status, json.RawMessage(rec))
 }
 
-// recordID reads the id from the rows' JSON for the log line only.
-func recordID(rec []byte) string {
-	var head struct {
-		ID string `json:"id"`
-	}
-	_ = json.Unmarshal(rec, &head)
-	return head.ID
-}
-
 // newID makes a record id: the collection's name, a hyphen and six characters
 // of a-z0-9 from crypto/rand, by rejection sampling so no character is
 // likelier than another.
