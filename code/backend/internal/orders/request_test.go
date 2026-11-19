@@ -142,10 +142,13 @@ func TestQuantityIsAWholeNumberFromOneToTen(t *testing.T) {
 			t.Errorf("qty %s refused: %v", token, p)
 		}
 	}
-	for _, token := range []string{"0", "11", "-1", "1.5", "2.0", "1e0", "00", "-0", "1234567890123456789012345"} {
+	for _, token := range []string{"0", "11", "-1", "1.5", "2.0", "1e0", "-0", "1234567890123456789012345"} {
 		_, _, p := Parse(jsonType, []byte(withQty(token)))
 		wantProblem(t, "qty "+token, p, "VALIDATION_FAILED", "lines[0].qty", "quantity")
 	}
+	// 00 is not a JSON number at all, so the body is refused whole as malformed.
+	_, _, p := Parse(jsonType, []byte(withQty("00")))
+	wantProblem(t, "qty 00", p, "MALFORMED_REQUEST", "", "JSON object")
 	for _, token := range []string{`"2"`, "null", "true", "[]", "{}"} {
 		_, _, p := Parse(jsonType, []byte(withQty(token)))
 		wantProblem(t, "qty "+token, p, "MALFORMED_REQUEST", "lines[0].qty", "quantity")
