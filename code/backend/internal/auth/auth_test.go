@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
@@ -652,14 +653,103 @@ func TestOtherMethodsAre405WithAllow(t *testing.T) {
 	}
 }
 
-func TestVerifyGivesUpWhenItsDeadlinePassesWhileWaitingForASlot(t *testing.T) {
+func TestAcquireGivesUpWhenItsDeadlinePassesWhileWaitingForASlot(t *testing.T) {
 	a := NewAccount(testEmail, testPassword)
 	for i := 0; i < maxHashes; i++ {
 		a.slots <- struct{}{}
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
 	defer cancel()
-	if ok, err := a.Verify(ctx, testEmail, testPassword); ok || !errors.Is(err, context.DeadlineExceeded) {
-		t.Errorf("Verify = %v, %v, want false and the deadline", ok, err)
+	if release, err := a.acquire(ctx); release != nil || !errors.Is(err, context.DeadlineExceeded) {
+		t.Errorf("acquire = %v, %v, want no slot and the deadline", release != nil, err)
+	}
+	<-a.slots
+	release, err := a.acquire(context.Background())
+	if err != nil {
+		t.Fatalf("acquire with a free slot: %v", err)
+	}
+	release()
+	if len(a.slots) != maxHashes-1 {
+		t.Errorf("%d slots held after a release, want %d", len(a.slots), maxHashes-1)
+	}
+}
+
+// A caller that opens many connections at once gets every request past the
+// first look at the lock before any has failed. The lock is looked at again
+// with a slot held, so at most 5 failures plus the maxHashes-1 attempts that
+// were already hashing are answered 401, and every other request is a 429
+// that sets no cookie.
+func TestConcurrentWrongSignInsFromOneAddressCannotGetPastTheLock(t *testing.T) {
+	const callers = 20
+	h := newHarness(NewAccount(testEmail, testPassword))
+	start := make(chan struct{})
+	recs := make([]*httptest.ResponseRecorder, callers)
+	var wg sync.WaitGroup
+	for i := range recs {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			recs[i] = h.signIn(testEmail, fmt.Sprintf("wrong %d", i), "X-Forwarded-For", "203.0.113.7")
+		}()
+	}
+	close(start)
+	wg.Wait()
+
+	var refused, limited int
+	for i, rec := range recs {
+		switch rec.Code {
+		case http.StatusUnauthorized:
+			refused++
+		case http.StatusTooManyRequests:
+			limited++
+			if cookieNamed(rec) != nil || rec.Header().Get("Set-Cookie") != "" {
+				t.Errorf("caller %d: a 429 set a cookie", i)
+			}
+			if rec.Header().Get("Retry-After") == "" {
+				t.Errorf("caller %d: a 429 without Retry-After", i)
+			}
+		default:
+			t.Errorf("caller %d: status %d, want 401 or 429", i, rec.Code)
+		}
+	}
+	if most := throttleLimit + maxHashes - 1; refused < throttleLimit || refused > most {
+		t.Errorf("%d callers answered 401, want %d to %d (the lock must engage after the fifth failure)", refused, throttleLimit, most)
+	}
+	if refused+limited != callers {
+		t.Errorf("%d answered 401 and %d answered 429 of %d callers", refused, limited, callers)
+	}
+	if rec := h.signIn(testEmail, testPassword, "X-Forwarded-For", "203.0.113.7"); rec.Code != http.StatusTooManyRequests {
+		t.Errorf("the right pair after the burst: status %d, want 429", rec.Code)
+	}
+	if h.store.creates != 0 {
+		t.Error("a session was stored during the burst")
+	}
+}
+
+// A request that passed the first look at the lock and then waited for a
+// slot is answered 429 when the address was locked meanwhile, even with the
+// right pair: it is not hashed, let alone accepted.
+func TestARequestThatWaitedForASlotChecksTheLockAgain(t *testing.T) {
+	a := NewAccount(testEmail, testPassword)
+	h := newHarness(a)
+	for i := 0; i < maxHashes; i++ {
+		a.slots <- struct{}{}
+	}
+	done := make(chan *httptest.ResponseRecorder, 1)
+	go func() { done <- h.signIn(testEmail, testPassword, "X-Forwarded-For", "203.0.113.8") }()
+	time.Sleep(100 * time.Millisecond)
+	for i := 0; i < throttleLimit; i++ {
+		h.svc.throttle.Fail("203.0.113.8")
+	}
+	for i := 0; i < maxHashes; i++ {
+		<-a.slots
+	}
+	rec := <-done
+	if rec.Code != http.StatusTooManyRequests {
+		t.Fatalf("status %d, want 429 (%s)", rec.Code, rec.Body.String())
+	}
+	if cookieNamed(rec) != nil || h.store.creates != 0 {
+		t.Error("a locked request was given a session")
 	}
 }
