@@ -121,6 +121,14 @@ One edge of the data module, recorded so Test does not mistake it for a page def
 
 Result: the design stands unchanged. No endpoint, field, error code, schema or migration is added by this pass; the delivery table of §9 is as written (no backend branch and no backend pull request; PR #13 is the story's only pull request). TC-02 and TC-23 of `docs/site/test-cases/bike-page-waits-for-its-record.md` remain the regression check for this page's call after PR #26 merges.
 
+### 7.5 Sixth check (`main` at `97d122a`, 2026-11-19), and when this design needs no new pass
+
+The step-6 task was dispatched a sixth time. The last commit that touches `code/` on `main` is still the merge of PR #25 that §7.4 read (`c86940a`); everything after it is documentation (PR #30 and the index rebuild). So `GET /v1/{collection}/{id}`, `useRecord` (`src/data/index.ts` lines 344–375) and `Product.tsx` (line 40 `const { item } = useRecord<Bike>("products", id)`, line 43 `if (!item) return <Missing />`) are exactly what §7.4 read. PR #26 (admin backend) and PR #13 are still open; PR #26's read path was read in §7.2 and is unchanged at its head `d4b1e23`.
+
+Result: the design stands unchanged. No endpoint, field, error code, schema or migration is added.
+
+A rule for the next dispatch, so this file does not grow one section per run: **a re-run of step 6 for this story needs a new section only when a commit that touches `code/` has landed on `main` after `97d122a`, or when PR #26 merges** (the one open change that re-wires the read handlers; TC-02 and TC-23 of `docs/site/test-cases/bike-page-waits-for-its-record.md` are the regression check then). With neither, the design is already on `main` (PR #24, with the re-checks of PRs #27–#30) and nothing remains for step 6 to produce. The delivery table of §9 is the answer for the steps after it: no backend branch, no backend pull request, PR #13 is the story's only pull request.
+
 ## 8. Migration and rollout
 
 No schema step and no deploy step of its own: see `docs/architecture/erd/bike-page-waits-for-its-record.md` §4. Rolling the page change out before *Site data from the database* is harmless (it is invisible on the file-backed mock). Rolling it back is reverting one line of `Product.tsx`; the API is untouched either way.
