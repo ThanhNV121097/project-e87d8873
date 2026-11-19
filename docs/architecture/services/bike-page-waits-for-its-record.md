@@ -68,6 +68,30 @@ The design departs from nothing, so nothing changes in the frontend beyond the r
 
 One behaviour of the data module that is correct for this page and worth knowing when Test reads a trace: the module keeps a single held answer. Going from bike A to bike B and back to A *before B has answered* draws A's earlier answer at once while A is asked again — a record in hand is drawn. It is never a not-found view and never B's record under A's address, so it needs no handling here.
 
+### 7.1 Second re-check (`main` at `760be06`, 2026-11-19)
+
+Nothing in the code this story reads has moved since PR #22 merged (`76a0160`): every later commit on `main` is documentation (this design's PR #24, the index rebuilds). Re-read against it:
+
+| What was read | Finding |
+|---|---|
+| `collections.Record` and its test `TestARecordIsAnsweredAsTheDatabaseWroteIt` | The id is bound exactly as sent (`Stance-0` is the argument `Stance-0`), and the statement is `WHERE t."id" = $1::text` (`sql_test.go`). An id with capitals therefore matches no row and is the `404` of the §3 row, not the record `stance-0` |
+| `TestARecordThatIsNotThereIs404`, `TestAnIdTheDatabaseCannotHoldIsAnswered404WithoutAsking` | `no-such-bike` is `404 NOT_FOUND` "That record does not exist." with no `ETag`; an id with a NUL byte is the same `404` with no query run |
+| The mock the task names (`code/frontend/src/lib/mock/bike-page-waits-for-its-record.ts`) | Does not exist. PR #13 changes `code/frontend/src/pages/Product.tsx` only, so there was no mock shape to judge or depart from; §6 stands |
+| Open PR #25 (orders) and PR #26 (admin), both cut from `main` and not merged | Neither adds a route for `GET /v1/products/{id}`. PR #26 changes how the `collections` handlers are wired (they take the owner's guard, which is for writes) and moves the connection-failure predicate to `httpx.Unavailable`. Its description says the read answers are unchanged; that is a claim to confirm, not to assume, so after whichever of the two merges first, the cases that pin this page's call (TC-02 and TC-23 of `docs/site/test-cases/bike-page-waits-for-its-record.md`) are the regression check: `GET /v1/products/stance-0` is `200` and `GET /v1/products/no-such-bike` is `404` with **no session cookie** |
+
+Result: the design above stands unchanged. No endpoint, field, code, schema or migration is added by this re-check either.
+
 ## 8. Migration and rollout
 
 No schema step and no deploy step of its own: see `docs/architecture/erd/bike-page-waits-for-its-record.md` §4. Rolling the page change out before *Site data from the database* is harmless (it is invisible on the file-backed mock). Rolling it back is reverting one line of `Product.tsx`; the API is untouched either way.
+
+## 9. Delivery: what this design asks of the steps after it
+
+| Step of the story flow | What it means for this story |
+|---|---|
+| 7. Story BE and 8. BE review | **Nothing to build and nothing to review.** No backend, schema, migration or mock-swap change exists (§1, §4, `erd/bike-page-waits-for-its-record.md` §1), so no backend branch or pull request is to be opened: its diff would be empty. A re-run of step 7 that finds this is correct, not stuck |
+| 9. Run local | Run `main` with the head of PR #13 applied; the API under it is the one `main` already has. The checks that need the database are the two of §7.1, plus the observation in story §5 (hold `GET /api/v1/products/<id>` for a few seconds and record the page's text from the start of navigation) |
+| 10. Verify | Against that running story, SC-1 to SC-7 of the story; SC-8 (one file) is read from the PR's file list |
+| 11–12. Merge | **PR #13 is the story's only pull request.** There is no backend PR to merge after it |
+
+The one thing that could make a verifier report a defect against this story is the data module's first render (§5, first row). If Test sees the not-found view for one frame, the report goes to DATA-007; `useRecord` on `main` was read in §7 and answers `loading: true` on that first render.
