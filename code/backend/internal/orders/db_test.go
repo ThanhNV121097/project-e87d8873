@@ -3,7 +3,6 @@ package orders
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"regexp"
 	"sync"
@@ -313,5 +312,4 @@ func TestAFailureAfterTheStockWasLoweredKeepsNeitherTheOrderNorTheChange(t *test
 	if got := stockOf(t, pool, id); got != 4 {
 		t.Errorf("stock = %d, want the unchanged 4", got)
 	}
-	_ = fmt.Sprint() // keeps fmt for the failure messages above if they grow
 }
