@@ -94,6 +94,17 @@ The step-6 task was dispatched again. `main` has moved only by documentation sin
 
 Nothing in this pass changes the contract, the ERD extension or the delivery table of §9. After whichever of PR #25 and PR #26 merges first, TC-02 and TC-23 remain the regression check for this page's call, as §7.1 says. Neither PR is a prerequisite of this story: PR #13 touches `Product.tsx` only and merges over `main` as it is.
 
+### 7.3 Fourth re-check (`main` at `b6e6759`, 2026-11-19)
+
+The step-6 task was dispatched once more. Since §7.2 (`main` at `074dc3b`) `main` has moved only by documentation (PR #28 and the index rebuild after it); no file under `code/` changed, and PR #25 (orders) and PR #26 (admin) are still open, so §7, §7.1 and §7.2 still describe the code this page runs against. The two reads that decide this story's correctness were repeated against the files themselves:
+
+| What was read | Finding |
+|---|---|
+| `code/frontend/src/data/index.ts`, `useRecord` (lines 344–375) | With an id and no held answer for the key `[name, id]`, the hook returns `{ item: undefined, loading: true, error: null }` on the render itself, not from an effect, and does so again on the first render after the id changes (DATA-007 AC-13, AC-14). A `404` settles `item` undefined with `error` null (line 363); any other status, a `200` that is not an object, and a rejected request settle an `Error`. The same key asked again (the collection's epoch moved) keeps the held answer, so a record in hand is never blanked (story SC-7) |
+| `code/frontend/src/pages/Product.tsx` on `main` | Still `const { item } = useRecord<Bike>("products", id)` and `if (!item) return <Missing />`. The defect of the plan item is therefore still open on `main`, and it is closed by PR #13 alone: one file, merges over the data module as it is |
+
+Result: the design stands unchanged. No endpoint, field, error code, schema or migration is added by this pass, no mock module exists to judge (§6), and the delivery table of §9 is as written: **no backend branch and no backend pull request for this story; PR #13 is the only pull request to verify and merge.**
+
 ## 8. Migration and rollout
 
 No schema step and no deploy step of its own: see `docs/architecture/erd/bike-page-waits-for-its-record.md` §4. Rolling the page change out before *Site data from the database* is harmless (it is invisible on the file-backed mock). Rolling it back is reverting one line of `Product.tsx`; the API is untouched either way.
