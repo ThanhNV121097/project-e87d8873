@@ -1271,6 +1271,8 @@ The page reads one bike by its id. That read is served by tables and an access p
 
 The lookup is a primary-key read, so it needs no index of its own and has no new query to name.
 
+One caution about the data this story's checks stand on, not a schema change: `no-such-bike` is absent because nothing seeds it, not because the table forbids it. The owner's "add a bike" write accepts any id matching `^[a-z0-9][a-z0-9-]{0,63}$` (`docs/architecture/services/_base.md` §3.4), which includes `no-such-bike`. A run that adds bikes must therefore not use that id, or must delete what it added before the 404 cases (SC-5) are read; the seed (`code/backend/migrations/20261118000200_seed_collections.up.sql`) inserts 14 bikes, among them `stance-0`, and no bike with the id `no-such-bike`.
+
 ## 3. Entities, columns, foreign keys, indexes
 
 None.
