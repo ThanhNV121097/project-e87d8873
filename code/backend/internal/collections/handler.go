@@ -4,18 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"log/slog"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
-	"syscall"
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
 )
@@ -48,8 +43,14 @@ type listAnswer struct {
 }
 
 // Collection answers GET /v1/{collection}: one page of the collection,
-// narrowed, searched and ordered. The collection is checked before the method.
-func Collection(db DB) http.HandlerFunc {
+// narrowed, searched and ordered, and POST /v1/{collection}: the owner adds a
+// record (guard lets only the signed-in owner through). The collection is
+// checked before the method, and the method before the session.
+func Collection(db DB, guard Guard) http.HandlerFunc {
+	return collection(db, pgWriter{db}, guard)
+}
+
+func collection(db DB, wr Writer, guard Guard) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s, ok := Lookup(r.PathValue("collection"))
 		if !ok {
@@ -57,7 +58,11 @@ func Collection(db DB) http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
-			methodNotAllowed(w)
+			if r.Method == http.MethodPost && s.Writable() {
+				guard(addHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			methodNotAllowed(w, s, false)
 			return
 		}
 		values, err := url.ParseQuery(r.URL.RawQuery)
@@ -88,8 +93,13 @@ func Collection(db DB) http.HandlerFunc {
 
 // Record answers GET /v1/{collection}/{id}: the record, and for a versioned
 // collection its version as the ETag. The id matches exactly, capitals
-// included.
-func Record(db DB) http.HandlerFunc {
+// included. PUT and DELETE are the owner's change and delete of a bike or a
+// riding type, behind guard.
+func Record(db DB, guard Guard) http.HandlerFunc {
+	return record(db, pgWriter{db}, guard)
+}
+
+func record(db DB, wr Writer, guard Guard) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s, ok := Lookup(r.PathValue("collection"))
 		if !ok {
@@ -97,7 +107,15 @@ func Record(db DB) http.HandlerFunc {
 			return
 		}
 		if r.Method != http.MethodGet {
-			methodNotAllowed(w)
+			if s.Writable() && r.Method == http.MethodPut {
+				guard(changeHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			if s.Writable() && r.Method == http.MethodDelete {
+				guard(removeHandler(s, wr)).ServeHTTP(w, r)
+				return
+			}
+			methodNotAllowed(w, s, true)
 			return
 		}
 		id := r.PathValue("id")
@@ -133,8 +151,18 @@ func Record(db DB) http.HandlerFunc {
 	}
 }
 
-func methodNotAllowed(w http.ResponseWriter) {
-	w.Header().Set("Allow", http.MethodGet)
+// methodNotAllowed answers a method the route does not offer, with the
+// methods it does: every collection offers GET, a writable one also POST on
+// its list and PUT and DELETE on a record.
+func methodNotAllowed(w http.ResponseWriter, s Spec, record bool) {
+	allow := http.MethodGet
+	switch {
+	case s.Writable() && record:
+		allow = "GET, PUT, DELETE"
+	case s.Writable():
+		allow = "GET, POST"
+	}
+	w.Header().Set("Allow", allow)
 	httpx.WriteCoded(w, http.StatusMethodNotAllowed, httpx.CodeMethodNotAllowed, sentenceMethod, "")
 }
 
