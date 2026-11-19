@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -196,7 +197,7 @@ func TestThePasswordIsInNoFieldOfTheAccount(t *testing.T) {
 				t.Errorf("field %s holds the password", v.Type().Field(i).Name)
 			}
 		case reflect.Slice:
-			if b, ok := f.Interface().([]byte); ok && bytes.Contains(b, []byte(testPassword)) {
+			if f.Type().Elem().Kind() == reflect.Uint8 && bytes.Contains(f.Bytes(), []byte(testPassword)) {
 				t.Errorf("field %s holds the password", v.Type().Field(i).Name)
 			}
 		}
@@ -241,7 +242,7 @@ func TestTheSessionCookieAttributes(t *testing.T) {
 	h := newHarness(testAccount)
 	r := httptest.NewRequest(http.MethodPost, "/v1/sessions", strings.NewReader(signInBody(testEmail, testPassword)))
 	r.Header.Set("Content-Type", "application/json")
-	r.TLS = &tlsState
+	r.TLS = &tls.ConnectionState{}
 	rec := httptest.NewRecorder()
 	h.h.ServeHTTP(rec, r)
 	if ck := cookieNamed(rec); ck == nil || !ck.Secure {
