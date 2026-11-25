@@ -39,6 +39,12 @@ type fakeDB struct{ err error }
 
 func (d fakeDB) QueryRow(context.Context, string, ...any) pgx.Row { return fakeRow{err: d.err} }
 
+// Begin has no transaction to give: a test that reaches it has gone further
+// than a route test should.
+func (d fakeDB) Begin(context.Context) (pgx.Tx, error) {
+	return nil, errors.New("the fake database has no transactions")
+}
+
 func do(h http.Handler, method, path string) *httptest.ResponseRecorder {
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, httptest.NewRequest(method, path, nil))

@@ -178,15 +178,9 @@ func storeFailed(w http.ResponseWriter, r *http.Request, collection, op string, 
 	} else {
 		slog.Error("read failed", attrs...)
 	}
-	if unavailable(err) {
+	if httpx.Unavailable(err) {
 		httpx.WriteCoded(w, http.StatusServiceUnavailable, httpx.CodeUnavailable, sentenceNotReady, "")
 		return
 	}
 	httpx.WriteCoded(w, http.StatusInternalServerError, httpx.CodeInternal, sentenceInternal, "")
 }
-
-// unavailable is the one predicate every handler uses to tell a database that
-// cannot be reached (503) from a bug or a slow query (500). It lives in httpx,
-// beside the sign-in and the owner's writes, which need it too; this name is
-// what the read tests pin.
-func unavailable(err error) bool { return httpx.Unavailable(err) }

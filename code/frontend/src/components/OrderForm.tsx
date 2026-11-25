@@ -1,11 +1,11 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { T, useContent } from "../editable";
 import { clearCart, type CartLine } from "../lib/cart";
 import { formatPrice } from "../lib/format";
-import { newOrderNumber, saveOrder, type Order } from "../lib/mock/orders";
+import { placeOrder, saveOrder, type Order } from "../lib/orders";
 import type { ShopInfo } from "../lib/shop";
-import { canSend, sendEnquiry } from "../site";
+import { canSend, sendEnquiry, type Enquiry } from "../site";
 import Icon, { type IconName } from "./Icon";
 
 type State = "idle" | "sending" | "failed";
@@ -19,12 +19,47 @@ const PAYMENTS: { id: Payment; icon: IconName }[] = [
   { id: "transfer", icon: "qr" }, { id: "cod", icon: "cash" }, { id: "shop", icon: "card" },
 ];
 
+/** How long the owner's message may hold the customer here once the order is stored. */
+const OWNER_MESSAGE_WAIT_MS = 10_000;
+
+/** What the form sends: the words and choices and the bikes as id, size and count — never a price. */
+function requestFrom(form: HTMLFormElement, delivery: Delivery, payment: Payment, lines: CartLine[]) {
+  const data = new FormData(form);
+  const value = (k: string) => String(data.get(k) ?? "").trim();
+  return {
+    name: value("name"), phone: value("phone"), delivery, address: delivery === "pickup" ? "" : value("address"),
+    payment, note: value("note"), website: value("website"),
+    lines: lines.map((l) => ({ id: l.id, variant: l.variant, qty: l.qty })),
+  };
+}
+
+/** The owner's message, from what the server stored; the note is the form's, the answer has none. */
+function ownerMessage(order: Order, note: string): Enquiry {
+  const bikes = order.lines.map((l) => `${l.qty} × ${l.name}${l.variant ? ` (size ${l.variant})` : ""} — ${formatPrice(l.price * l.qty)}`).join("\n");
+  return {
+    name: order.name, reply_to: order.phone, message: [bikes, note].filter(Boolean).join("\n\n"),
+    details: { order: order.number, delivery: order.delivery, address: order.address, payment: order.payment, total: formatPrice(order.total) },
+  };
+}
+
+/** Tells the owner, waiting at most OWNER_MESSAGE_WAIT_MS. A message that fails or is slow never touches the stored order. */
+async function tellOwner(order: Order, note: string): Promise<void> {
+  if (!canSend) return;
+  const sent = sendEnquiry(ownerMessage(order, note)).catch(() => undefined);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<void>((resolve) => { timer = setTimeout(resolve, OWNER_MESSAGE_WAIT_MS); });
+  await Promise.race([sent, late]);
+  clearTimeout(timer);
+}
+
 /**
  * THE ORDER, SENT. Who it is for, how it reaches them and how it is paid —
  * each choice a rounded card that fills with the tint when chosen, never a
  * box to type into. What happens next is said above the button. The order
- * goes to the owner as one message (src/site.ts, the same inbox the contact
- * form reaches); nothing is charged on this page — the shop calls first.
+ * goes to the server first, which prices it, holds the bikes and numbers it
+ * (src/lib/orders.ts); only once it is stored does the owner get one message
+ * (src/site.ts, the same inbox the contact form reaches). Nothing is charged
+ * on this page — the shop calls first.
  */
 export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, payment, onPayment, terms, className = "" }: {
   lines: CartLine[];
@@ -42,29 +77,26 @@ export default function OrderForm({ lines, subtotal, fee, delivery, onDelivery, 
   const [problem, setProblem] = useState("");
   const offline = useContent("contact.form.offline");
   const go = useNavigate();
+  const busy = useRef(false);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const value = (k: string) => String(data.get(k) ?? "").trim();
-    const order: Order = {
-      number: newOrderNumber(), placed: new Date().toISOString(), name: value("name"), phone: value("phone"),
-      delivery, address: value("address"), payment, lines, subtotal, delivery_fee: fee, total: subtotal + fee,
-    };
+    if (busy.current) return;
+    busy.current = true;
+    setProblem("");
     setState("sending");
-    try {
-      await sendEnquiry({
-        name: order.name, reply_to: order.phone, website: value("website"),
-        message: [lines.map((l) => `${l.qty} × ${l.name}${l.variant ? ` (size ${l.variant})` : ""} — ${formatPrice(l.price * l.qty)}`).join("\n"), value("note")].filter(Boolean).join("\n\n"),
-        details: { order: order.number, delivery, address: order.address, payment, total: formatPrice(order.total) },
-      });
-      saveOrder(order);
-      clearCart();
-      go("/checkout/done");
-    } catch (err) {
-      setProblem(err instanceof Error ? err.message : "");
+    const request = requestFrom(e.currentTarget, delivery, payment, lines);
+    const placed = await placeOrder(request);
+    if (!placed.ok) {
+      setProblem(placed.problem);
       setState("failed");
+      busy.current = false;
+      return;
     }
+    saveOrder(placed.order);
+    await tellOwner(placed.order, request.note);
+    clearCart();
+    go("/checkout/done");
   }
 
   const input = "w-full appearance-none rounded-[var(--radius-sm)] border border-field bg-ground px-4 py-3 text-ink";

@@ -16,12 +16,15 @@ import (
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/auth"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/collections"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/httpx"
+	"github.com/ThanhNV121097/project-e87d8873/backend/internal/orders"
 )
 
 // DB is the part of the connection pool the handlers use; *pgxpool.Pool
 // satisfies it. Handlers take this, not the pool, so a test can stand in.
+// Begin is for the one thing that needs a transaction: placing an order.
 type DB interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+	Begin(ctx context.Context) (pgx.Tx, error)
 }
 
 // Router returns the whole application as one handler. A story adds its
@@ -38,6 +41,9 @@ func Router(db DB, account *auth.Account) http.Handler {
 	mux.HandleFunc("/v1/sessions", owner.SignIn)
 	mux.HandleFunc("DELETE /v1/sessions/current", owner.SignOut)
 	mux.HandleFunc("/v1/me", owner.Me)
+	// The one literal address of the orders story: a longer path under it is
+	// the collections' 404, and any method but POST here is a 405.
+	mux.HandleFunc("/v1/orders", orders.Place(orders.NewStore(db), time.Now))
 	// No method in these patterns: the handler, not the mux, decides what a
 	// method gets (the read, the owner's write behind the guard, or 405 with
 	// Allow).
