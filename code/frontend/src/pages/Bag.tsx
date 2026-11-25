@@ -5,7 +5,7 @@ import { useCollection } from "../data";
 import { lineKey, removeFromCart, setQuantity, useCart } from "../lib/cart";
 import { useDemo } from "../lib/demo";
 import { formatPrice } from "../lib/format";
-import { EXAMPLE_LINES } from "../lib/mock/orders";
+import { EXAMPLE_LINES } from "../lib/orders";
 import type { Department, ShopInfo } from "../lib/shop";
 import { Picture } from "../picture";
 import Bleed from "../components/Bleed";

@@ -7,7 +7,7 @@ import { useCollection } from "../data";
 import { useCart } from "../lib/cart";
 import { useDemo } from "../lib/demo";
 import { formatPrice } from "../lib/format";
-import { EXAMPLE_LINES } from "../lib/mock/orders";
+import { EXAMPLE_LINES } from "../lib/orders";
 import type { ShopInfo } from "../lib/shop";
 import Bleed from "../components/Bleed";
 import OrderForm, { type Delivery, type Payment } from "../components/OrderForm";
