@@ -19,11 +19,19 @@
  * The fields come from src/data/schema.json; giving a spec a `section` puts
  * it on a tab of that name, and a page that passes none gets one panel.
  *
- * WHAT IT REFUSES TO GUESS: a record the list cannot find. An id that is not
- * there is a link somebody followed after the record was deleted, or a typed
- * address, and a page that draws an empty form for it invites the person to
- * save a new record under an id of their own — so it says so and offers the
- * way back.
+ * IT READS THE RECORD ITSELF, BY ID (store.ts readRow), because the values
+ * on the form and the version token a save is judged by must come from the
+ * same answer. Until that answer is in it draws neither the form nor "This
+ * record is not here": a record that has not arrived is not a record that is
+ * missing. Save changes and Delete wait for the server; a refusal is said in
+ * an alert notice (above the form, or inside the delete question) and the
+ * typed values stay.
+ *
+ * WHAT IT REFUSES TO GUESS: a record the server says is not there. An id that
+ * is not there is a link somebody followed after the record was deleted, or a
+ * typed address, and a page that draws an empty form for it invites the
+ * person to save a new record under an id of their own — so it says so and
+ * offers the way back.
  */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -31,8 +39,41 @@ import DashboardLayout, { type NavGroup } from "../DashboardLayout";
 import { Breadcrumb, Button, Confirm, Empty, Notice, PageHeader, Panel, Sections } from "./index";
 import { Form } from "./Form";
 import { fieldsOf, missing, titleOf, type FieldSpec } from "./fields";
-import { deleteRow, saveRow } from "./store";
-import { useRecord, type Row } from "../../data";
+import { deleteRow, OPEN_FAILED, readRow, saveRow, StoreError, useAttempt } from "./store";
+import type { Row } from "../../data";
+
+/** Where the read of the record stands: asked, in hand, not there, or unreadable. */
+type Read =
+  | { state: "loading" }
+  | { state: "ready"; row: Row }
+  | { state: "missing" }
+  | { state: "failed"; problem: string };
+
+type Values = Record<string, unknown>;
+
+/** The form, in the tabs the fields ask for (in the order they first appear) or one panel. */
+function formOf(
+  specs: readonly FieldSpec[], values: Values, errors: Record<string, string>,
+  change: (key: string, v: unknown) => void,
+) {
+  const areas: string[] = [];
+  for (const f of specs) {
+    const area = f.section ?? "";
+    if (area && !areas.includes(area)) areas.push(area);
+  }
+  if (areas.length === 0) return <Form fields={specs} values={values} errors={errors} onChange={change} />;
+  return (
+    <Sections
+      tabs={areas.map((area) => ({
+        label: area,
+        content: (
+          <Form fields={specs.filter((f) => (f.section ?? "") === area)}
+            values={values} errors={errors} onChange={change} />
+        ),
+      }))}
+    />
+  );
+}
 
 export default function RecordPage({
   collection, id, nav, title, brand, fields, backTo, remove = true, children,
@@ -52,32 +93,57 @@ export default function RecordPage({
   children?: React.ReactNode;
 }) {
   const navigate = useNavigate();
-  const { item } = useRecord(collection, id);
   const specs = fields ?? fieldsOf(collection);
-  const [values, setValues] = useState<Record<string, unknown>>({});
+  const [read, setRead] = useState<Read>({ state: "loading" });
+  const [values, setValues] = useState<Values>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saved, setSaved] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const attempt = useAttempt();
+  const item = read.state === "ready" ? read.row : undefined;
 
-  // The record arrives from the store; it changes when another screen edits
-  // it, and the form follows it rather than holding a stale copy.
+  // The record as the server holds it now, and — kept by readRow — the token
+  // a save of these values will be judged by.
   useEffect(() => {
-    if (item) setValues({ ...item });
-  }, [item]);
+    let current = true;
+    setRead({ state: "loading" });
+    readRow(collection, id ?? "").then(
+      (row) => {
+        if (!current) return;
+        setValues({ ...row });
+        setRead({ state: "ready", row });
+      },
+      (failure: unknown) => {
+        if (!current) return;
+        const gone = failure instanceof StoreError && failure.status === 404;
+        setRead(gone
+          ? { state: "missing" }
+          : { state: "failed", problem: failure instanceof Error ? failure.message : OPEN_FAILED });
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [collection, id]);
 
-  function save() {
+  async function save() {
     const bad = missing(specs, values);
     setErrors(bad);
-    if (Object.keys(bad).length > 0) {
+    if (Object.keys(bad).length > 0 || !item) {
       setSaved(false);
       return;
     }
-    saveRow(collection, { ...(item ?? ({ id: id ?? "" } as Row)), ...values } as Row);
-    setSaved(true);
+    const done = await attempt.run(async () => {
+      const row = await saveRow(collection, { ...values, id: item.id } as Row);
+      setValues({ ...row });
+      setRead({ state: "ready", row });
+    });
+    setSaved(done);
   }
 
-  function destroy() {
-    if (item) deleteRow(collection, item.id);
+  async function destroy() {
+    if (!item) return;
+    await deleteRow(collection, item.id);
     // Two calls, not navigate(backTo ?? -1): the router's delta overload
     // takes a number and its address overload a string, never a union.
     if (backTo) navigate(backTo);
@@ -89,60 +155,42 @@ export default function RecordPage({
     setSaved(false);
   };
 
-  // The sections the fields ask for, in the order they first appear.
-  const areas: string[] = [];
-  for (const f of specs) {
-    const area = f.section ?? "";
-    if (area && !areas.includes(area)) areas.push(area);
-  }
-
-  const form = areas.length > 0
-    ? (
-      <Sections
-        tabs={areas.map((area) => ({
-          label: area,
-          content: (
-            <Form fields={specs.filter((f) => (f.section ?? "") === area)}
-              values={values} errors={errors} onChange={change} />
-          ),
-        }))}
-      />
-    )
-    : <Form fields={specs} values={values} errors={errors} onChange={change} />;
-
   return (
     <DashboardLayout title={title} nav={nav} brand={brand}>
-      {backTo && <Breadcrumb trail={[{ label: title, to: backTo }, { label: titleOf(item) }]} />}
-      {!item
-        ? (
-          <Empty
-            title="This record is not here"
-            note="It may have been deleted since the link was made."
-            action={backTo ? <Button onClick={() => navigate(backTo)}>Back to the list</Button> : undefined}
+      {backTo && read.state !== "loading" && (
+        <Breadcrumb trail={[{ label: title, to: backTo }, { label: titleOf(item) }]} />
+      )}
+      {read.state === "missing" && (
+        <Empty
+          title="This record is not here"
+          note="It may have been deleted since the link was made."
+          action={backTo ? <Button onClick={() => navigate(backTo)}>Back to the list</Button> : undefined}
+        />
+      )}
+      {read.state === "failed" && <Notice tone="alert">{read.problem}</Notice>}
+      {item && (
+        <>
+          <PageHeader
+            title={titleOf(item)}
+            actions={
+              <>
+                {remove && <Button kind="quiet" icon="remove" onClick={() => setConfirming(true)}>Delete</Button>}
+                <Button kind="primary" icon="check" onClick={save} disabled={attempt.busy}>Save changes</Button>
+              </>
+            }
           />
-        )
-        : (
-          <>
-            <PageHeader
-              title={titleOf(item)}
-              actions={
-                <>
-                  {remove && <Button kind="quiet" icon="remove" onClick={() => setConfirming(true)}>Delete</Button>}
-                  <Button kind="primary" icon="check" onClick={save}>Save changes</Button>
-                </>
-              }
-            />
-            {saved && <Notice tone="done" onClose={() => setSaved(false)}>Saved.</Notice>}
-            <Panel>{form}</Panel>
-            {children}
-            <Confirm
-              open={confirming}
-              onClose={() => setConfirming(false)}
-              onConfirm={destroy}
-              title={`Delete ${titleOf(item)}?`}
-            />
-          </>
-        )}
+          {saved && <Notice tone="done" onClose={() => setSaved(false)}>Saved.</Notice>}
+          {attempt.problem && <Notice tone="alert">{attempt.problem}</Notice>}
+          <Panel>{formOf(specs, values, errors, change)}</Panel>
+          {children}
+          <Confirm
+            open={confirming}
+            onClose={() => setConfirming(false)}
+            onConfirm={destroy}
+            title={`Delete ${titleOf(item)}?`}
+          />
+        </>
+      )}
     </DashboardLayout>
   );
 }
