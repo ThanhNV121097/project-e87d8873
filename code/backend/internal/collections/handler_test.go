@@ -65,8 +65,8 @@ func failing(err error) scanFunc { return func(...any) error { return err } }
 // router mounts the two reads the way server.Router does.
 func router(db DB) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/{collection}", Collection(db))
-	mux.HandleFunc("/v1/{collection}/{id}", Record(db))
+	mux.HandleFunc("/v1/{collection}", Collection(db, noOwner))
+	mux.HandleFunc("/v1/{collection}/{id}", Record(db, noOwner))
 	return httpx.RequestID(httpx.NoStore(mux))
 }
 
@@ -190,10 +190,10 @@ func TestARefusedQueryIs400WithTheFieldAndNeverReachesTheDatabase(t *testing.T) 
 	}
 }
 
-func TestOtherMethodsAre405WithAllowGet(t *testing.T) {
+func TestOtherMethodsOnAReadOnlyCollectionAre405WithAllowGet(t *testing.T) {
 	db := &fakeDB{scan: listRows(0, `[]`)}
 	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodHead, http.MethodOptions} {
-		for _, target := range []string{"/v1/products", "/v1/products/talon-2"} {
+		for _, target := range []string{"/v1/reviews", "/v1/reviews/r1"} {
 			rec := serve(db, method, target)
 			if rec.Code != http.StatusMethodNotAllowed || rec.Header().Get("Allow") != "GET" {
 				t.Errorf("%s %s: status %d, Allow %q", method, target, rec.Code, rec.Header().Get("Allow"))
