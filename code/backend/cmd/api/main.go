@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ThanhNV121097/project-e87d8873/backend/internal/auth"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/config"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/db"
 	"github.com/ThanhNV121097/project-e87d8873/backend/internal/migrate"
@@ -49,9 +50,16 @@ func run() error {
 		return fmt.Errorf("apply migrations: %w", err)
 	}
 
+	// The owner's two secrets are used here and nowhere else: the account keeps
+	// a salted hash and a fingerprint, never the password.
+	account := auth.NewAccount(cfg.AdminEmail, cfg.AdminPassword)
+	if !account.Configured() {
+		slog.Warn("admin account is not configured: nobody can sign in until ADMIN_EMAIL and ADMIN_PASSWORD are set")
+	}
+
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           server.Router(pool),
+		Handler:           server.Router(pool, account),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,
